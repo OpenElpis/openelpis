@@ -13,6 +13,12 @@ A non-profit, open-source platform building a trustworthy, <b>citation-grounded<
   📍 Türkiye
 </p>
 
+<p align="center">
+  <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
+  <a href="https://openelpis.com"><img alt="Live site" src="https://img.shields.io/badge/site-openelpis.com-0e7c7b.svg"></a>
+  <img alt="Status" src="https://img.shields.io/badge/status-early%20%C2%B7%20building%20in%20the%20open-e35d8a.svg">
+</p>
+
 ---
 
 > ⚕️ **Liability framing:** OpenElpis produces **research hypotheses for qualified professionals** — never medical diagnosis or treatment advice.
