@@ -1,0 +1,22 @@
+# OS / editor cruft
+.DS_Store
+*.swp
+
+# Agent / working files
+.claude/
+CLAUDE.md
+
+# Operational runbooks & infra (contain server IPs, Oracle OCIDs, emails) — keep private
+server1-README.md
+server2-README.md
+deploy/
+server2/setup-db.sh
+server2/app/deploy-app.sh
+server2/app/openelpis-app.service
+server2/app/openelpis-tunnel.service
+
+# Internal strategy / outreach — keep private
+funding-and-credits.md
+email-templates.md
+partnership-proposal.md
+proposal/

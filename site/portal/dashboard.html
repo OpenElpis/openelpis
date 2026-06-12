@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your portal — OpenElpis</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a5b5a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<style>
+  :root{--ink:#13211e;--ink-soft:#42524d;--muted:#6c7d78;--teal:#0e7c7b;--teal-deep:#0a5b5a;
+    --mint:#e7f3f1;--mint-2:#f4faf8;--rose:#e35d8a;--rose-deep:#c43a6e;--rose-dark:#a82f5f;--rose-soft:#fdeef3;
+    --amber:#9a6a00;--amber-soft:#fdf4e3;--line:#dde7e4;--bg:#fbfdfc;--shadow:0 1px 2px rgba(7,63,62,.04),0 12px 32px -12px rgba(7,63,62,.16)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,sans-serif;color:var(--ink);background:var(--mint-2);min-height:100vh;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  a{color:var(--teal-deep);text-decoration:none}
+  header{background:#fff;border-bottom:1px solid var(--line)}
+  header .in{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto;padding:14px 24px;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces';font-size:19px;font-weight:600;color:var(--ink)}
+  .brand img{width:32px;height:32px}
+  .hr{display:flex;align-items:center;gap:12px}
+  .plang{font-size:16px;line-height:1;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 23px 5px 10px;cursor:pointer;
+    appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7d78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+  .logout{font-size:14px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 15px;cursor:pointer}
+  .logout:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
+  .wrap{max-width:1000px;margin:0 auto;padding:30px 24px 70px}
+  .hello{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:26px}
+  .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;border-radius:999px;padding:4px 12px;margin-top:8px}
+  .status.pending{background:var(--amber-soft);color:var(--amber);border:1px solid #eedcae}
+  .status.verified{background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
+  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;margin-top:26px;align-items:start}
+  @media(max-width:780px){.grid{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px}
+  .card h2{font-family:'Fraunces';font-weight:600;font-size:19px;margin-bottom:4px}
+  .card .hint{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:12px 0 6px}
+  label .lhint{color:var(--muted);font-weight:400}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;font:inherit;font-size:14.5px;color:var(--ink);background:#fbfdfc}
+  textarea{resize:vertical;min-height:60px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
+  .btn{width:100%;margin-top:18px;background:var(--rose-dark);color:#fff;border:0;border-radius:999px;padding:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+  .btn:hover{background:#8a2750}.btn:disabled{opacity:.6;cursor:not-allowed}
+  .msg{margin-top:14px;font-size:13.5px;padding:10px 13px;border-radius:11px;display:none}
+  .msg.err{display:block;background:var(--rose-soft);color:var(--rose-dark);border:1px solid #f3c6d6}
+  .msg.ok{display:block;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 10px 10px}
+  td{padding:11px 10px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+  td .t{color:var(--ink);font-weight:600}
+  .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .pill.pending_review{background:var(--amber-soft);color:var(--amber)}
+  .pill.approved{background:var(--mint);color:var(--teal-deep)}
+  .pill.rejected{background:var(--rose-soft);color:var(--rose-dark)}
+  .pill.processing,.pill.error{background:#eef1f0;color:var(--ink-soft)}
+  .empty{color:var(--muted);font-size:14px;padding:18px 0}
+  .disc{margin-top:26px;font-size:12.5px;color:var(--muted);max-width:70ch;line-height:1.5}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <a class="brand" href="/"><img src="/logo.svg" alt="OpenElpis"> OpenElpis</a>
+  <div class="hr">
+    <select id="portalLang" class="plang" aria-label="Language" title="Language">
+      <option value="en">🇬🇧</option><option value="tr">🇹🇷</option><option value="es">🇪🇸</option><option value="de">🇩🇪</option>
+      <option value="fr">🇫🇷</option><option value="it">🇮🇹</option><option value="ru">🇷🇺</option><option value="nl">🇳🇱</option>
+    </select>
+    <button class="logout" onclick="logout()" data-i18n="d_logout">Log out</button>
+  </div>
+</div></header>
+<div class="wrap">
+  <div id="who"></div>
+  <div class="grid">
+    <div class="card">
+      <h2 data-i18n="d_upload">Upload a material</h2>
+      <p class="hint" data-i18n="d_upload_hint">Literature, de-identified findings, datasets or reports. Reviewed by an expert before it enters the corpus.</p>
+      <form id="up" onsubmit="return doUpload(event)">
+        <label data-i18n="d_dtitle">Title</label><input id="u_title" required maxlength="200" data-i18n-ph="d_title_ph" placeholder="e.g. ESR1 resistance in HR+ breast cancer">
+        <label data-i18n="p_type">Type</label>
+        <select id="u_type">
+          <option value="literature" data-i18n="mt_literature">Literature</option><option value="finding" data-i18n="mt_finding">De-identified finding</option>
+          <option value="dataset" data-i18n="mt_dataset">Dataset</option><option value="report" data-i18n="mt_report">Report</option>
+          <option value="guideline" data-i18n="mt_guideline">Guideline</option><option value="other" data-i18n="mt_other">Other</option>
+        </select>
+        <label><span data-i18n="d_desc">Description</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+        <textarea id="u_desc" maxlength="2000"></textarea>
+        <label><span data-i18n="d_file">File</span> <span class="lhint" data-i18n="d_file_hint">(PDF, DOCX, CSV, TXT… max 25 MB)</span></label>
+        <input type="file" id="u_file" required accept=".pdf,.doc,.docx,.csv,.txt,.md,.json,.xlsx">
+        <button class="btn" type="submit" data-i18n="d_upload_btn">Upload for review</button>
+        <div id="upmsg" class="msg"></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2 data-i18n="d_contrib">Your contributions</h2>
+      <p class="hint" data-i18n="d_contrib_hint">Everything you've uploaded and its review status.</p>
+      <div id="list"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+    </div>
+  </div>
+  <p class="disc" data-i18n="d_disc">OpenElpis produces research hypotheses for qualified professionals and does not provide medical diagnosis or treatment advice. Do not upload patient-identifiable data — only published literature and de-identified, aggregate material at this stage.</p>
+</div>
+<script src="/portal/i18n.js"></script>
+<script>
+  const $ = s => document.querySelector(s);
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  const state = { me:null, materials:null };
+
+  async function api(path, opt){
+    opt = opt || {}; opt.credentials='same-origin';
+    const res = await fetch(path, opt);
+    if(res.status===401){ location.href='/portal/'; throw new Error('auth'); }
+    let data={}; try{ data=await res.json(); }catch(e){}
+    if(!res.ok) throw new Error(data.detail || T('err_generic'));
+    return data;
+  }
+  function msg(text, ok){ const m=$('#upmsg'); m.className='msg'+(text?(ok?' ok':' err'):''); m.textContent=text||''; }
+
+  function renderWho(){
+    if(!state.me) return;
+    const v = state.me.verification_status;
+    $('#who').innerHTML = '<div class="hello">'+esc(T('d_welcome'))+' '+esc(state.me.full_name)+'</div>'+
+      '<span class="status '+(v==='verified'?'verified':'pending')+'">'+
+      (v==='verified'?'✓ '+esc(T('d_verified')):'⏳ '+esc(T('d_pending')))+'</span>';
+  }
+  function renderList(){
+    const m = state.materials;
+    if(m===null) return;
+    if(!m.length){ $('#list').innerHTML='<div class="empty">'+esc(T('d_empty'))+'</div>'; return; }
+    const rows = m.map(x=>'<tr><td><span class="t">'+esc(x.title)+'</span><br><span style="color:var(--muted);font-size:12px">'+esc(x.filename||'')+'</span></td>'+
+      '<td>'+esc(T('mt_'+x.source_type)||x.source_type)+'</td>'+
+      '<td><span class="pill '+esc(x.status)+'">'+esc(T('st_'+x.status)||x.status.replace('_',' '))+'</span></td>'+
+      '<td>'+new Date(x.created_at).toLocaleDateString(window.OE_LANG||'en')+'</td></tr>').join('');
+    $('#list').innerHTML='<table><thead><tr><th>'+esc(T('th_material'))+'</th><th>'+esc(T('th_type'))+'</th><th>'+esc(T('th_status'))+'</th><th>'+esc(T('th_date'))+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+  // re-render dynamic content when the language changes
+  window.onPortalLang = function(){ renderWho(); renderList(); };
+
+  async function refresh(){ const {materials} = await api('/api/materials'); state.materials = materials; renderList(); }
+  async function doUpload(e){
+    e.preventDefault(); msg(''); const b=$('#up button'); b.disabled=true;
+    try{
+      const fd = new FormData();
+      fd.append('file', $('#u_file').files[0]);
+      fd.append('title', $('#u_title').value.trim());
+      fd.append('source_type', $('#u_type').value);
+      fd.append('description', $('#u_desc').value.trim());
+      await api('/api/materials', { method:'POST', body:fd });
+      msg(T('d_uploaded'), true); $('#up').reset(); await refresh();
+    }catch(err){ if(err.message!=='auth') msg(err.message); }
+    b.disabled=false; return false;
+  }
+  async function logout(){ try{ await api('/api/logout',{method:'POST'}); }catch(e){} location.href='/portal/'; }
+  async function load(){
+    const me = await api('/api/me'); state.me = me; renderWho(); await refresh();
+  }
+  load().catch(e=>{ if(e.message!=='auth') $('#who').innerHTML='<div class="empty">'+esc(T('d_loaderr'))+' <a href="/portal/">'+esc(T('d_relogin'))+'</a></div>'; });
+</script>
+</body>
+</html>

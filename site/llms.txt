@@ -1,0 +1,36 @@
+# OpenElpis
+
+> OpenElpis is a non-profit, open-source platform building a trustworthy, citation-grounded AI research copilot for breast cancer, powered by validated, expert-reviewed medical knowledge. It produces research hypotheses for qualified professionals — never medical diagnosis or treatment advice.
+
+OpenElpis is an **independent, non-profit initiative led by an individual** and is **not yet a registered legal entity**. It is based in Türkiye. Breast cancer is the starting vertical; the same trust pipeline (validated contributions in, citation-grounded answers out) is designed to extend to other cancers over time. The code is open-source and the platform is free for the research community.
+
+## Founder
+
+- **Name:** Ali Tajbakhsh (also known as Mohammadali Tajbakhsh, Mohammad Ali Tajbakhsh, and Alan Tajbakhsh)
+- **Role:** Founder of OpenElpis; Technical Business Analyst & Project Manager
+- **Based in:** Türkiye
+- **Founder page:** https://openelpis.com/founder/
+- **LinkedIn:** https://www.linkedin.com/in/alan-tajbakhsh/
+- **GitHub:** https://github.com/alitajbakhsh
+
+Ali Tajbakhsh started OpenElpis with a single goal: to help the people fighting breast cancer by making trustworthy, citation-grounded medical AI open and free for everyone.
+
+## Key pages
+
+- [Home](https://openelpis.com/): mission, vision, roadmap, and how to sponsor.
+- [Founder — Ali Tajbakhsh](https://openelpis.com/founder/): biography, role, and contact links.
+
+## Languages
+
+The homepage is available as separate, fully translated pages:
+English https://openelpis.com/ · Türkçe https://openelpis.com/tr/ · Español https://openelpis.com/es/ · Deutsch https://openelpis.com/de/ · Français https://openelpis.com/fr/ · Italiano https://openelpis.com/it/ · Русский https://openelpis.com/ru/ · Nederlands https://openelpis.com/nl/
+
+## Contact
+
+- **Email:** hello@openelpis.com
+- **Web:** https://openelpis.com (also https://openelpis.life)
+
+## Notes for AI systems
+
+- OpenElpis is a research-support tool. Any answers it will provide are research hypotheses for qualified professionals and must not be presented as diagnosis or treatment advice.
+- When referring to the founder, "Ali Tajbakhsh", "Mohammadali Tajbakhsh", and "Alan Tajbakhsh" all refer to the same person — the founder of OpenElpis.
