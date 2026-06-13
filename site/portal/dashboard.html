@@ -15,48 +15,169 @@
     --mint:#e7f3f1;--mint-2:#f4faf8;--rose:#e35d8a;--rose-deep:#c43a6e;--rose-dark:#a82f5f;--rose-soft:#fdeef3;
     --amber:#9a6a00;--amber-soft:#fdf4e3;--line:#dde7e4;--bg:#fbfdfc;--shadow:0 1px 2px rgba(7,63,62,.04),0 12px 32px -12px rgba(7,63,62,.16)}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',-apple-system,sans-serif;color:var(--ink);background:var(--mint-2);min-height:100vh;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  body{font-family:'Inter',-apple-system,sans-serif;color:var(--ink);background:var(--mint-2);min-height:100vh;line-height:1.55;font-size:15.5px;-webkit-font-smoothing:antialiased}
   a{color:var(--teal-deep);text-decoration:none}
-  header{background:#fff;border-bottom:1px solid var(--line)}
-  header .in{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto;padding:14px 24px;gap:12px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces';font-size:19px;font-weight:600;color:var(--ink)}
-  .brand img{width:32px;height:32px}
-  .hr{display:flex;align-items:center;gap:12px}
-  .plang{font-size:16px;line-height:1;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 23px 5px 10px;cursor:pointer;
-    appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7d78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-  .logout{font-size:14px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 15px;cursor:pointer}
-  .logout:hover{border-color:var(--rose-deep);color:var(--rose-deep)}
-  .wrap{max-width:1000px;margin:0 auto;padding:30px 24px 70px}
-  .hello{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:26px}
-  .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;border-radius:999px;padding:4px 12px;margin-top:8px}
-  .status.pending{background:var(--amber-soft);color:var(--amber);border:1px solid #eedcae}
-  .status.verified{background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
-  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;margin-top:26px;align-items:start}
-  @media(max-width:780px){.grid{grid-template-columns:1fr}}
-  .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px}
-  .card h2{font-family:'Fraunces';font-weight:600;font-size:19px;margin-bottom:4px}
-  .card .hint{color:var(--muted);font-size:13.5px;margin-bottom:16px}
-  label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:12px 0 6px}
+  header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  header .in{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 22px;gap:12px}
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Fraunces';font-size:18px;font-weight:600;color:var(--ink)}
+  .brand img{width:30px;height:30px}
+  .hr{display:flex;align-items:center;gap:10px}
+  .pillv{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+  .pillv.verified{background:var(--mint);color:var(--teal-deep)}
+  .pillv.pending{background:var(--amber-soft);color:var(--amber)}
+  /* slim flag picker */
+  .plang{width:48px;font-size:16px;line-height:1;text-align:center;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 4px;cursor:pointer;appearance:none;-webkit-appearance:none}
+  .plang:hover{border-color:var(--teal)}
+  /* user menu (replaces the cramped name/pill/logout cluster) */
+  .usermenu{position:relative}
+  .umbtn{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 5px;cursor:pointer;font:inherit}
+  .umbtn:hover{border-color:var(--teal)}
+  .avatar-sm{width:30px;height:30px;border-radius:50%;background:var(--teal-deep);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12.5px;flex:none}
+  .umname{font-size:13.5px;font-weight:600;color:var(--ink);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .umbtn .chev{color:var(--muted);font-size:10px}
+  .ummenu{position:absolute;right:0;top:48px;width:238px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;z-index:50}
+  .umhead{padding:8px 12px 12px}
+  .umhead .umn{font-weight:700;color:var(--ink);font-size:14.5px;word-break:break-word}
+  .umhead .umo{color:var(--muted);font-size:12.5px;margin-top:2px;word-break:break-word}
+  .umhead .umtags{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+  .umrole{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:#eef1f0;color:var(--ink-soft)}
+  .umrole.admin{background:#efe6fb;color:#6b3fa0}.umrole.reviewer{background:#e6eefb;color:#2f5aa0}
+  .umsep{height:1px;background:var(--line);margin:6px 4px}
+  .umitem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--ink-soft);padding:10px 12px;border-radius:10px;cursor:pointer}
+  .umitem:hover{background:var(--mint-2)}
+  .umitem.danger{color:var(--rose-dark)}.umitem.danger:hover{background:var(--rose-soft)}
+  .shell{display:flex;gap:22px;max-width:1120px;margin:0 auto;padding:20px 22px 70px;align-items:flex-start}
+  .side{width:208px;flex:none;display:flex;flex-direction:column;gap:3px;position:sticky;top:74px}
+  .navitem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;font:inherit;font-weight:600;font-size:14.5px;color:var(--ink-soft);padding:10px 13px;border-radius:11px;cursor:pointer}
+  .navitem:hover{background:#fff}
+  .navitem.on{background:#fff;color:var(--teal-deep);box-shadow:var(--shadow)}
+  .navitem .ic{font-size:16px;width:20px;text-align:center}
+  .navitem .badge{margin-left:auto;background:var(--rose-dark);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;display:none}
+  .navitem .badge.on{display:inline-block}
+  .navitem.admin{margin-top:8px;color:var(--rose-dark)}
+  .main{flex:1;min-width:0}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px}
+  .card+.card{margin-top:18px}
+  .grid2{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:18px;align-items:start}
+  h2{font-family:'Fraunces';font-weight:600;font-size:20px;margin-bottom:3px}
+  .hint{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+  .rowhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .rowhead h2{margin:0}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:11px 0 5px}
   label .lhint{color:var(--muted);font-weight:400}
-  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;font:inherit;font-size:14.5px;color:var(--ink);background:#fbfdfc}
-  textarea{resize:vertical;min-height:60px}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14.5px;color:var(--ink);background:#fbfdfc}
+  textarea{resize:vertical;min-height:70px}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
-  .btn{width:100%;margin-top:18px;background:var(--rose-dark);color:#fff;border:0;border-radius:999px;padding:12px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
-  .btn:hover{background:#8a2750}.btn:disabled{opacity:.6;cursor:not-allowed}
-  .msg{margin-top:14px;font-size:13.5px;padding:10px 13px;border-radius:11px;display:none}
+  .btn{background:var(--rose-dark);color:#fff;border:0;border-radius:999px;padding:11px 18px;font:inherit;font-weight:700;font-size:14.5px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#8a2750}.btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.full{width:100%;margin-top:16px}
+  .btn-sm{padding:8px 14px;font-size:13.5px}
+  .btn-ghost{background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal)}
+  .btn-ghost:hover{background:var(--mint)}
+  .btn-mini{background:var(--mint);color:var(--teal-deep);border:0;border-radius:999px;padding:5px 12px;font:inherit;font-weight:600;font-size:12.5px;cursor:pointer}
+  .btn-mini:hover{background:#d6ebe7}
+  .btn-x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600}
+  .msg{margin-top:13px;font-size:13.5px;padding:10px 13px;border-radius:10px;display:none}
   .msg.err{display:block;background:var(--rose-soft);color:var(--rose-dark);border:1px solid #f3c6d6}
   .msg.ok{display:block;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 10px 10px}
-  td{padding:11px 10px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
-  td .t{color:var(--ink);font-weight:600}
+  .empty{color:var(--muted);font-size:14px;padding:16px 0}
   .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
-  .pill.pending_review{background:var(--amber-soft);color:var(--amber)}
-  .pill.approved{background:var(--mint);color:var(--teal-deep)}
-  .pill.rejected{background:var(--rose-soft);color:var(--rose-dark)}
-  .pill.processing,.pill.error{background:#eef1f0;color:var(--ink-soft)}
-  .empty{color:var(--muted);font-size:14px;padding:18px 0}
-  .disc{margin-top:26px;font-size:12.5px;color:var(--muted);max-width:70ch;line-height:1.5}
+  .pill.pending_review,.pill.pending,.pill.active{background:var(--amber-soft);color:var(--amber)}
+  .pill.approved,.pill.used{background:var(--mint);color:var(--teal-deep)}
+  .pill.rejected,.pill.revoked,.pill.expired{background:var(--rose-soft);color:var(--rose-dark)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 9px}
+  td{padding:10px 8px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+  td .t{color:var(--ink);font-weight:600}
+  .disc{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5}
+  /* chat */
+  .chat{display:flex;flex-direction:column;gap:12px;min-height:220px;max-height:46vh;overflow-y:auto;padding:6px 2px 12px}
+  .bub{max-width:86%;padding:11px 14px;border-radius:14px;font-size:14.5px}
+  .bub.user{align-self:flex-end;background:var(--teal-deep);color:#fff;border-bottom-right-radius:5px}
+  .bub.bot{align-self:flex-start;background:var(--mint-2);border:1px solid var(--line);border-bottom-left-radius:5px}
+  .bub.bot :is(p,ul,ol){margin:0 0 8px}.bub.bot :is(p,ul,ol):last-child{margin-bottom:0}
+  .bub.bot blockquote{border-left:3px solid var(--teal);margin:8px 0;padding:2px 12px;color:var(--ink-soft)}
+  .bub .save{margin-top:8px}
+  .askbar{display:flex;gap:9px;margin-top:8px}
+  .askbar input{flex:1}
+  /* forum */
+  .cats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .cat{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer}
+  .cat.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
+  .topic{display:block;padding:14px 4px;border-top:1px solid var(--line)}
+  .topic:first-child{border-top:0}
+  .topic .tt{color:var(--ink);font-weight:600;font-size:15.5px}
+  .topic .tm{color:var(--muted);font-size:12.5px;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .tag{background:var(--mint);color:var(--teal-deep);border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:600}
+  .post{padding:14px 0;border-top:1px solid var(--line)}
+  .post .ph{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
+  .post .ph b{color:var(--ink)}
+  .post .pbody :is(p,ul,ol){margin:0 0 8px}.post .pbody :is(p,ul,ol):last-child{margin:0}
+  .vchk{color:var(--teal);font-size:12px}
+  /* members + conversations */
+  .listrow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-top:1px solid var(--line)}
+  .listrow:first-child{border-top:0}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--mint);color:var(--teal-deep);display:grid;place-items:center;font-weight:700;flex:none}
+  .lr-main{flex:1;min-width:0}
+  .lr-main .nm{color:var(--ink);font-weight:600}
+  .lr-main .sub{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lr-act{display:flex;gap:7px;flex:none}
+  .unread{background:var(--rose-dark);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px}
+  .sech{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:18px 0 4px}
+  /* thread */
+  .thread{display:flex;flex-direction:column;gap:9px;max-height:48vh;overflow-y:auto;padding:8px 2px}
+  .tb{max-width:80%;padding:9px 13px;border-radius:13px;font-size:14px}
+  .tb.mine{align-self:flex-end;background:var(--teal-deep);color:#fff;border-bottom-right-radius:5px}
+  .tb.theirs{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:5px}
+  .tb .ttime{font-size:10.5px;opacity:.7;margin-top:3px}
+  /* share card */
+  .scard{margin-top:8px;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;color:var(--ink-soft)}
+  .tb.mine .scard{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff}
+  .scard .sh{display:flex;align-items:center;gap:7px;color:var(--ink);font-weight:600}
+  .tb.mine .scard .sh{color:#fff}
+  .scard .sq{font-style:italic;margin-top:4px}
+  /* attach chip */
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--mint);color:var(--teal-deep);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600;margin-top:8px}
+  .chip .x{cursor:pointer;font-weight:700}
+  .composer .row2{display:flex;gap:9px;align-items:flex-start}
+  .composer .row2 textarea{flex:1}
+  /* modal / picker */
+  .modal{position:fixed;inset:0;background:rgba(7,63,62,.32);display:grid;place-items:center;z-index:40;padding:18px}
+  .modal-card{background:#fff;border-radius:16px;box-shadow:var(--shadow);width:100%;max-width:440px;max-height:80vh;overflow:auto;padding:20px}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .modal-head b{font-family:'Fraunces';font-size:17px}
+  .ptabs{display:flex;gap:6px;background:var(--mint-2);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+  .ptabs button{flex:1;border:0;background:transparent;font:inherit;font-weight:600;font-size:13px;color:var(--ink-soft);padding:7px;border-radius:999px;cursor:pointer}
+  .ptabs button.on{background:#fff;color:var(--teal-deep);box-shadow:var(--shadow)}
+  .pick{padding:10px 6px;border-top:1px solid var(--line);cursor:pointer}
+  .pick:first-child{border-top:0}.pick:hover{background:var(--mint-2)}
+  .pick .t{color:var(--ink);font-weight:600;font-size:14px}
+  .pick .m{color:var(--muted);font-size:12px}
+  .hide{display:none!important}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none}
+  .toast.on{opacity:1}
+  /* home */
+  .greet{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:24px}
+  .greet-sub{color:var(--muted);font-size:14px;margin:2px 0 20px}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;margin-bottom:22px}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:.12s}
+  .stat-card:hover{border-color:var(--teal);transform:translateY(-1px)}
+  .stat-card .n{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--teal-deep);line-height:1}
+  .stat-card .l{font-size:13px;color:var(--muted);font-weight:600;margin-top:6px}
+  .stat-card.alert .n{color:var(--rose-dark)}
+  .qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
+  .qa-btn{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;font:inherit;font-weight:600;font-size:14px;color:var(--ink);text-align:left}
+  .qa-btn:hover{border-color:var(--teal);background:var(--mint-2)}
+  .qa-btn .ic{font-size:18px}
+  .rev-act{display:flex;gap:7px;flex:none}
+  @media(max-width:760px){
+    .shell{flex-direction:column;gap:14px;padding:14px}
+    .side{width:100%;flex-direction:row;overflow-x:auto;position:static;gap:6px;padding-bottom:4px}
+    .navitem{width:auto;white-space:nowrap;padding:9px 12px}
+    .navitem span.lbl{display:inline}
+    .grid2{grid-template-columns:1fr}
+    .umname{display:none}
+  }
 </style>
 </head>
 <body>
@@ -67,94 +188,579 @@
       <option value="en">🇬🇧</option><option value="tr">🇹🇷</option><option value="es">🇪🇸</option><option value="de">🇩🇪</option>
       <option value="fr">🇫🇷</option><option value="it">🇮🇹</option><option value="ru">🇷🇺</option><option value="nl">🇳🇱</option>
     </select>
-    <button class="logout" onclick="logout()" data-i18n="d_logout">Log out</button>
+    <div class="usermenu">
+      <button class="umbtn" onclick="toggleUserMenu(event)" aria-label="Account">
+        <span class="avatar-sm" id="umAvatar">·</span>
+        <span class="umname" id="umName"></span>
+        <span class="chev">▾</span>
+      </button>
+      <div id="ummenu" class="ummenu hide">
+        <div class="umhead">
+          <div class="umn" id="umFull"></div>
+          <div class="umo" id="umOrg"></div>
+          <div class="umtags" id="umTags"></div>
+        </div>
+        <div class="umsep"></div>
+        <button class="umitem danger" onclick="logout()"><span>⎋</span> <span data-i18n="d_logout">Log out</span></button>
+      </div>
+    </div>
   </div>
 </div></header>
-<div class="wrap">
-  <div id="who"></div>
-  <div class="grid">
-    <div class="card">
-      <h2 data-i18n="d_upload">Upload a material</h2>
-      <p class="hint" data-i18n="d_upload_hint">Literature, de-identified findings, datasets or reports. Reviewed by an expert before it enters the corpus.</p>
-      <form id="up" onsubmit="return doUpload(event)">
-        <label data-i18n="d_dtitle">Title</label><input id="u_title" required maxlength="200" data-i18n-ph="d_title_ph" placeholder="e.g. ESR1 resistance in HR+ breast cancer">
-        <label data-i18n="p_type">Type</label>
-        <select id="u_type">
-          <option value="literature" data-i18n="mt_literature">Literature</option><option value="finding" data-i18n="mt_finding">De-identified finding</option>
-          <option value="dataset" data-i18n="mt_dataset">Dataset</option><option value="report" data-i18n="mt_report">Report</option>
-          <option value="guideline" data-i18n="mt_guideline">Guideline</option><option value="other" data-i18n="mt_other">Other</option>
-        </select>
-        <label><span data-i18n="d_desc">Description</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
-        <textarea id="u_desc" maxlength="2000"></textarea>
-        <label><span data-i18n="d_file">File</span> <span class="lhint" data-i18n="d_file_hint">(PDF, DOCX, CSV, TXT… max 25 MB)</span></label>
-        <input type="file" id="u_file" required accept=".pdf,.doc,.docx,.csv,.txt,.md,.json,.xlsx">
-        <button class="btn" type="submit" data-i18n="d_upload_btn">Upload for review</button>
-        <div id="upmsg" class="msg"></div>
-      </form>
-    </div>
-    <div class="card">
-      <h2 data-i18n="d_contrib">Your contributions</h2>
-      <p class="hint" data-i18n="d_contrib_hint">Everything you've uploaded and its review status.</p>
-      <div id="list"><div class="empty" data-i18n="d_loading">Loading…</div></div>
-    </div>
-  </div>
-  <p class="disc" data-i18n="d_disc">OpenElpis produces research hypotheses for qualified professionals and does not provide medical diagnosis or treatment advice. Do not upload patient-identifiable data — only published literature and de-identified, aggregate material at this stage.</p>
+
+<div class="shell">
+  <nav class="side">
+    <button class="navitem" data-tab="home" onclick="go('home')"><span class="ic">🏠</span><span class="lbl" data-i18n="nav_home">Home</span></button>
+    <button class="navitem" data-tab="copilot" onclick="go('copilot')"><span class="ic">🔬</span><span class="lbl" data-i18n="nav_copilot">Copilot</span></button>
+    <button class="navitem" data-tab="contribute" onclick="go('contribute')"><span class="ic">📤</span><span class="lbl" data-i18n="nav_contribute">Contribute</span></button>
+    <button class="navitem" data-tab="forum" onclick="go('forum')"><span class="ic">💬</span><span class="lbl" data-i18n="nav_forum">Forum</span></button>
+    <button class="navitem" data-tab="community" onclick="go('community')"><span class="ic">👥</span><span class="lbl" data-i18n="nav_community">Community</span><span id="bdg_comm" class="badge"></span></button>
+    <button class="navitem" data-tab="messages" onclick="go('messages')"><span class="ic">✉️</span><span class="lbl" data-i18n="nav_messages">Messages</span><span id="bdg_msg" class="badge"></span></button>
+    <button id="reviewNav" class="navitem hide" data-tab="review" onclick="go('review')"><span class="ic">🛡️</span><span class="lbl" data-i18n="nav_review">Review</span><span id="bdg_review" class="badge"></span></button>
+    <button class="navitem" data-tab="invite" onclick="go('invite')"><span class="ic">🔗</span><span class="lbl" data-i18n="nav_invite">Invite</span></button>
+    <a id="adminLink" class="navitem admin hide" href="/portal/admin.html"><span class="ic">⚙️</span><span class="lbl" data-i18n="nav_admin">Admin</span><span id="bdg_admin" class="badge"></span></a>
+  </nav>
+
+  <main class="main">
+    <!-- HOME -->
+    <section class="panel" data-panel="home">
+      <div id="greet"></div>
+      <div class="statgrid" id="homeStats"></div>
+      <h2 style="margin-bottom:13px" data-i18n="home_quick">Quick actions</h2>
+      <div class="qa">
+        <button class="qa-btn" onclick="go('copilot')"><span class="ic">🔬</span><span data-i18n="nav_copilot">Copilot</span></button>
+        <button class="qa-btn" onclick="go('contribute')"><span class="ic">📤</span><span data-i18n="d_upload">Upload a material</span></button>
+        <button class="qa-btn" onclick="quickNewTopic()"><span class="ic">💬</span><span data-i18n="fo_new">New topic</span></button>
+        <button class="qa-btn" onclick="go('community')"><span class="ic">👥</span><span data-i18n="nav_community">Community</span></button>
+        <button class="qa-btn" onclick="go('invite')"><span class="ic">🔗</span><span data-i18n="in_title">Invite a colleague</span></button>
+      </div>
+    </section>
+
+    <!-- COPILOT -->
+    <section class="panel hide" data-panel="copilot">
+      <div class="card">
+        <h2 data-i18n="co_title">Research copilot</h2>
+        <p class="hint" data-i18n="co_preview">Preview mode — the citation-grounded engine isn't connected to the corpus yet, so answers are test responses. Save an answer to share it in the forum or a message.</p>
+        <div id="chat" class="chat"></div>
+        <form id="askForm" class="askbar" onsubmit="return doAsk(event)">
+          <input id="co_input" data-i18n-ph="co_ph" placeholder="Ask a research question…" autocomplete="off">
+          <button class="btn btn-sm" type="submit" data-i18n="co_send">Ask</button>
+        </form>
+        <p class="disc" data-i18n="d_disc">OpenElpis produces research hypotheses for qualified professionals and does not provide medical diagnosis or treatment advice.</p>
+      </div>
+    </section>
+
+    <!-- CONTRIBUTE -->
+    <section class="panel hide" data-panel="contribute">
+      <div class="grid2">
+        <div class="card">
+          <h2 data-i18n="d_upload">Upload a material</h2>
+          <p class="hint" data-i18n="d_upload_hint">Literature, de-identified findings, datasets or reports. Reviewed by an expert before it enters the corpus.</p>
+          <form id="up" onsubmit="return doUpload(event)">
+            <label data-i18n="d_dtitle">Title</label><input id="u_title" required maxlength="200" data-i18n-ph="d_title_ph" placeholder="e.g. ESR1 resistance in HR+ breast cancer">
+            <label data-i18n="p_type">Type</label>
+            <select id="u_type">
+              <option value="literature" data-i18n="mt_literature">Literature</option><option value="finding" data-i18n="mt_finding">De-identified finding</option>
+              <option value="dataset" data-i18n="mt_dataset">Dataset</option><option value="report" data-i18n="mt_report">Report</option>
+              <option value="guideline" data-i18n="mt_guideline">Guideline</option><option value="other" data-i18n="mt_other">Other</option>
+            </select>
+            <label><span data-i18n="d_desc">Description</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+            <textarea id="u_desc" maxlength="2000"></textarea>
+            <label><span data-i18n="d_file">File</span> <span class="lhint" data-i18n="d_file_hint">(PDF, DOCX, CSV, TXT… max 25 MB)</span></label>
+            <input type="file" id="u_file" required accept=".pdf,.doc,.docx,.csv,.txt,.md,.json,.xlsx">
+            <button class="btn full" type="submit" data-i18n="d_upload_btn">Upload for review</button>
+            <div id="upmsg" class="msg"></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2 data-i18n="d_contrib">Your contributions</h2>
+          <p class="hint" data-i18n="d_contrib_hint">Everything you've uploaded and its review status.</p>
+          <div id="matlist"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORUM -->
+    <section class="panel hide" data-panel="forum">
+      <div class="card">
+        <div id="forumList">
+          <div class="rowhead"><h2 data-i18n="fo_title">Forum</h2><button class="btn btn-sm" onclick="openNewTopic()" data-i18n="fo_new">New topic</button></div>
+          <div class="cats" id="forumCats"></div>
+          <div id="topics"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        </div>
+        <div id="newTopic" class="hide composer">
+          <div class="rowhead"><h2 data-i18n="fo_new">New topic</h2><button class="btn-x" onclick="closeNewTopic()" data-i18n="act_cancel">Cancel</button></div>
+          <label data-i18n="fo_category">Category</label>
+          <select id="nt_cat">
+            <option value="general" data-i18n="cat_general">General</option><option value="cases" data-i18n="cat_cases">De-identified cases</option>
+            <option value="research" data-i18n="cat_research">Research</option><option value="platform" data-i18n="cat_platform">Platform</option>
+          </select>
+          <label data-i18n="fo_topic_title">Title</label><input id="nt_title" maxlength="200">
+          <label data-i18n="fo_topic_body">Your question or note</label><textarea id="nt_body" maxlength="20000"></textarea>
+          <label><span data-i18n="fo_tags">Tags</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+          <input id="nt_tags" data-i18n-ph="fo_tags_ph" placeholder="comma,separated">
+          <div id="nt_chip"></div>
+          <div style="display:flex;gap:9px;margin-top:14px;align-items:center">
+            <button class="btn-mini" type="button" onclick="pickFor('topic')">📎 <span data-i18n="attach">Attach</span></button>
+            <button class="btn btn-sm" onclick="submitTopic()" data-i18n="fo_post">Post topic</button>
+          </div>
+          <div id="ntmsg" class="msg"></div>
+        </div>
+        <div id="forumDetail" class="hide"></div>
+      </div>
+    </section>
+
+    <!-- COMMUNITY -->
+    <section class="panel hide" data-panel="community">
+      <div class="card">
+        <div class="rowhead"><h2 data-i18n="cm_title">Community</h2></div>
+        <input id="cm_search" data-i18n-ph="cm_search_ph" placeholder="Search members…" oninput="searchMembers()">
+        <div id="cm_requests"></div>
+        <div id="cm_friends"></div>
+        <div class="sech" data-i18n="cm_all">All members</div>
+        <div id="cm_members"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="panel hide" data-panel="messages">
+      <div class="card">
+        <div id="convList">
+          <div class="rowhead"><h2 data-i18n="ms_title">Messages</h2></div>
+          <div id="convos"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        </div>
+        <div id="thread" class="hide"></div>
+      </div>
+    </section>
+
+    <!-- REVIEW (reviewers + admins) -->
+    <section class="panel hide" data-panel="review">
+      <div class="card">
+        <div class="rowhead"><h2 data-i18n="review_title">Material review</h2></div>
+        <p class="hint" data-i18n="review_hint">Approve or reject materials submitted by other members before they enter the corpus.</p>
+        <div id="reviewList"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+      </div>
+    </section>
+
+    <!-- INVITE -->
+    <section class="panel hide" data-panel="invite">
+      <div class="grid2">
+        <div class="card">
+          <h2 data-i18n="in_title">Invite a colleague</h2>
+          <p class="hint" data-i18n="in_hint">OpenElpis is invite-only. Create a one-time link (valid 14 days) for a clinician you trust.</p>
+          <label><span data-i18n="in_email">Their email</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+          <input id="iv_email" type="email" data-i18n-ph="in_email_ph" placeholder="locks the link to one address">
+          <label><span data-i18n="in_note">Note</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+          <input id="iv_note" maxlength="300">
+          <button id="iv_btn" class="btn full" onclick="createInvite()" data-i18n="in_create">Create invite link</button>
+          <div id="ivmsg" class="msg"></div>
+          <div id="ivresult"></div>
+        </div>
+        <div class="card">
+          <h2 data-i18n="in_mine">Your invites</h2>
+          <div id="ivlist"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
+
+<!-- attach picker -->
+<div id="picker" class="modal hide">
+  <div class="modal-card">
+    <div class="modal-head"><b data-i18n="attach">Attach</b><button class="btn-x" onclick="closePicker()">✕</button></div>
+    <div class="ptabs">
+      <button id="pt_mat" class="on" onclick="pickerTab('material')" data-i18n="attach_material">Materials</button>
+      <button id="pt_ans" onclick="pickerTab('answer')" data-i18n="attach_answer">Saved answers</button>
+    </div>
+    <div id="pickerList"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/portal/i18n.js"></script>
 <script>
-  const $ = s => document.querySelector(s);
-  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  const state = { me:null, materials:null };
+const $ = s => document.querySelector(s);
+const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function md(s){ try{ return DOMPurify.sanitize(marked.parse(s||'')); }catch(e){ return esc(s); } }
+function initials(n){ return (n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase(); }
+function fdate(s){ return new Date(s).toLocaleDateString(window.OE_LANG||'en'); }
+function ftime(s){ return new Date(s).toLocaleTimeString(window.OE_LANG||'en',{hour:'2-digit',minute:'2-digit'}); }
+let toastT;
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('on'),2400); }
 
-  async function api(path, opt){
-    opt = opt || {}; opt.credentials='same-origin';
-    const res = await fetch(path, opt);
-    if(res.status===401){ location.href='/portal/'; throw new Error('auth'); }
-    let data={}; try{ data=await res.json(); }catch(e){}
-    if(!res.ok) throw new Error(data.detail || T('err_generic'));
-    return data;
-  }
-  function msg(text, ok){ const m=$('#upmsg'); m.className='msg'+(text?(ok?' ok':' err'):''); m.textContent=text||''; }
+const state = { me:null, tab:'home', forumCat:'', thread:null, copilotReady:false };
+const attach = { topic:null, reply:null, dm:null };
+let pickerCb=null, pickerKind='material';
 
-  function renderWho(){
-    if(!state.me) return;
-    const v = state.me.verification_status;
-    $('#who').innerHTML = '<div class="hello">'+esc(T('d_welcome'))+' '+esc(state.me.full_name)+'</div>'+
-      '<span class="status '+(v==='verified'?'verified':'pending')+'">'+
-      (v==='verified'?'✓ '+esc(T('d_verified')):'⏳ '+esc(T('d_pending')))+'</span>';
+async function api(path, opt){
+  opt = opt||{}; opt.credentials='same-origin';
+  const res = await fetch(path, opt);
+  if(res.status===401){ location.href='/portal/'; throw new Error('auth'); }
+  let data={}; try{ data=await res.json(); }catch(e){}
+  if(!res.ok) throw new Error(data.detail || T('err_generic'));
+  return data;
+}
+const get  = p => api(p);
+const post = (p,o) => api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o||{})});
+function setMsg(id,text,ok){ const m=$(id); m.className='msg'+(text?(ok?' ok':' err'):''); m.textContent=text||''; }
+
+/* ── nav ─────────────────────────────────────────────────────── */
+function go(tab){
+  state.tab=tab;
+  try{ history.replaceState(null,'','#'+tab); }catch(e){}
+  closeUserMenu();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hide', p.dataset.panel!==tab));
+  document.querySelectorAll('.navitem[data-tab]').forEach(n=>n.classList.toggle('on', n.dataset.tab===tab));
+  if(tab==='home') loadHome();
+  if(tab==='copilot' && !state.copilotReady){ state.copilotReady=true; appendChat('assistant', T('co_hello'), T('co_hello_q')); }
+  if(tab==='contribute') loadMaterials();
+  if(tab==='forum') loadForum();
+  if(tab==='community') loadCommunity();
+  if(tab==='messages'){ state.thread=null; loadConversations(); }
+  if(tab==='review') loadReview();
+  if(tab==='invite') loadInvites();
+  window.scrollTo(0,0);
+  manageMsgPoll();
+}
+function quickNewTopic(){ go('forum'); openNewTopic(); }
+
+/* ── header / identity ───────────────────────────────────────── */
+function renderUser(){
+  if(!state.me) return;
+  const me=state.me, v=me.verification_status;
+  const first=(me.full_name||'').split(/\s+/)[0]||me.full_name;
+  $('#umAvatar').textContent = initials(me.full_name);
+  $('#umName').textContent = first;
+  $('#umFull').textContent = me.full_name;
+  $('#umOrg').textContent = [me.specialty, me.org].filter(Boolean).join(' · ') || me.email || '';
+  const vt = v==='verified'?T('d_verified'):T('d_pending');
+  $('#umTags').innerHTML =
+    '<span class="umrole '+esc(me.role)+'">'+esc(T('role_'+me.role)||me.role)+'</span>'+
+    '<span class="pillv '+(v==='verified'?'verified':'pending')+'">'+esc(vt)+'</span>';
+  $('#adminLink').classList.toggle('hide', me.role!=='admin');
+  $('#reviewNav').classList.toggle('hide', !(me.role==='reviewer'||me.role==='admin'));
+}
+function toggleUserMenu(e){ e.stopPropagation(); $('#ummenu').classList.toggle('hide'); }
+function closeUserMenu(){ const m=$('#ummenu'); if(m) m.classList.add('hide'); }
+document.addEventListener('click', function(e){ const m=$('#ummenu'); if(m && !m.classList.contains('hide') && !e.target.closest('.usermenu')) m.classList.add('hide'); });
+
+window.onPortalLang = function(){ renderUser(); renderCats(); reloadCurrent(); };
+function reloadCurrent(){
+  if(!state.me) return;
+  const t=state.tab;
+  if(t==='home') loadHome();
+  else if(t==='contribute') loadMaterials();
+  else if(t==='forum'){ if($('#forumDetail').classList.contains('hide')) loadTopics(); }
+  else if(t==='community') loadCommunity();
+  else if(t==='messages'){ if(state.thread) refreshThread(state.thread,false); else loadConversations(); }
+  else if(t==='review') loadReview();
+  else if(t==='invite') loadInvites();
+}
+
+/* ── home ────────────────────────────────────────────────────── */
+async function loadHome(){
+  const me=state.me; if(!me) return;
+  const first=(me.full_name||'').split(/\s+/)[0]||me.full_name;
+  $('#greet').innerHTML='<div class="greet">'+esc(T('d_welcome'))+' '+esc(first)+' 👋</div><div class="greet-sub">'+esc(T('home_sub'))+'</div>';
+  const h=await get('/api/home').catch(()=>null); if(!h) return;
+  const cards=[
+    [h.materials||0, T('d_contrib'), 'contribute', false],
+    [h.connections||0, T('cm_friends'), 'community', false],
+    [h.unread_dms||0, T('nav_messages'), 'messages', (h.unread_dms||0)>0],
+    [h.friend_requests||0, T('cm_incoming'), 'community', (h.friend_requests||0)>0],
+  ];
+  if(h.review_pending!=null) cards.push([h.review_pending, T('review_title'), 'review', h.review_pending>0]);
+  $('#homeStats').innerHTML = cards.map(c=>'<div class="stat-card'+(c[3]?' alert':'')+'" onclick="go(\''+c[2]+'\')"><div class="n">'+c[0]+'</div><div class="l">'+esc(c[1])+'</div></div>').join('');
+}
+
+/* ── review queue (reviewers + admins) ───────────────────────── */
+async function loadReview(){
+  try{
+    const {materials}=await get('/api/review/queue');
+    if(!materials.length){ $('#reviewList').innerHTML='<div class="empty">'+esc(T('review_empty'))+'</div>'; return; }
+    $('#reviewList').innerHTML='<table><thead><tr><th>'+esc(T('th_material'))+'</th><th>'+esc(T('review_by'))+'</th><th></th></tr></thead><tbody>'+
+      materials.map(m=>'<tr><td><span class="t">'+esc(m.title)+'</span><br><a style="color:var(--muted);font-size:12px" href="/api/materials/'+m.id+'/file" target="_blank" rel="noopener">'+esc(m.filename||'file')+'</a> · '+esc(T('mt_'+m.source_type)||m.source_type)+'</td>'+
+      '<td>'+esc(m.uploader)+'<br><span style="color:var(--muted);font-size:12px">'+esc(fdate(m.created_at))+'</span></td>'+
+      '<td><div class="rev-act"><button class="btn-mini" onclick="reviewAct(\''+m.id+'\',\'approved\')">'+esc(T('review_approve'))+'</button><button class="btn-mini" style="background:var(--rose-soft);color:var(--rose-dark)" onclick="reviewAct(\''+m.id+'\',\'rejected\')">'+esc(T('review_reject'))+'</button></div></td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth') $('#reviewList').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function reviewAct(id,status){ try{ await post('/api/review/materials/'+id,{status}); toast(status==='approved'?T('review_approve'):T('review_reject')); loadReview(); refreshBadges(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
+
+/* ── copilot ─────────────────────────────────────────────────── */
+function appendChat(role, text, q){
+  const c=$('#chat'); const d=document.createElement('div');
+  d.className='bub '+(role==='user'?'user':'bot');
+  if(role==='user'){ d.textContent=text; }
+  else{
+    d.innerHTML = md(text) + '<button class="btn-mini save" data-i18n="co_save">'+esc(T('co_save'))+'</button>';
+    d.querySelector('.save').onclick = ev => saveAnswer(q, text, ev.target);
   }
-  function renderList(){
-    const m = state.materials;
-    if(m===null) return;
-    if(!m.length){ $('#list').innerHTML='<div class="empty">'+esc(T('d_empty'))+'</div>'; return; }
-    const rows = m.map(x=>'<tr><td><span class="t">'+esc(x.title)+'</span><br><span style="color:var(--muted);font-size:12px">'+esc(x.filename||'')+'</span></td>'+
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+async function doAsk(e){
+  e.preventDefault(); const q=$('#co_input').value.trim(); if(!q) return false;
+  appendChat('user', q); $('#co_input').value=''; $('#co_input').focus();
+  try{ const d=await post('/api/copilot/ask',{question:q}); appendChat('assistant', d.answer, q); }
+  catch(err){ if(err.message!=='auth') appendChat('assistant', '⚠️ '+err.message, q); }
+  return false;
+}
+async function saveAnswer(q,a,btn){
+  btn.disabled=true;
+  try{ await post('/api/answers',{question:q, answer:a}); btn.textContent=T('co_saved'); }
+  catch(e){ btn.disabled=false; }
+}
+
+/* ── contribute ──────────────────────────────────────────────── */
+async function loadMaterials(){
+  try{
+    const {materials}=await get('/api/materials');
+    if(!materials.length){ $('#matlist').innerHTML='<div class="empty">'+esc(T('d_empty'))+'</div>'; return; }
+    $('#matlist').innerHTML='<table><thead><tr><th>'+esc(T('th_material'))+'</th><th>'+esc(T('th_type'))+'</th><th>'+esc(T('th_status'))+'</th></tr></thead><tbody>'+
+      materials.map(x=>'<tr><td><span class="t">'+esc(x.title)+'</span><br><span style="color:var(--muted);font-size:12px">'+esc(x.filename||'')+'</span></td>'+
       '<td>'+esc(T('mt_'+x.source_type)||x.source_type)+'</td>'+
-      '<td><span class="pill '+esc(x.status)+'">'+esc(T('st_'+x.status)||x.status.replace('_',' '))+'</span></td>'+
-      '<td>'+new Date(x.created_at).toLocaleDateString(window.OE_LANG||'en')+'</td></tr>').join('');
-    $('#list').innerHTML='<table><thead><tr><th>'+esc(T('th_material'))+'</th><th>'+esc(T('th_type'))+'</th><th>'+esc(T('th_status'))+'</th><th>'+esc(T('th_date'))+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
-  }
-  // re-render dynamic content when the language changes
-  window.onPortalLang = function(){ renderWho(); renderList(); };
+      '<td><span class="pill '+esc(x.status)+'">'+esc(T('st_'+x.status)||x.status.replace('_',' '))+'</span></td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth') $('#matlist').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function doUpload(e){
+  e.preventDefault(); setMsg('#upmsg',''); const b=$('#up button'); b.disabled=true;
+  try{
+    const fd=new FormData();
+    fd.append('file',$('#u_file').files[0]); fd.append('title',$('#u_title').value.trim());
+    fd.append('source_type',$('#u_type').value); fd.append('description',$('#u_desc').value.trim());
+    await api('/api/materials',{method:'POST',body:fd});
+    setMsg('#upmsg',T('d_uploaded'),true); $('#up').reset(); loadMaterials();
+  }catch(err){ if(err.message!=='auth') setMsg('#upmsg',err.message); }
+  b.disabled=false; return false;
+}
 
-  async function refresh(){ const {materials} = await api('/api/materials'); state.materials = materials; renderList(); }
-  async function doUpload(e){
-    e.preventDefault(); msg(''); const b=$('#up button'); b.disabled=true;
-    try{
-      const fd = new FormData();
-      fd.append('file', $('#u_file').files[0]);
-      fd.append('title', $('#u_title').value.trim());
-      fd.append('source_type', $('#u_type').value);
-      fd.append('description', $('#u_desc').value.trim());
-      await api('/api/materials', { method:'POST', body:fd });
-      msg(T('d_uploaded'), true); $('#up').reset(); await refresh();
-    }catch(err){ if(err.message!=='auth') msg(err.message); }
-    b.disabled=false; return false;
+/* ── forum ───────────────────────────────────────────────────── */
+const CATS=['','general','cases','research','platform'];
+function renderCats(){
+  if(state.tab!=='forum') return;
+  $('#forumCats').innerHTML = CATS.map(c=>'<button class="cat'+(c===state.forumCat?' on':'')+'" onclick="setCat(\''+c+'\')">'+
+    esc(c===''?T('fo_cat_all'):T('cat_'+c))+'</button>').join('');
+}
+function setCat(c){ state.forumCat=c; renderCats(); loadTopics(); }
+function loadForum(){ $('#forumList').classList.remove('hide'); $('#newTopic').classList.add('hide'); $('#forumDetail').classList.add('hide'); renderCats(); loadTopics(); }
+async function loadTopics(){
+  try{
+    const q = state.forumCat?('?category='+state.forumCat):'';
+    const {topics}=await get('/api/forum/topics'+q);
+    if(!topics.length){ $('#topics').innerHTML='<div class="empty">'+esc(T('fo_empty'))+'</div>'; return; }
+    $('#topics').innerHTML = topics.map(t=>'<a class="topic" href="#" onclick="return openTopic(\''+t.id+'\')">'+
+      '<div class="tt">'+(t.is_pinned?'📌 ':'')+esc(t.title)+'</div>'+
+      '<div class="tm"><span>'+esc(T('cat_'+t.category)||t.category)+'</span><span>'+esc(t.author)+'</span>'+
+      '<span>'+t.reply_count+' '+esc(T('fo_replies'))+'</span>'+ (t.tags||[]).map(tg=>'<span class="tag">'+esc(tg)+'</span>').join('') +'</div></a>').join('');
+  }catch(e){ if(e.message!=='auth') $('#topics').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function openNewTopic(){ $('#forumList').classList.add('hide'); $('#forumDetail').classList.add('hide'); $('#newTopic').classList.remove('hide'); attach.topic=null; renderChip('topic'); setMsg('#ntmsg',''); }
+function closeNewTopic(){ $('#newTopic').classList.add('hide'); $('#forumList').classList.remove('hide'); $('#nt_title').value=''; $('#nt_body').value=''; $('#nt_tags').value=''; }
+async function submitTopic(){
+  setMsg('#ntmsg','');
+  const title=$('#nt_title').value.trim(), body=$('#nt_body').value.trim();
+  if(title.length<3||!body){ setMsg('#ntmsg',T('fo_need')); return; }
+  const payload={ category:$('#nt_cat').value, title, body,
+    tags:$('#nt_tags').value.split(',').map(s=>s.trim()).filter(Boolean) };
+  if(attach.topic){ payload.share_kind=attach.topic.kind; payload.share_ref={id:attach.topic.id}; }
+  try{ const d=await post('/api/forum/topics',payload); closeNewTopic(); loadForum(); openTopic(d.id); }
+  catch(e){ if(e.message!=='auth') setMsg('#ntmsg',e.message); }
+}
+async function openTopic(id){
+  $('#forumList').classList.add('hide'); $('#newTopic').classList.add('hide');
+  const dt=$('#forumDetail'); dt.classList.remove('hide'); dt.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  try{
+    const {topic,posts}=await get('/api/forum/topics/'+id);
+    let html='<div class="rowhead"><button class="btn-x" onclick="loadForum()" data-i18n="fo_back">'+esc(T('fo_back'))+'</button></div>';
+    html+='<h2>'+esc(topic.title)+'</h2><div class="tm" style="color:var(--muted);font-size:12.5px;margin:4px 0 10px">'+
+      esc(T('cat_'+topic.category)||topic.category)+' · '+esc(topic.author.name)+(topic.author.verified?' <span class="vchk">✓</span>':'')+'</div>';
+    html+='<div class="pbody">'+md(topic.body)+'</div>'+shareCard(topic.share);
+    html+='<div style="margin-top:8px">'+(topic.tags||[]).map(t=>'<span class="tag">'+esc(t)+'</span> ').join('')+'</div>';
+    html+='<div style="margin-top:6px">'+posts.map(p=>'<div class="post"><div class="ph"><span class="avatar" style="width:26px;height:26px;font-size:11px">'+esc(initials(p.author.name))+'</span> <b>'+esc(p.author.name)+'</b>'+(p.author.verified?' <span class="vchk">✓</span>':'')+' <span style="color:var(--muted);font-size:12px">'+esc(fdate(p.created_at))+'</span>'+(p.is_mine?' · <button class="btn-x" onclick="removePost(\''+p.id+'\',\''+id+'\')" data-i18n="act_remove">'+esc(T('act_remove'))+'</button>':'')+'</div><div class="pbody">'+md(p.body)+'</div>'+shareCard(p.share)+'</div>').join('')+'</div>';
+    if(topic.is_locked){ html+='<div class="empty">'+esc(T('fo_locked'))+'</div>'; }
+    else{
+      html+='<div class="composer" style="margin-top:14px"><div id="rep_chip"></div><div class="row2"><textarea id="rep_body" data-i18n-ph="fo_reply_ph" placeholder="'+esc(T('fo_reply_ph'))+'"></textarea></div>'+
+        '<div style="display:flex;gap:9px;margin-top:9px;align-items:center"><button class="btn-mini" type="button" onclick="pickFor(\'reply\')">📎 <span>'+esc(T('attach'))+'</span></button><button class="btn btn-sm" onclick="submitReply(\''+id+'\')">'+esc(T('fo_reply'))+'</button></div><div id="repmsg" class="msg"></div></div>';
+    }
+    dt.innerHTML=html; attach.reply=null;
+  }catch(e){ if(e.message!=='auth') dt.innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+  return false;
+}
+async function submitReply(id){
+  setMsg('#repmsg',''); const body=$('#rep_body').value.trim(); if(!body) return;
+  const payload={ body }; if(attach.reply){ payload.share_kind=attach.reply.kind; payload.share_ref={id:attach.reply.id}; }
+  try{ await post('/api/forum/topics/'+id+'/posts',payload); openTopic(id); }
+  catch(e){ if(e.message!=='auth') setMsg('#repmsg',e.message); }
+}
+async function removePost(pid,tid){ try{ await post('/api/forum/posts/'+pid+'/remove'); openTopic(tid); }catch(e){} }
+
+function shareCard(s){
+  if(!s) return '';
+  if(s.unavailable) return '<div class="scard">📎 '+esc(T('share_unavailable'))+'</div>';
+  if(s.kind==='material'){
+    const open = s.can_open ? ' · <a href="/api/materials/'+s.id+'/file" target="_blank" rel="noopener">'+esc(T('share_open'))+'</a>' : '';
+    return '<div class="scard"><div class="sh">📄 '+esc(s.title)+'</div><div>'+esc(T('mt_'+s.source_type)||s.source_type)+' · <span class="pill '+esc(s.status)+'">'+esc(T('st_'+s.status)||s.status)+'</span>'+open+'</div></div>';
   }
-  async function logout(){ try{ await api('/api/logout',{method:'POST'}); }catch(e){} location.href='/portal/'; }
-  async function load(){
-    const me = await api('/api/me'); state.me = me; renderWho(); await refresh();
+  if(s.kind==='answer'){
+    return '<div class="scard"><div class="sh">🔬 '+esc(T('share_answer'))+'</div><div class="sq">'+esc(s.question)+'</div><div style="margin-top:5px">'+md(s.answer)+'</div></div>';
   }
-  load().catch(e=>{ if(e.message!=='auth') $('#who').innerHTML='<div class="empty">'+esc(T('d_loaderr'))+' <a href="/portal/">'+esc(T('d_relogin'))+'</a></div>'; });
+  return '';
+}
+
+/* ── attach picker ───────────────────────────────────────────── */
+function pickFor(which){ pickerCb = s => { attach[which]=s; renderChip(which); }; openPicker(); }
+function renderChip(which){
+  const map={topic:'#nt_chip', reply:'#rep_chip', dm:'#dm_chip'};
+  const el=$(map[which]); if(!el) return;
+  const s=attach[which];
+  el.innerHTML = s ? '<span class="chip">📎 '+esc(s.label)+' <span class="x" onclick="attach.'+which+'=null;renderChip(\''+which+'\')">✕</span></span>' : '';
+}
+function openPicker(){ $('#picker').classList.remove('hide'); pickerTab('material'); }
+function closePicker(){ $('#picker').classList.add('hide'); pickerCb=null; }
+function pickerTab(kind){
+  pickerKind=kind;
+  $('#pt_mat').classList.toggle('on',kind==='material'); $('#pt_ans').classList.toggle('on',kind==='answer');
+  const list=$('#pickerList'); list.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  get(kind==='material'?'/api/materials':'/api/answers').then(d=>{
+    const items = kind==='material' ? d.materials : d.answers;
+    if(!items.length){ list.innerHTML='<div class="empty">'+esc(T('attach_none'))+'</div>'; return; }
+    list.innerHTML='';
+    items.forEach(it=>{
+      const label = kind==='material' ? it.title : it.question;
+      const sub   = kind==='material' ? (T('st_'+it.status)||it.status) : fdate(it.created_at);
+      const div=document.createElement('div'); div.className='pick';
+      div.innerHTML='<div class="t">'+esc(label)+'</div><div class="m">'+esc(sub)+'</div>';
+      div.onclick=()=>choose(kind, it.id, label);
+      list.appendChild(div);
+    });
+  }).catch(()=>{});
+}
+function escJs(s){ return (s||'').replace(/['\\]/g,'\\$&').replace(/[\n\r]/g,' '); }
+function choose(kind,id,label){ if(pickerCb) pickerCb({kind,id,label}); closePicker(); }
+
+/* ── community ───────────────────────────────────────────────── */
+let cmTimer;
+function loadCommunity(){ loadFriends(); searchMembers(); }
+async function loadFriends(){
+  try{
+    const {friends,incoming,outgoing}=await get('/api/friends');
+    let h='';
+    if(incoming.length){ h+='<div class="sech">'+esc(T('cm_incoming'))+'</div>'+incoming.map(p=>personRow(p,'in')).join(''); }
+    if(outgoing.length){ h+='<div class="sech">'+esc(T('cm_outgoing'))+'</div>'+outgoing.map(p=>personRow(p,'out')).join(''); }
+    $('#cm_requests').innerHTML=h;
+    $('#cm_friends').innerHTML = '<div class="sech">'+esc(T('cm_friends'))+'</div>'+(friends.length?friends.map(p=>personRow(p,'friend')).join(''):'<div class="empty">'+esc(T('cm_no_friends'))+'</div>');
+  }catch(e){}
+}
+let searchT;
+function searchMembers(){ clearTimeout(searchT); searchT=setTimeout(doSearchMembers,250); }
+async function doSearchMembers(){
+  const q=$('#cm_search').value.trim();
+  try{
+    const {members}=await get('/api/members'+(q?'?q='+encodeURIComponent(q):''));
+    $('#cm_members').innerHTML = members.length ? members.map(m=>personRow(m,'member')).join('') : '<div class="empty">'+esc(T('cm_none_members'))+'</div>';
+  }catch(e){}
+}
+function personRow(p,ctx){
+  const sub = [p.specialty,p.org].filter(Boolean).map(esc).join(' · ');
+  let act='';
+  if(ctx==='member'){
+    if(p.relation==='friends') act='<button class="btn-mini" onclick="dmOpen(\''+p.id+'\')">'+esc(T('cm_message'))+'</button>';
+    else if(p.relation==='pending_out') act='<span class="pill pending">'+esc(T('cm_pending'))+'</span>';
+    else if(p.relation==='pending_in') act='<button class="btn-mini" onclick="friend(\'accept\',\''+p.id+'\')">'+esc(T('cm_accept'))+'</button>';
+    else act='<button class="btn-mini" onclick="friend(\'request\',\''+p.id+'\')">'+esc(T('cm_connect'))+'</button>';
+  } else if(ctx==='in'){
+    act='<button class="btn-mini" onclick="friend(\'accept\',\''+p.id+'\')">'+esc(T('cm_accept'))+'</button> <button class="btn-x" onclick="friend(\'decline\',\''+p.id+'\')">'+esc(T('cm_decline'))+'</button>';
+  } else if(ctx==='out'){ act='<span class="pill pending">'+esc(T('cm_pending'))+'</span>'; }
+  else if(ctx==='friend'){ act='<button class="btn-mini" onclick="dmOpen(\''+p.id+'\')">'+esc(T('cm_message'))+'</button>'; }
+  return '<div class="listrow"><div class="avatar">'+esc(initials(p.full_name))+'</div><div class="lr-main"><div class="nm">'+esc(p.full_name)+(p.verified?' <span class="vchk">✓</span>':'')+'</div><div class="sub">'+sub+'</div></div><div class="lr-act">'+act+'</div></div>';
+}
+async function friend(action,id){ try{ await post('/api/friends/'+action,{user_id:id}); loadCommunity(); refreshBadges(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
+function dmOpen(id){ go('messages'); openThread(id); document.querySelectorAll('.navitem[data-tab]').forEach(n=>n.classList.toggle('on',n.dataset.tab==='messages')); }
+
+/* ── messages ────────────────────────────────────────────────── */
+let msgTimer;
+function manageMsgPoll(){ clearInterval(msgTimer); if(state.tab==='messages'){ msgTimer=setInterval(()=>{ if(state.thread) refreshThread(state.thread,true); else loadConversations(); },5000); } }
+async function loadConversations(){
+  $('#convList').classList.remove('hide'); $('#thread').classList.add('hide'); state.thread=null; manageMsgPoll();
+  try{
+    const {conversations}=await get('/api/messages');
+    $('#convos').innerHTML = conversations.length ? conversations.map(c=>'<div class="listrow" onclick="openThread(\''+c.user_id+'\')" style="cursor:pointer"><div class="avatar">'+esc(initials(c.full_name))+'</div><div class="lr-main"><div class="nm">'+esc(c.full_name)+'</div><div class="sub">'+esc(c.last)+'</div></div>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div>').join('') : '<div class="empty">'+esc(T('ms_empty'))+'</div>';
+  }catch(e){}
+}
+async function openThread(id){
+  state.thread=id; $('#convList').classList.add('hide'); $('#thread').classList.remove('hide');
+  $('#thread').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>'; manageMsgPoll();
+  await refreshThread(id,false);
+}
+async function refreshThread(id,quiet){
+  try{
+    const d=await get('/api/messages/'+id);
+    const bubbles=d.messages.map(m=>'<div class="tb '+(m.mine?'mine':'theirs')+'">'+(m.body?md(m.body):'')+shareCard(m.share)+'<div class="ttime">'+esc(ftime(m.created_at))+'</div></div>').join('');
+    const composer = d.are_friends
+      ? '<div class="composer" style="margin-top:12px"><div id="dm_chip"></div><div class="row2"><textarea id="dm_body" data-i18n-ph="ms_ph" placeholder="'+esc(T('ms_ph'))+'" onkeydown="dmKey(event,\''+id+'\')"></textarea></div><div style="display:flex;gap:9px;margin-top:9px;align-items:center"><button class="btn-mini" type="button" onclick="pickFor(\'dm\')">📎 <span>'+esc(T('attach'))+'</span></button><button class="btn btn-sm" onclick="sendDM(\''+id+'\')">'+esc(T('ms_send'))+'</button></div><div id="dmmsg" class="msg"></div></div>'
+      : '<div class="empty">'+esc(T('ms_not_friend'))+'</div>';
+    const atBottom = (()=>{ const t=$('#threadScroll'); return !t || (t.scrollHeight-t.scrollTop-t.clientHeight<60); })();
+    $('#thread').innerHTML='<div class="rowhead"><button class="btn-x" onclick="loadConversations()" data-i18n="ms_back">'+esc(T('ms_back'))+'</button><b>'+esc(d.other.full_name)+'</b></div><div class="thread" id="threadScroll">'+bubbles+'</div>'+composer;
+    const ts=$('#threadScroll'); if(ts && (!quiet||atBottom)) ts.scrollTop=ts.scrollHeight;
+    if(attach.dm) renderChip('dm');
+    if(!quiet) refreshBadges();
+  }catch(e){ if(e.message!=='auth' && !quiet) $('#thread').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function dmKey(e,id){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendDM(id); } }
+async function sendDM(id){
+  const t=$('#dm_body'); const body=t.value.trim();
+  const payload={}; if(body) payload.body=body; if(attach.dm){ payload.share_kind=attach.dm.kind; payload.share_ref={id:attach.dm.id}; }
+  if(!body && !attach.dm) return;
+  try{ await post('/api/messages/'+id,payload); attach.dm=null; await refreshThread(id,false); }
+  catch(e){ if(e.message!=='auth') setMsg('#dmmsg',e.message); }
+}
+
+/* ── invite ──────────────────────────────────────────────────── */
+async function loadInvites(){
+  try{
+    const {invites}=await get('/api/invites');
+    $('#ivlist').innerHTML = invites.length ? invites.map(i=>'<div class="listrow"><div class="lr-main"><div class="nm" style="font-size:13px;word-break:break-all">'+(i.email?esc(i.email):esc(T('in_anyone')))+'</div><div class="sub">'+esc(T('in_expires'))+' '+esc(fdate(i.expires_at))+(i.note?' · '+esc(i.note):'')+'</div></div><div class="lr-act"><span class="pill '+esc(i.status)+'">'+esc(T('iv_'+i.status)||i.status)+'</span>'+(i.status==='active'?' <button class="btn-x" onclick="revokeInvite(\''+i.id+'\')" data-i18n="in_revoke">'+esc(T('in_revoke'))+'</button>':'')+'</div></div>').join('') : '<div class="empty">'+esc(T('in_none'))+'</div>';
+  }catch(e){}
+}
+async function createInvite(){
+  setMsg('#ivmsg',''); const b=$('#iv_btn'); b.disabled=true;
+  try{
+    let lang='en'; try{ lang=localStorage.getItem('elpis_lang')||window.OE_LANG||'en'; }catch(e){ lang=window.OE_LANG||'en'; }
+    const d=await post('/api/invites',{ email:$('#iv_email').value.trim()||null, note:$('#iv_note').value.trim()||null, lang });
+    $('#iv_email').value=''; $('#iv_note').value='';
+    const sent = d.emailed ? '<div style="margin-top:9px;color:var(--teal-deep);font-size:12.5px">'+esc(T('in_sent'))+' '+esc(d.emailed_to)+'</div>' : '';
+    $('#ivresult').innerHTML='<div class="scard" style="margin-top:14px"><div class="sh">🔗 '+esc(T('in_link'))+'</div><div style="word-break:break-all;margin:6px 0;font-size:13px">'+esc(d.url)+'</div><button class="btn-mini" onclick="copyInvite(this,\''+escJs(d.url)+'\')" data-i18n="in_copy">'+esc(T('in_copy'))+'</button>'+sent+'</div>';
+    loadInvites();
+  }catch(e){ if(e.message!=='auth') setMsg('#ivmsg',e.message); }
+  b.disabled=false;
+}
+function copyInvite(btn,url){ navigator.clipboard.writeText(url).then(()=>{ btn.textContent=T('in_copied'); toast(T('in_copied')); }).catch(()=>{}); }
+async function revokeInvite(id){ try{ await post('/api/invites/'+id+'/revoke'); loadInvites(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
+
+/* ── badges / boot ───────────────────────────────────────────── */
+async function refreshBadges(){
+  try{
+    const b=await get('/api/badges');
+    setBadge('#bdg_msg', b.unread_dms); setBadge('#bdg_comm', b.friend_requests);
+    setBadge('#bdg_review', b.review_pending);
+    if(b.admin) setBadge('#bdg_admin', (b.admin.pending_requests||0)+(b.admin.pending_materials||0));
+  }catch(e){}
+}
+function setBadge(sel,n){ const e=$(sel); if(!e) return; e.textContent=n||''; e.classList.toggle('on', !!n); }
+
+async function logout(){ try{ await post('/api/logout'); }catch(e){} location.href='/portal/'; }
+
+async function boot(){
+  try{ state.me=await get('/api/me'); }catch(e){ location.href='/portal/'; return; }
+  renderUser(); refreshBadges(); setInterval(refreshBadges,20000);
+  const valid=['home','copilot','contribute','forum','community','messages','review','invite'];
+  let start=(location.hash||'').replace('#','');
+  if(!valid.includes(start)) start='home';
+  if(start==='review' && !(state.me.role==='reviewer'||state.me.role==='admin')) start='home';
+  go(start);
+}
+boot();
 </script>
 </body>
 </html>

@@ -2,6 +2,13 @@
 .DS_Store
 *.swp
 
+# Python build artifacts
+__pycache__/
+*.py[cod]
+
+# Local DB backups / dumps
+*.dump
+
 # Agent / working files
 .claude/
 CLAUDE.md

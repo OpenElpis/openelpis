@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clinician portal — log in or sign up | OpenElpis</title>
-<meta name="description" content="Sign in or create an OpenElpis account for clinics, hospitals, labs and clinicians to contribute validated breast-cancer materials.">
+<title>Clinician portal — log in or request access | OpenElpis</title>
+<meta name="description" content="Invitation-only portal for verified clinicians, hospitals and labs contributing validated breast-cancer materials to OpenElpis.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://openelpis.com/portal/">
 <meta name="theme-color" content="#0a5b5a">
@@ -15,6 +15,7 @@
 <style>
   :root{--ink:#13211e;--ink-soft:#42524d;--muted:#6c7d78;--teal:#0e7c7b;--teal-deep:#0a5b5a;--teal-dark:#073f3e;
     --mint:#e7f3f1;--mint-2:#f4faf8;--rose:#e35d8a;--rose-deep:#c43a6e;--rose-dark:#a82f5f;--rose-soft:#fdeef3;
+    --amber:#9a6a00;--amber-soft:#fdf4e3;
     --line:#dde7e4;--bg:#fbfdfc;--shadow:0 1px 2px rgba(7,63,62,.04),0 12px 32px -12px rgba(7,63,62,.16)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',-apple-system,sans-serif;color:var(--ink);background:
@@ -33,13 +34,17 @@
   .card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:34px 30px}
   h1{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:27px;margin-bottom:6px}
   .sub{color:var(--ink-soft);font-size:15px;margin-bottom:22px}
-  .tabs{display:flex;gap:6px;background:var(--mint-2);border:1px solid var(--line);border-radius:999px;padding:5px;margin-bottom:24px}
+  .tabs{display:flex;gap:6px;background:var(--mint-2);border:1px solid var(--line);border-radius:999px;padding:5px;margin-bottom:22px}
   .tabs button{flex:1;border:0;background:transparent;font:inherit;font-weight:600;font-size:14px;color:var(--ink-soft);padding:9px;border-radius:999px;cursor:pointer}
   .tabs button.on{background:#fff;color:var(--teal-deep);box-shadow:var(--shadow)}
+  .notice{margin:0 0 18px;font-size:13.5px;padding:11px 14px;border-radius:11px;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
+  .notice.warn{background:var(--amber-soft);color:var(--amber);border-color:#eedcae}
   label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin:14px 0 6px}
   label .lhint{color:var(--muted);font-weight:400}
-  input,select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font:inherit;font-size:15px;color:var(--ink);background:#fbfdfc}
-  input:focus,select:focus{outline:none;border-color:var(--teal)}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font:inherit;font-size:15px;color:var(--ink);background:#fbfdfc}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
+  input:read-only{background:#f0f5f3;color:var(--ink-soft)}
+  textarea{resize:vertical;min-height:64px}
   .row{display:flex;gap:12px}.row>div{flex:1}
   .btn{width:100%;margin-top:22px;background:var(--rose-dark);color:#fff;border:0;border-radius:999px;padding:13px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
   .btn:hover{background:#8a2750}.btn:disabled{opacity:.6;cursor:not-allowed}
@@ -64,23 +69,27 @@
 <div class="wrap">
   <div class="card">
     <h1 data-i18n="p_title">Clinician portal</h1>
-    <p class="sub" data-i18n="p_sub">For clinics, hospitals, labs &amp; clinicians contributing validated breast-cancer materials.</p>
+    <p class="sub" data-i18n="p_sub2">Invitation-only — for verified clinicians, hospitals &amp; labs contributing validated breast-cancer materials.</p>
     <div class="tabs">
       <button id="tabLogin" class="on" onclick="show('login')" data-i18n="p_login">Log in</button>
-      <button id="tabSignup" onclick="show('signup')" data-i18n="p_signup">Create account</button>
+      <button id="tabJoin" onclick="show('join')" data-i18n="p_request">Request access</button>
     </div>
 
+    <div id="notice" class="notice hide"></div>
+
+    <!-- LOGIN -->
     <form id="loginForm" onsubmit="return doLogin(event)">
       <label data-i18n="p_email">Email</label><input type="email" id="l_email" required autocomplete="email">
       <label data-i18n="p_password">Password</label><input type="password" id="l_pass" required autocomplete="current-password">
       <button class="btn" type="submit" data-i18n="p_login">Log in</button>
     </form>
 
+    <!-- SIGNUP (only shown with a valid invite) -->
     <form id="signupForm" class="hide" onsubmit="return doSignup(event)">
-      <label data-i18n="p_name">Full name</label><input id="s_name" required autocomplete="name">
-      <label data-i18n="p_workemail">Work email</label><input type="email" id="s_email" required autocomplete="email">
+      <label data-i18n="p_name">Full name</label><input id="s_name" autocomplete="name">
+      <label data-i18n="p_workemail">Work email</label><input type="email" id="s_email" autocomplete="email">
       <label><span data-i18n="p_password">Password</span> <span class="lhint">(<span data-i18n="p_pwmin">min 10 characters</span>)</span></label>
-      <input type="password" id="s_pass" required minlength="10" autocomplete="new-password">
+      <input type="password" id="s_pass" minlength="10" autocomplete="new-password">
       <div class="row">
         <div><label data-i18n="p_org">Organization</label><input id="s_org" data-i18n-ph="p_org_ph" placeholder="e.g. City Hospital"></div>
         <div><label data-i18n="p_type">Type</label>
@@ -91,9 +100,33 @@
           </select>
         </div>
       </div>
-      <label data-i18n="p_country">Country</label><input id="s_country" data-i18n-ph="p_country_ph" placeholder="e.g. Türkiye">
-      <button class="btn" type="submit" data-i18n="p_signup">Create account</button>
-      <p class="fine" data-i18n="p_fine">Accounts are reviewed before verification. OpenElpis is a non-profit research-support project — materials you upload are checked by an expert before they enter the corpus, and the platform never provides diagnosis or treatment advice.</p>
+      <div class="row">
+        <div><label data-i18n="p_specialty">Specialty</label><input id="s_specialty" data-i18n-ph="p_specialty_ph" placeholder="e.g. Medical oncology"></div>
+        <div><label data-i18n="p_country">Country</label><input id="s_country" data-i18n-ph="p_country_ph" placeholder="e.g. Türkiye"></div>
+      </div>
+      <button class="btn" type="submit" data-i18n="p_create">Create account</button>
+      <p class="fine" data-i18n="p_fine">OpenElpis is a non-profit research-support project. Materials you upload are checked by an expert before they enter the corpus, and the platform never provides diagnosis or treatment advice.</p>
+    </form>
+
+    <!-- REQUEST ACCESS (no/invalid invite) -->
+    <form id="requestForm" class="hide" onsubmit="return doRequest(event)">
+      <label data-i18n="p_name">Full name</label><input id="r_name" autocomplete="name">
+      <label data-i18n="p_workemail">Work email</label><input type="email" id="r_email" autocomplete="email">
+      <div class="row">
+        <div><label data-i18n="p_org">Organization</label><input id="r_org" data-i18n-ph="p_org_ph" placeholder="e.g. City Hospital"></div>
+        <div><label data-i18n="p_type">Type</label>
+          <select id="r_type">
+            <option value="clinic" data-i18n="ot_clinic">Clinic</option><option value="hospital" data-i18n="ot_hospital">Hospital</option>
+            <option value="lab" data-i18n="ot_lab">Lab</option><option value="university" data-i18n="ot_university">University</option>
+            <option value="individual" data-i18n="ot_individual">Individual</option><option value="other" data-i18n="ot_other">Other</option>
+          </select>
+        </div>
+      </div>
+      <label data-i18n="p_country">Country</label><input id="r_country" data-i18n-ph="p_country_ph" placeholder="e.g. Türkiye">
+      <label><span data-i18n="p_message">Anything we should know?</span> <span class="lhint" data-i18n="d_optional">(optional)</span></label>
+      <textarea id="r_message" maxlength="1000" data-i18n-ph="p_message_ph" placeholder="Your role, institution, and how you'd contribute…"></textarea>
+      <button class="btn" type="submit" data-i18n="p_request">Request access</button>
+      <p class="fine" data-i18n="p_request_fine">We review every applicant to keep OpenElpis a trusted space for clinicians. If approved, you'll receive a personal invitation link by email.</p>
     </form>
 
     <div id="msg" class="msg"></div>
@@ -102,23 +135,37 @@
 <script src="/portal/i18n.js"></script>
 <script>
   const $ = s => document.querySelector(s);
-  function show(which){
-    const login = which==='login';
-    $('#loginForm').classList.toggle('hide', !login);
-    $('#signupForm').classList.toggle('hide', login);
-    $('#tabLogin').classList.toggle('on', login);
-    $('#tabSignup').classList.toggle('on', !login);
-    msg('');
-  }
+  const inviteToken = new URLSearchParams(location.search).get('invite');
+  let joinMode = 'request';   // 'signup' once an invite validates
+
   function msg(text, ok){
     const m = $('#msg'); m.className = 'msg' + (text ? (ok ? ' ok' : ' err') : '');
     m.textContent = text || '';
   }
-  async function api(path, body, isForm){
-    const opt = { method:'POST', credentials:'same-origin' };
-    if(isForm){ opt.body = body; }
-    else { opt.headers = {'Content-Type':'application/json'}; opt.body = JSON.stringify(body); }
-    const res = await fetch(path, opt);
+  function renderJoin(){
+    $('#tabJoin').textContent = T(joinMode === 'signup' ? 'p_create' : 'p_request');
+    const n = $('#notice');
+    if(joinMode === 'signup'){ n.className = 'notice'; n.textContent = T('p_invite_valid'); }
+    else if(inviteToken){ n.className = 'notice warn'; n.textContent = T('p_invite_invalid'); }
+    else { n.className = 'notice'; n.textContent = T('p_invite_only_note'); }
+  }
+  // re-apply dynamic bits when the language changes
+  window.onPortalLang = renderJoin;
+
+  function show(tab){
+    const login = tab === 'login';
+    $('#loginForm').classList.toggle('hide', !login);
+    $('#signupForm').classList.toggle('hide', login || joinMode !== 'signup');
+    $('#requestForm').classList.toggle('hide', login || joinMode !== 'request');
+    $('#notice').classList.toggle('hide', login);
+    $('#tabLogin').classList.toggle('on', login);
+    $('#tabJoin').classList.toggle('on', !login);
+    msg('');
+  }
+
+  async function api(path, body){
+    const res = await fetch(path, { method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     let data = {}; try{ data = await res.json(); }catch(e){}
     if(!res.ok){
       const detail = data.detail || '';
@@ -128,6 +175,7 @@
     }
     return data;
   }
+
   async function doLogin(e){
     e.preventDefault(); msg(''); const b=$('#loginForm button'); b.disabled=true;
     try{
@@ -139,15 +187,43 @@
   async function doSignup(e){
     e.preventDefault(); msg(''); const b=$('#signupForm button'); b.disabled=true;
     try{
+      if($('#s_pass').value.length < 10) throw new Error(T('p_pwmin'));
       await api('/api/signup', {
         full_name:$('#s_name').value.trim(), email:$('#s_email').value.trim(),
         password:$('#s_pass').value, org_name:$('#s_org').value.trim()||null,
-        org_type:$('#s_type').value, country:$('#s_country').value.trim()||null });
-      show('login'); msg(T('p_signup_ok'), true);
+        org_type:$('#s_type').value, country:$('#s_country').value.trim()||null,
+        specialty:$('#s_specialty').value.trim()||null, invite_token:inviteToken });
+      location.href = '/portal/dashboard.html';
     }catch(err){ msg(err.message); b.disabled=false; }
     return false;
   }
-  fetch('/api/me', {credentials:'same-origin'}).then(r=>{ if(r.ok) location.href='/portal/dashboard.html'; });
+  async function doRequest(e){
+    e.preventDefault(); msg(''); const b=$('#requestForm button'); b.disabled=true;
+    try{
+      const d = await api('/api/access-request', {
+        full_name:$('#r_name').value.trim(), email:$('#r_email').value.trim(),
+        org_name:$('#r_org').value.trim()||null, org_type:$('#r_type').value,
+        country:$('#r_country').value.trim()||null, message:$('#r_message').value.trim()||null });
+      $('#requestForm').reset();
+      msg(d.message || T('p_request_ok'), true);
+    }catch(err){ msg(err.message); b.disabled=false; }
+    return false;
+  }
+
+  async function init(){
+    try{ const r = await fetch('/api/me',{credentials:'same-origin'}); if(r.ok){ location.href='/portal/dashboard.html'; return; } }catch(e){}
+    if(inviteToken){
+      try{
+        const r = await fetch('/api/invite/'+encodeURIComponent(inviteToken));
+        const d = await r.json();
+        if(d.valid){ joinMode='signup'; if(d.email){ $('#s_email').value=d.email; $('#s_email').readOnly=true; } }
+        else joinMode='request';
+      }catch(e){ joinMode='request'; }
+    }
+    renderJoin();
+    show(joinMode === 'signup' ? 'join' : 'login');
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>
 </body>
 </html>

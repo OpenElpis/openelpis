@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — OpenElpis</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a5b5a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<style>
+  :root{--ink:#13211e;--ink-soft:#42524d;--muted:#6c7d78;--teal:#0e7c7b;--teal-deep:#0a5b5a;
+    --mint:#e7f3f1;--mint-2:#f4faf8;--rose:#e35d8a;--rose-deep:#c43a6e;--rose-dark:#a82f5f;--rose-soft:#fdeef3;
+    --amber:#9a6a00;--amber-soft:#fdf4e3;--line:#dde7e4;--shadow:0 1px 2px rgba(7,63,62,.04),0 12px 32px -12px rgba(7,63,62,.16)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,sans-serif;color:var(--ink);background:var(--mint-2);min-height:100vh;line-height:1.5;font-size:14.5px;-webkit-font-smoothing:antialiased}
+  a{color:var(--teal-deep);text-decoration:none}
+  header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  header .in{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:0 auto;padding:12px 22px;gap:12px}
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Fraunces';font-size:18px;font-weight:600;color:var(--ink)}
+  .brand img{width:30px;height:30px}.brand .tag{font-family:'Inter';font-size:11px;font-weight:700;background:var(--rose-soft);color:var(--rose-dark);border-radius:6px;padding:2px 7px}
+  .hr{display:flex;align-items:center;gap:10px;font-size:13px}
+  .btn-ghost{font-size:13px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+  .btn-ghost:hover{border-color:var(--teal);color:var(--teal-deep)}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 22px 70px}
+  .tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px}
+  .tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 15px;font:inherit;font-weight:600;font-size:13.5px;color:var(--ink-soft);cursor:pointer}
+  .tabs button.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
+  .tabs button .b{margin-left:6px;background:var(--rose-dark);color:#fff;font-size:11px;border-radius:999px;padding:0 6px}
+  .tabs button.on .b{background:rgba(255,255,255,.3)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+  h2{font-family:'Fraunces';font-weight:600;font-size:19px;margin-bottom:12px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{background:var(--mint-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat .n{font-family:'Sora';font-weight:800;font-size:26px;color:var(--teal-deep)}
+  .stat .l{font-size:12.5px;color:var(--muted);font-weight:600}
+  .filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+  input,select{border:1px solid var(--line);border-radius:9px;padding:8px 11px;font:inherit;font-size:13.5px;color:var(--ink);background:#fbfdfc}
+  input:focus,select:focus{outline:none;border-color:var(--teal)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 9px;white-space:nowrap}
+  td{padding:10px 8px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+  td .t{color:var(--ink);font-weight:600}
+  .pill{font-size:10.5px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .pill.pending,.pill.pending_review,.pill.active{background:var(--amber-soft);color:var(--amber)}
+  .pill.verified,.pill.approved,.pill.used{background:var(--mint);color:var(--teal-deep)}
+  .pill.rejected,.pill.revoked,.pill.expired,.pill.inactive{background:var(--rose-soft);color:var(--rose-dark)}
+  .pill.admin{background:#efe6fb;color:#6b3fa0}.pill.reviewer{background:#e6eefb;color:#2f5aa0}.pill.contributor{background:#eef1f0;color:var(--ink-soft)}
+  .act{display:flex;gap:6px;flex-wrap:wrap}
+  .b-mini{border:0;border-radius:999px;padding:5px 11px;font:inherit;font-weight:600;font-size:12px;cursor:pointer;background:var(--mint);color:var(--teal-deep)}
+  .b-mini:hover{background:#d6ebe7}
+  .b-mini.warn{background:var(--rose-soft);color:var(--rose-dark)}.b-mini.warn:hover{background:#f8d9e4}
+  .b-mini.go{background:var(--rose-dark);color:#fff}.b-mini.go:hover{background:#8a2750}
+  .empty{color:var(--muted);padding:16px 0}
+  .msg{margin-top:12px;font-size:13px;padding:10px 13px;border-radius:10px;display:none}
+  .msg.ok{display:block;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
+  .msg.err{display:block;background:var(--rose-soft);color:var(--rose-dark);border:1px solid #f3c6d6}
+  .urlbox{margin-top:10px;background:var(--mint-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;word-break:break-all}
+  .mini-form{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .rolelegend{background:var(--mint-2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.65}
+  .rolelegend b{color:var(--ink)}
+  .hide{display:none!important}
+  .sub{color:var(--muted);font-size:12px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:60;box-shadow:var(--shadow);opacity:0;transition:.2s;pointer-events:none}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <a class="brand" href="/"><img src="/logo.svg" alt="OpenElpis"> OpenElpis <span class="tag">ADMIN</span></a>
+  <div class="hr">
+    <span id="who" class="sub"></span>
+    <a class="btn-ghost" href="/portal/dashboard.html">← Dashboard</a>
+    <button class="btn-ghost" onclick="logout()">Log out</button>
+  </div>
+</div></header>
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="on" data-tab="overview" onclick="go('overview')">Overview</button>
+    <button data-tab="members" onclick="go('members')">Members</button>
+    <button data-tab="requests" onclick="go('requests')">Requests <span id="b_req" class="b hide"></span></button>
+    <button data-tab="invites" onclick="go('invites')">Invites</button>
+    <button data-tab="materials" onclick="go('materials')">Materials <span id="b_mat" class="b hide"></span></button>
+    <button data-tab="forum" onclick="go('forum')">Forum</button>
+    <button data-tab="audit" onclick="go('audit')">Audit</button>
+  </div>
+
+  <section class="panel card" data-panel="overview"><h2>Overview</h2><div id="ov" class="stats"><div class="empty">Loading…</div></div></section>
+
+  <section class="panel card hide" data-panel="members">
+    <h2>Members</h2>
+    <div class="rolelegend">Assign roles in the table below. <b>Contributor</b> — uploads &amp; participates. <b>Reviewer</b> — can approve/reject other members' uploaded materials from their own dashboard (no admin access). <b>Admin</b> — full admin panel; <b>only the owner</b> can add or modify admins.</div>
+    <div class="filters">
+      <input id="m_q" placeholder="Search name or email…" oninput="dl(loadMembers)">
+      <select id="m_status" onchange="loadMembers()">
+        <option value="">All statuses</option><option value="pending">Pending</option><option value="verified">Verified</option><option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div id="members"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel card hide" data-panel="requests">
+    <h2>Access requests</h2>
+    <div class="filters">
+      <select id="r_status" onchange="loadRequests()">
+        <option value="pending">Pending</option><option value="approved">Approved</option><option value="invited">Invited</option><option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div id="requests"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel card hide" data-panel="invites">
+    <h2>Invitations</h2>
+    <div class="mini-form">
+      <input id="i_email" type="email" placeholder="Email (optional)">
+      <select id="i_role"><option value="contributor">Contributor</option><option value="reviewer">Reviewer</option><option value="admin">Admin</option></select>
+      <input id="i_note" placeholder="Note (optional)">
+      <button class="b-mini go" onclick="adminCreateInvite()">Create invite</button>
+    </div>
+    <div id="i_result"></div>
+    <div id="invites"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel card hide" data-panel="materials">
+    <h2>Materials</h2>
+    <div class="filters">
+      <input id="mat_q" placeholder="Search title…" oninput="dl(loadAdminMaterials)">
+      <input id="mat_uploader" placeholder="Uploader id (optional)">
+      <select id="mat_status" onchange="loadAdminMaterials()">
+        <option value="">All</option><option value="pending_review">Pending review</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+      </select>
+      <button class="b-mini" onclick="loadAdminMaterials()">Filter</button>
+    </div>
+    <div id="materials"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel card hide" data-panel="forum">
+    <h2>Forum moderation</h2>
+    <p class="sub" style="margin-bottom:12px">Open topics — remove anything off-policy.</p>
+    <div id="forum"><div class="empty">Loading…</div></div>
+  </section>
+
+  <section class="panel card hide" data-panel="audit"><h2>Recent activity</h2><div id="audit"><div class="empty">Loading…</div></div></section>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fdate = s => s ? new Date(s).toLocaleDateString('en',{year:'numeric',month:'short',day:'numeric'}) : '—';
+const ftime = s => new Date(s).toLocaleString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+let toastT; function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('on'),2200); }
+let dlT; function dl(fn){ clearTimeout(dlT); dlT=setTimeout(fn,250); }
+
+async function api(path, opt){
+  opt=opt||{}; opt.credentials='same-origin';
+  const res=await fetch(path,opt);
+  if(res.status===401){ location.href='/portal/'; throw new Error('auth'); }
+  if(res.status===403){ location.href='/portal/dashboard.html'; throw new Error('forbidden'); }
+  let data={}; try{ data=await res.json(); }catch(e){}
+  if(!res.ok) throw new Error(data.detail||'Something went wrong');
+  return data;
+}
+const get=p=>api(p);
+const post=(p,o)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o||{})});
+
+function go(tab){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hide',p.dataset.panel!==tab));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  ({overview:loadOverview,members:loadMembers,requests:loadRequests,invites:loadInvites,materials:loadAdminMaterials,forum:loadForumMod,audit:loadAudit}[tab]||(()=>{}))();
+}
+
+async function loadOverview(){
+  try{
+    const s=await get('/api/admin/overview');
+    const cards=[['Members',s.users],['Pending members',s.users_pending],['Verified',s.users_verified],
+      ['Materials',s.materials],['Pending review',s.materials_pending],['Approved',s.materials_approved],
+      ['Access requests',s.requests_pending],['Active invites',s.invites_active],['Forum topics',s.topics],['Messages',s.dms]];
+    $('#ov').innerHTML=cards.map(c=>'<div class="stat"><div class="n">'+c[1]+'</div><div class="l">'+c[0]+'</div></div>').join('');
+    setBadge('#b_req',s.requests_pending); setBadge('#b_mat',s.materials_pending);
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#ov').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function setBadge(sel,n){ const e=$(sel); if(!e)return; e.textContent=n||''; e.classList.toggle('hide',!n); }
+
+async function loadMembers(){
+  try{
+    const q=$('#m_q').value.trim(), st=$('#m_status').value;
+    const {members}=await get('/api/admin/members?'+(q?'q='+encodeURIComponent(q)+'&':'')+(st?'status='+st:''));
+    if(!members.length){ $('#members').innerHTML='<div class="empty">No members.</div>'; return; }
+    $('#members').innerHTML='<table><thead><tr><th>Member</th><th>Role</th><th>Status</th><th>Uploads</th><th>Joined</th><th></th></tr></thead><tbody>'+
+      members.map(m=>{
+        const ver = m.verification_status;
+        const lockAdmin = m.role==='admin' && !window.IS_SUPER;   // only owner manages admins
+        const verBtns = (!lockAdmin && ver!=='verified') ? '<button class="b-mini" onclick="setMember(\''+m.id+'\',{verification_status:\'verified\'})">Verify</button>' : '';
+        const rejBtn = (!lockAdmin && ver!=='rejected') ? '<button class="b-mini warn" onclick="setMember(\''+m.id+'\',{verification_status:\'rejected\'})">Reject</button>' : '';
+        const actBtn = lockAdmin ? '' : (m.is_active ? '<button class="b-mini warn" onclick="setMember(\''+m.id+'\',{is_active:false})">Disable</button>' : '<button class="b-mini" onclick="setMember(\''+m.id+'\',{is_active:true})">Enable</button>');
+        const roleOpts = ['contributor','reviewer'].concat(window.IS_SUPER?['admin']:[]);
+        const roleCell = lockAdmin ? '<span class="pill admin">admin</span>'
+          : '<span class="pill '+esc(m.role)+'">'+esc(m.role)+'</span><br><select class="sub" style="margin-top:4px;padding:3px 6px" onchange="setMember(\''+m.id+'\',{role:this.value})">'+roleOpts.map(o=>'<option'+(m.role===o?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+        return '<tr><td><span class="t">'+esc(m.full_name)+'</span>'+(m.is_active?'':' <span class="pill inactive">disabled</span>')+
+          '<br><span class="sub">'+esc(m.email)+(m.org?' · '+esc(m.org):'')+(m.specialty?' · '+esc(m.specialty):'')+'</span>'+(m.invited_by?'<br><span class="sub">invited by '+esc(m.invited_by)+'</span>':'')+'</td>'+
+          '<td>'+roleCell+'</td>'+
+          '<td><span class="pill '+esc(ver)+'">'+esc(ver)+'</span></td><td>'+m.uploads+'</td><td class="sub">'+esc(fdate(m.created_at))+'</td>'+
+          '<td><div class="act">'+(lockAdmin?'<span class="sub">owner-managed</span>':(verBtns+rejBtn+actBtn))+'</div></td></tr>';
+      }).join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#members').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function setMember(id,patch){ try{ await post('/api/admin/members/'+id,patch); toast('Updated'); loadMembers(); loadOverview(); }catch(e){ toast(e.message); } }
+
+async function loadRequests(){
+  try{
+    const {requests}=await get('/api/admin/requests?status='+$('#r_status').value);
+    if(!requests.length){ $('#requests').innerHTML='<div class="empty">No requests.</div>'; return; }
+    $('#requests').innerHTML='<table><thead><tr><th>Applicant</th><th>Org</th><th>Message</th><th>When</th><th></th></tr></thead><tbody>'+
+      requests.map(r=>'<tr><td><span class="t">'+esc(r.full_name)+'</span><br><span class="sub">'+esc(r.email)+(r.country?' · '+esc(r.country):'')+'</span>'+(r.credential_ref?'<br><span class="sub">'+esc(r.credential_type||'cred')+': '+esc(r.credential_ref)+'</span>':'')+'</td>'+
+        '<td>'+esc(r.org_name||'—')+(r.org_type?'<br><span class="sub">'+esc(r.org_type)+'</span>':'')+'</td>'+
+        '<td style="max-width:280px">'+esc(r.message||'—')+'</td><td class="sub">'+esc(fdate(r.created_at))+'</td>'+
+        '<td><div class="act">'+(r.status==='pending'?'<button class="b-mini go" onclick="approveReq(\''+r.id+'\')">Approve</button><button class="b-mini warn" onclick="rejectReq(\''+r.id+'\')">Reject</button>':'<span class="pill '+esc(r.status)+'">'+esc(r.status)+'</span>')+'</div></td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#requests').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function approveReq(id){ try{ const d=await post('/api/admin/requests/'+id+'/approve'); showInviteUrl(d.invite_url, d.emailed?('✅ Approved — invite emailed to '+d.email+'. Link:'):('Approved — email not sent, send this link to '+d.email+' manually:')); loadRequests(); loadOverview(); }catch(e){ toast(e.message); } }
+async function rejectReq(id){ try{ await post('/api/admin/requests/'+id+'/reject'); toast('Rejected'); loadRequests(); loadOverview(); }catch(e){ toast(e.message); } }
+
+async function loadInvites(){
+  try{
+    const {invites}=await get('/api/admin/invites');
+    if(!invites.length){ $('#invites').innerHTML='<div class="empty">No invitations yet.</div>'; return; }
+    $('#invites').innerHTML='<table><thead><tr><th>For</th><th>Role</th><th>Status</th><th>Created by</th><th>Used by</th><th>Expires</th><th></th></tr></thead><tbody>'+
+      invites.map(i=>'<tr><td>'+(i.email?esc(i.email):'<span class="sub">anyone with link</span>')+(i.note?'<br><span class="sub">'+esc(i.note)+'</span>':'')+'</td><td><span class="pill '+esc(i.role)+'">'+esc(i.role)+'</span></td>'+
+        '<td><span class="pill '+esc(i.status)+'">'+esc(i.status)+'</span></td><td class="sub">'+esc(i.creator||'—')+'</td><td class="sub">'+esc(i.used_by||'—')+'</td><td class="sub">'+esc(fdate(i.expires_at))+'</td>'+
+        '<td>'+(i.status==='active'?'<button class="b-mini warn" onclick="adminRevoke(\''+i.id+'\')">Revoke</button>':'')+'</td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#invites').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function adminCreateInvite(){
+  try{
+    const d=await post('/api/admin/invites',{ email:$('#i_email').value.trim()||null, role:$('#i_role').value, note:$('#i_note').value.trim()||null });
+    $('#i_email').value=''; $('#i_note').value='';
+    showInviteUrl(d.invite_url, d.emailed?'✅ Invite created & emailed. Link:':'Invite created — copy the link:'); loadInvites(); loadOverview();
+  }catch(e){ toast(e.message); }
+}
+async function adminRevoke(id){ try{ await post('/api/admin/invites/'+id+'/revoke'); toast('Revoked'); loadInvites(); loadOverview(); }catch(e){ toast(e.message); } }
+function showInviteUrl(url,label){ $('#i_result').innerHTML='<div class="urlbox"><b>'+esc(label)+'</b><br>'+esc(url)+' <button class="b-mini" onclick="navigator.clipboard.writeText(\''+url.replace(/'/g,"\\'")+'\').then(()=>toast(\'Copied\'))">Copy</button></div>'; }
+
+async function loadAdminMaterials(){
+  try{
+    const q=$('#mat_q').value.trim(), up=$('#mat_uploader').value.trim(), st=$('#mat_status').value;
+    const qs=[]; if(q)qs.push('q='+encodeURIComponent(q)); if(up)qs.push('uploader='+encodeURIComponent(up)); if(st)qs.push('status='+st);
+    const {materials}=await get('/api/admin/materials'+(qs.length?'?'+qs.join('&'):''));
+    if(!materials.length){ $('#materials').innerHTML='<div class="empty">No materials.</div>'; return; }
+    $('#materials').innerHTML='<table><thead><tr><th>Material</th><th>Uploader</th><th>Type</th><th>Status</th><th>When</th><th></th></tr></thead><tbody>'+
+      materials.map(m=>'<tr><td><span class="t">'+esc(m.title)+'</span><br><a class="sub" href="/api/materials/'+m.id+'/file" target="_blank" rel="noopener">'+esc(m.filename||'file')+'</a></td>'+
+        '<td>'+esc(m.uploader)+'<br><span class="sub" style="cursor:pointer" title="filter by this uploader" onclick="$(\'#mat_uploader\').value=\''+m.uploader_id+'\';loadAdminMaterials()">'+esc(m.uploader_email)+'</span></td>'+
+        '<td class="sub">'+esc(m.source_type)+'</td><td><span class="pill '+esc(m.status)+'">'+esc(m.status.replace('_',' '))+'</span></td><td class="sub">'+esc(fdate(m.created_at))+'</td>'+
+        '<td><div class="act">'+(m.status!=='approved'?'<button class="b-mini go" onclick="reviewMat(\''+m.id+'\',\'approved\')">Approve</button>':'')+(m.status!=='rejected'?'<button class="b-mini warn" onclick="reviewMat(\''+m.id+'\',\'rejected\')">Reject</button>':'')+'</div></td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#materials').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function reviewMat(id,status){ try{ await post('/api/admin/materials/'+id+'/review',{status}); toast(status==='approved'?'Approved — it can now enter the corpus':'Rejected'); loadAdminMaterials(); loadOverview(); }catch(e){ toast(e.message); } }
+
+async function loadForumMod(){
+  try{
+    const {topics}=await get('/api/forum/topics');
+    if(!topics.length){ $('#forum').innerHTML='<div class="empty">No topics.</div>'; return; }
+    $('#forum').innerHTML='<table><thead><tr><th>Topic</th><th>Author</th><th>Category</th><th>Replies</th><th></th></tr></thead><tbody>'+
+      topics.map(t=>'<tr><td><span class="t">'+esc(t.title)+'</span></td><td class="sub">'+esc(t.author)+'</td><td class="sub">'+esc(t.category)+'</td><td>'+t.reply_count+'</td>'+
+        '<td><button class="b-mini warn" onclick="removeTopic(\''+t.id+'\')">Remove</button></td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#forum').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function removeTopic(id){ if(!confirm('Remove this topic?'))return; try{ await post('/api/admin/forum/topics/'+id+'/remove'); toast('Removed'); loadForumMod(); }catch(e){ toast(e.message); } }
+
+async function loadAudit(){
+  try{
+    const {events}=await get('/api/admin/audit?limit=150');
+    if(!events.length){ $('#audit').innerHTML='<div class="empty">No activity.</div>'; return; }
+    $('#audit').innerHTML='<table><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Entity</th><th>IP</th></tr></thead><tbody>'+
+      events.map(e=>'<tr><td class="sub">'+esc(ftime(e.at))+'</td><td>'+esc(e.who)+'</td><td><span class="t">'+esc(e.action)+'</span></td><td class="sub">'+esc(e.entity||'')+(e.entity_id?' '+esc(String(e.entity_id).slice(0,8)):'')+'</td><td class="sub">'+esc(e.ip||'')+'</td></tr>').join('')+'</tbody></table>';
+  }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#audit').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+
+async function logout(){ try{ await post('/api/logout'); }catch(e){} location.href='/portal/'; }
+
+(async function boot(){
+  let me; try{ me=await get('/api/me'); }catch(e){ location.href='/portal/'; return; }
+  if(me.role!=='admin'){ location.href='/portal/dashboard.html'; return; }
+  window.IS_SUPER = !!me.is_super_admin;
+  if(!IS_SUPER){ const o=document.querySelector('#i_role option[value="admin"]'); if(o) o.remove(); }
+  $('#who').textContent=me.full_name+(IS_SUPER?' · owner':' · admin');
+  loadOverview();
+})();
+</script>
+</body>
+</html>

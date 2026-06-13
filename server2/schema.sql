@@ -135,6 +135,134 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 CREATE INDEX IF NOT EXISTS audit_created_idx ON audit_log(created_at);
 
+-- ============================================================================
+-- COMMUNITY LAYER (added June 2026): invitation-gated signup, a small trusted
+-- network for clinicians (forum, friends, direct messages), and the shareable
+-- "saved answer" unit. All additive + idempotent — safe to re-apply.
+-- ============================================================================
+
+-- ── Invitations: signup is invite-only. Any active member can mint a one-time
+--    link (14-day expiry); admins can target an email / set the role. Only the
+--    sha256 HASH of the token is stored — the raw token lives only in the link. ──
+CREATE TABLE IF NOT EXISTS invitations (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  token_hash     text UNIQUE NOT NULL,
+  created_by     uuid REFERENCES users(id) ON DELETE SET NULL,
+  email          citext,                          -- optional: locks the invite to one address
+  intended_role  text NOT NULL DEFAULT 'contributor'
+                   CHECK (intended_role IN ('contributor','reviewer','admin')),
+  note           text,
+  expires_at     timestamptz NOT NULL,
+  used_at        timestamptz,
+  used_by        uuid REFERENCES users(id) ON DELETE SET NULL,
+  revoked_at     timestamptz,
+  created_at     timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS invitations_creator_idx ON invitations(created_by);
+
+-- ── Access requests: someone WITHOUT an invite asks to join; an admin reviews
+--    and (if a real clinician) issues an invitation. ──
+CREATE TABLE IF NOT EXISTS access_requests (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name       text NOT NULL,
+  email           citext NOT NULL,
+  org_name        text,
+  org_type        text,
+  country         text,
+  credential_type text,
+  credential_ref  text,
+  message         text,
+  status          text NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending','approved','rejected','invited')),
+  reviewed_by     uuid REFERENCES users(id) ON DELETE SET NULL,
+  reviewed_at     timestamptz,
+  invitation_id   uuid REFERENCES invitations(id) ON DELETE SET NULL,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS access_requests_status_idx ON access_requests(status);
+
+-- ── Connections: the friend graph — one row per unordered pair, any direction. ──
+CREATE TABLE IF NOT EXISTS connections (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  requester_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  addressee_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status        text NOT NULL DEFAULT 'pending'
+                  CHECK (status IN ('pending','accepted','declined','blocked')),
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  responded_at  timestamptz,
+  CHECK (requester_id <> addressee_id)
+);
+-- one connection per unordered pair (a↔b is the same as b↔a):
+CREATE UNIQUE INDEX IF NOT EXISTS connections_pair_idx
+  ON connections (LEAST(requester_id,addressee_id), GREATEST(requester_id,addressee_id));
+
+-- ── Direct messages: 1:1 chat between members. A message can carry a "share"
+--    (a material or a saved answer) so members can discuss it. ──
+CREATE TABLE IF NOT EXISTS direct_messages (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  recipient_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body          text,
+  share_kind    text CHECK (share_kind IN ('material','answer')),
+  share_ref     jsonb,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  read_at       timestamptz,
+  CHECK (body IS NOT NULL OR share_kind IS NOT NULL)
+);
+CREATE INDEX IF NOT EXISTS dm_thread_idx ON direct_messages(recipient_id, sender_id, created_at);
+CREATE INDEX IF NOT EXISTS dm_sender_idx ON direct_messages(sender_id, recipient_id, created_at);
+
+-- ── Saved answers: a copilot result a member kept / shared. (The real RAG
+--    copilot isn't built yet — `sources` is empty for placeholder answers.) ──
+CREATE TABLE IF NOT EXISTS saved_answers (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  question      text NOT NULL,
+  answer        text NOT NULL,
+  sources       jsonb NOT NULL DEFAULT '[]',
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS saved_answers_user_idx ON saved_answers(user_id);
+
+-- ── Forum: question topics + threaded replies. A topic/post can carry a share. ──
+CREATE TABLE IF NOT EXISTS forum_topics (
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  author_id        uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category         text NOT NULL DEFAULT 'general'
+                     CHECK (category IN ('general','cases','research','platform')),
+  title            text NOT NULL,
+  body             text NOT NULL,
+  tags             text[] NOT NULL DEFAULT '{}',
+  reply_count      int NOT NULL DEFAULT 0,
+  last_activity_at timestamptz NOT NULL DEFAULT now(),
+  is_pinned        boolean NOT NULL DEFAULT false,
+  is_locked        boolean NOT NULL DEFAULT false,
+  status           text NOT NULL DEFAULT 'open' CHECK (status IN ('open','removed')),
+  share_kind       text CHECK (share_kind IN ('material','answer')),
+  share_ref        jsonb,
+  created_at       timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS forum_topics_activity_idx ON forum_topics(last_activity_at DESC);
+CREATE INDEX IF NOT EXISTS forum_topics_category_idx ON forum_topics(category);
+
+CREATE TABLE IF NOT EXISTS forum_posts (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  topic_id      uuid NOT NULL REFERENCES forum_topics(id) ON DELETE CASCADE,
+  author_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body          text NOT NULL,
+  share_kind    text CHECK (share_kind IN ('material','answer')),
+  share_ref     jsonb,
+  status        text NOT NULL DEFAULT 'visible' CHECK (status IN ('visible','removed')),
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  edited_at     timestamptz
+);
+CREATE INDEX IF NOT EXISTS forum_posts_topic_idx ON forum_posts(topic_id, created_at);
+
+-- ── users: community profile + invite provenance (additive columns) ──
+ALTER TABLE users ADD COLUMN IF NOT EXISTS invited_by uuid REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS specialty  text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio        text;
+
 -- ── Privileges: the app connects as openelpis_app (DML only; not table owner) ──
 GRANT USAGE ON SCHEMA public TO openelpis_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO openelpis_app;

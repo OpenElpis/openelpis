@@ -1,127 +1,56 @@
 """
-OpenElpis clinician portal — backend API (FastAPI).
+OpenElpis clinician portal — backend API (FastAPI), modular.
 Runs on server2 (localhost:8000), behind server1's Caddy at openelpis.com/api/*.
 
-Endpoints (all JSON, prefix /api):
-  GET  /api/health
-  POST /api/signup        {email, password, full_name, org_name?, org_type?, country?}
-  POST /api/login         {email, password}          -> sets httpOnly cookie
-  POST /api/logout
-  GET  /api/me
-  POST /api/materials     (multipart: file, title, source_type?, description?)  [auth]
-  GET  /api/materials     -> the caller's own uploads                            [auth]
+  main.py      app + /api/health + auth (invite-gated signup, login, logout, me, badges)
+  core.py      config, DB pool, auth helpers + FastAPI deps
+  shares.py    attach/preview a material or saved answer
+  invites.py   invitations + public invite validation + access requests
+  materials.py upload / list-mine / visibility-checked file download
+  forum.py     question topics + replies (+ shares)
+  social.py    member directory + friend requests + direct messages
+  copilot.py   PLACEHOLDER ask + saved (shareable) answers
+  admin.py     admin panel: members, requests, invites, materials, moderation, audit
 
-Security: argon2 password hashing, JWT in an httpOnly+Secure+SameSite cookie,
-parameterized SQL, upload size/type limits, every file content-hashed (provenance).
-Secrets (DATABASE_URL, JWT_SECRET) come from /etc/openelpis.env — never hard-coded.
+Security: argon2 hashing, JWT in an httpOnly+Secure cookie, parameterized SQL,
+INVITE-ONLY signup (founder bootstrap via ADMIN_EMAILS), per-file content hashing.
+Secrets (DATABASE_URL, JWT_SECRET, ADMIN_EMAILS) come from /etc/openelpis.env.
 """
-import os, re, json, hashlib, datetime as dt, uuid, pathlib
+import datetime as dt, hashlib
 from typing import Optional
 
-import jwt
-import psycopg2
-from psycopg2.pool import ThreadedConnectionPool
-from psycopg2.extras import RealDictCursor
-from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import FastAPI, Request, Response, UploadFile, File, Form, HTTPException, Depends
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, constr
 
-# ── config ──────────────────────────────────────────────────────────────────
-DATABASE_URL = os.environ["DATABASE_URL"]
-JWT_SECRET   = os.environ["JWT_SECRET"]
-UPLOAD_DIR   = pathlib.Path(os.environ.get("UPLOAD_DIR", "/var/lib/openelpis/uploads"))
-COOKIE_NAME  = "oe_session"
-TOKEN_TTL    = dt.timedelta(days=7)
-MAX_UPLOAD   = 25 * 1024 * 1024  # 25 MB
-ALLOWED_MIME = {
-    "application/pdf", "text/plain", "text/csv", "text/markdown",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/json",
-}
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+from core import (db, ph, audit, client_ip, make_token, set_cookie, current_user,
+                  is_admin_email, COOKIE_NAME)
+import invites, materials, forum, social, copilot, admin
 
-ph   = PasswordHasher()
-pool = ThreadedConnectionPool(1, 8, dsn=DATABASE_URL)
-app  = FastAPI(title="OpenElpis portal API", docs_url=None, redoc_url=None)
-
-
-# ── db helpers ──────────────────────────────────────────────────────────────
-class db:
-    def __enter__(self):
-        self.conn = pool.getconn()
-        self.cur = self.conn.cursor(cursor_factory=RealDictCursor)
-        return self.cur
-    def __exit__(self, exc_type, *_):
-        if exc_type: self.conn.rollback()
-        else: self.conn.commit()
-        self.cur.close(); pool.putconn(self.conn)
-
-
-def audit(cur, user_id, action, etype=None, eid=None, detail=None, ip=None):
-    cur.execute(
-        "INSERT INTO audit_log(user_id,action,entity_type,entity_id,detail,ip) "
-        "VALUES (%s,%s,%s,%s,%s,%s)",
-        (user_id, action, etype, str(eid) if eid else None, json.dumps(detail or {}), ip),
-    )
-
-
-# ── auth helpers ────────────────────────────────────────────────────────────
-def make_token(user) -> str:
-    now = dt.datetime.now(dt.timezone.utc)
-    return jwt.encode(
-        {"sub": str(user["id"]), "email": user["email"], "role": user["role"],
-         "iat": now, "exp": now + TOKEN_TTL},
-        JWT_SECRET, algorithm="HS256")
-
-
-def set_cookie(resp: Response, token: str):
-    resp.set_cookie(COOKIE_NAME, token, max_age=int(TOKEN_TTL.total_seconds()),
-                    httponly=True, secure=True, samesite="lax", path="/")
-
-
-def current_user(request: Request):
-    token = request.cookies.get(COOKIE_NAME)
-    if not token:
-        raise HTTPException(401, "not authenticated")
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-    except jwt.PyJWTError:
-        raise HTTPException(401, "invalid session")
-    with db() as cur:
-        cur.execute("SELECT id,email,full_name,role,verification_status,is_active,org_id "
-                    "FROM users WHERE id=%s", (payload["sub"],))
-        user = cur.fetchone()
-    if not user or not user["is_active"]:
-        raise HTTPException(401, "account not found or disabled")
-    return user
-
-
-def client_ip(request: Request) -> Optional[str]:
-    xff = request.headers.get("x-forwarded-for")
-    return xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-
-
-# ── models ──────────────────────────────────────────────────────────────────
-class SignupIn(BaseModel):
-    email: EmailStr
-    password: constr(min_length=10, max_length=200)
-    full_name: constr(min_length=2, max_length=200)
-    org_name: Optional[constr(max_length=200)] = None
-    org_type: Optional[str] = None
-    country: Optional[constr(max_length=100)] = None
-
-class LoginIn(BaseModel):
-    email: EmailStr
-    password: str
+app = FastAPI(title="OpenElpis portal API", docs_url=None, redoc_url=None)
+for module in (invites, materials, forum, social, copilot, admin):
+    app.include_router(module.router)
 
 ORG_TYPES = {"clinic", "hospital", "lab", "university", "individual", "other"}
 
 
-# ── routes ──────────────────────────────────────────────────────────────────
+class SignupIn(BaseModel):
+    email:        EmailStr
+    password:     constr(min_length=10, max_length=200)
+    full_name:    constr(min_length=2, max_length=200)
+    org_name:     Optional[constr(max_length=200)] = None
+    org_type:     Optional[str] = None
+    country:      Optional[constr(max_length=100)] = None
+    specialty:    Optional[constr(max_length=120)] = None
+    invite_token: Optional[constr(max_length=200)] = None
+
+
+class LoginIn(BaseModel):
+    email:    EmailStr
+    password: str
+
+
 @app.get("/api/health")
 def health():
     with db() as cur:
@@ -131,33 +60,65 @@ def health():
 
 @app.post("/api/signup")
 def signup(body: SignupIn, request: Request):
+    """Invite-only. Admin-listed emails bootstrap without an invite (founder)."""
     otype = body.org_type if body.org_type in ORG_TYPES else "other"
-    pw_hash = ph.hash(body.password)
+    admin_bootstrap = is_admin_email(body.email)
     with db() as cur:
         cur.execute("SELECT 1 FROM users WHERE email=%s", (body.email,))
         if cur.fetchone():
             raise HTTPException(409, "an account with this email already exists")
+
+        invited_by, role, vstatus, invite = None, "contributor", "pending", None
+        if admin_bootstrap:
+            role, vstatus = "admin", "verified"
+        else:
+            if not body.invite_token:
+                raise HTTPException(403, "Sign-up is invite-only. Please request access.")
+            th = hashlib.sha256(body.invite_token.encode()).hexdigest()
+            cur.execute("SELECT id,created_by,email,intended_role,expires_at,used_at,revoked_at "
+                        "FROM invitations WHERE token_hash=%s", (th,))
+            invite = cur.fetchone()
+            if (not invite or invite["used_at"] or invite["revoked_at"]
+                    or invite["expires_at"] <= dt.datetime.now(dt.timezone.utc)):
+                raise HTTPException(403, "This invitation is invalid, already used, or expired.")
+            if invite["email"] and invite["email"].lower() != body.email.lower():
+                raise HTTPException(403, "This invitation was issued for a different email address.")
+            invited_by = invite["created_by"]
+            role = invite["intended_role"] or "contributor"
+
         org_id = None
         if body.org_name:
             cur.execute("INSERT INTO organizations(name,org_type,country) VALUES (%s,%s,%s) RETURNING id",
                         (body.org_name, otype, body.country))
             org_id = cur.fetchone()["id"]
+
+        pw_hash = ph.hash(body.password)
         cur.execute(
-            "INSERT INTO users(org_id,email,password_hash,full_name) VALUES (%s,%s,%s,%s) "
+            "INSERT INTO users(org_id,email,password_hash,full_name,role,verification_status,"
+            "invited_by,specialty,email_verified) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) "
             "RETURNING id,email,full_name,role,verification_status",
-            (org_id, body.email, pw_hash, body.full_name))
-        user = cur.fetchone()
-        audit(cur, user["id"], "signup", "user", user["id"], {"org": body.org_name}, client_ip(request))
-    return {"ok": True, "message": "Account created. It's pending verification by our team.",
-            "user": {"email": user["email"], "full_name": user["full_name"],
-                     "verification_status": user["verification_status"]}}
+            (org_id, body.email, pw_hash, body.full_name, role, vstatus,
+             invited_by, body.specialty, admin_bootstrap))
+        u = cur.fetchone()
+        if invite:
+            cur.execute("UPDATE invitations SET used_at=now(), used_by=%s WHERE id=%s", (u["id"], invite["id"]))
+            cur.execute("UPDATE access_requests SET status='invited' "
+                        "WHERE email=%s AND status IN ('pending','approved')", (body.email,))
+        audit(cur, u["id"], "signup", "user", u["id"],
+              {"org": body.org_name, "via": "admin" if admin_bootstrap else "invite"}, client_ip(request))
+
+    resp = JSONResponse({"ok": True, "message": "Welcome to OpenElpis — you're in.",
+        "user": {"email": u["email"], "full_name": u["full_name"], "role": u["role"],
+                 "verification_status": u["verification_status"]}})
+    set_cookie(resp, make_token(u))  # log them straight in
+    return resp
 
 
 @app.post("/api/login")
 def login(body: LoginIn, request: Request):
     with db() as cur:
-        cur.execute("SELECT id,email,full_name,role,password_hash,is_active FROM users WHERE email=%s",
-                    (body.email,))
+        cur.execute("SELECT id,email,full_name,role,password_hash,is_active,verification_status "
+                    "FROM users WHERE email=%s", (body.email,))
         user = cur.fetchone()
     if not user or not user["is_active"]:
         raise HTTPException(401, "invalid email or password")
@@ -166,6 +127,10 @@ def login(body: LoginIn, request: Request):
     except VerifyMismatchError:
         raise HTTPException(401, "invalid email or password")
     with db() as cur:
+        # keep founder/admins bootstrapped even if their account predates ADMIN_EMAILS
+        if is_admin_email(user["email"]) and (user["role"] != "admin" or user["verification_status"] != "verified"):
+            cur.execute("UPDATE users SET role='admin', verification_status='verified' WHERE id=%s", (user["id"],))
+            user["role"], user["verification_status"] = "admin", "verified"
         cur.execute("UPDATE users SET last_login_at=now() WHERE id=%s", (user["id"],))
         audit(cur, user["id"], "login", "user", user["id"], None, client_ip(request))
     resp = JSONResponse({"ok": True, "user": {"email": user["email"], "full_name": user["full_name"],
@@ -183,62 +148,62 @@ def logout():
 
 @app.get("/api/me")
 def me(user=Depends(current_user)):
-    return {"email": user["email"], "full_name": user["full_name"], "role": user["role"],
-            "verification_status": user["verification_status"]}
+    org = None
+    if user["org_id"]:
+        with db() as cur:
+            cur.execute("SELECT name FROM organizations WHERE id=%s", (user["org_id"],))
+            o = cur.fetchone()
+            org = o["name"] if o else None
+    return {"id": str(user["id"]), "email": user["email"], "full_name": user["full_name"],
+            "role": user["role"], "verification_status": user["verification_status"],
+            "specialty": user.get("specialty"), "bio": user.get("bio"), "org": org,
+            "is_super_admin": is_admin_email(user["email"])}
 
 
-@app.post("/api/materials")
-async def upload_material(
-    request: Request,
-    file: UploadFile = File(...),
-    title: str = Form(...),
-    source_type: str = Form("literature"),
-    description: str = Form(""),
-    user=Depends(current_user),
-):
-    SRC = {"literature", "dataset", "finding", "report", "guideline", "other"}
-    stype = source_type if source_type in SRC else "other"
-    if file.content_type not in ALLOWED_MIME:
-        raise HTTPException(415, f"file type not allowed: {file.content_type}")
-
-    data = await file.read(MAX_UPLOAD + 1)
-    if len(data) > MAX_UPLOAD:
-        raise HTTPException(413, "file too large (max 25 MB)")
-    if not data:
-        raise HTTPException(400, "empty file")
-    sha = hashlib.sha256(data).hexdigest()
-
-    safe = re.sub(r"[^A-Za-z0-9._-]", "_", (file.filename or "upload"))[:120]
-    key = f"{dt.date.today():%Y/%m}/{uuid.uuid4().hex}-{safe}"
-    dest = UPLOAD_DIR / key
-    dest.parent.mkdir(parents=True, exist_ok=True)
-
+@app.get("/api/badges")
+def badges(user=Depends(current_user)):
+    """Lightweight counters for the dashboard nav (polled slowly)."""
+    out = {"unread_dms": 0, "friend_requests": 0}
     with db() as cur:
-        cur.execute("SELECT id FROM materials WHERE sha256=%s", (sha,))
-        if cur.fetchone():
-            raise HTTPException(409, "this exact file has already been uploaded")
-        dest.write_bytes(data)
-        cur.execute(
-            "INSERT INTO materials(uploaded_by,org_id,title,description,source_type,"
-            "storage_backend,storage_key,original_filename,mime_type,size_bytes,sha256) "
-            "VALUES (%s,%s,%s,%s,%s,'local',%s,%s,%s,%s,%s) RETURNING id,status,created_at",
-            (user["id"], user["org_id"], title, description or None, stype, key,
-             file.filename, file.content_type, len(data), sha))
-        m = cur.fetchone()
-        audit(cur, user["id"], "upload", "material", m["id"],
-              {"title": title, "bytes": len(data)}, client_ip(request))
-    return {"ok": True, "message": "Uploaded. It's pending expert review before it enters the corpus.",
-            "material": {"id": str(m["id"]), "title": title, "status": m["status"]}}
+        cur.execute("SELECT count(*) AS n FROM direct_messages WHERE recipient_id=%s AND read_at IS NULL", (user["id"],))
+        out["unread_dms"] = cur.fetchone()["n"]
+        cur.execute("SELECT count(*) AS n FROM connections WHERE addressee_id=%s AND status='pending'", (user["id"],))
+        out["friend_requests"] = cur.fetchone()["n"]
+        if user["role"] in ("reviewer", "admin"):
+            cur.execute("SELECT count(*) AS n FROM materials WHERE status='pending_review' AND uploaded_by<>%s", (user["id"],))
+            out["review_pending"] = cur.fetchone()["n"]
+        if user["role"] == "admin":
+            cur.execute("SELECT (SELECT count(*) FROM access_requests WHERE status='pending') AS reqs, "
+                        "(SELECT count(*) FROM materials WHERE status='pending_review') AS mats")
+            r = cur.fetchone()
+            out["admin"] = {"pending_requests": r["reqs"], "pending_materials": r["mats"]}
+    return out
 
 
-@app.get("/api/materials")
-def my_materials(user=Depends(current_user)):
+@app.get("/api/home")
+def home(user=Depends(current_user)):
+    """Quick-glance summary for the dashboard home tab."""
+    uid = user["id"]
+    out = {"role": user["role"]}
     with db() as cur:
-        cur.execute(
-            "SELECT id,title,source_type,status,original_filename,size_bytes,created_at "
-            "FROM materials WHERE uploaded_by=%s ORDER BY created_at DESC LIMIT 200", (user["id"],))
-        rows = cur.fetchall()
-    return {"materials": [
-        {"id": str(r["id"]), "title": r["title"], "source_type": r["source_type"],
-         "status": r["status"], "filename": r["original_filename"],
-         "size_bytes": r["size_bytes"], "created_at": r["created_at"].isoformat()} for r in rows]}
+        cur.execute("SELECT count(*) AS total, count(*) FILTER (WHERE status='pending_review') AS pending "
+                    "FROM materials WHERE uploaded_by=%s", (uid,))
+        m = cur.fetchone(); out["materials"] = m["total"]; out["materials_pending"] = m["pending"]
+        cur.execute("SELECT count(*) AS n FROM connections WHERE status='accepted' "
+                    "AND (requester_id=%s OR addressee_id=%s)", (uid, uid))
+        out["connections"] = cur.fetchone()["n"]
+        cur.execute("SELECT count(*) AS n FROM invitations WHERE created_by=%s "
+                    "AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now()", (uid,))
+        out["invites_active"] = cur.fetchone()["n"]
+        cur.execute("SELECT count(*) AS n FROM direct_messages WHERE recipient_id=%s AND read_at IS NULL", (uid,))
+        out["unread_dms"] = cur.fetchone()["n"]
+        cur.execute("SELECT count(*) AS n FROM connections WHERE addressee_id=%s AND status='pending'", (uid,))
+        out["friend_requests"] = cur.fetchone()["n"]
+        if user["role"] in ("reviewer", "admin"):
+            cur.execute("SELECT count(*) AS n FROM materials WHERE status='pending_review' AND uploaded_by<>%s", (uid,))
+            out["review_pending"] = cur.fetchone()["n"]
+        if user["role"] == "admin":
+            cur.execute("SELECT (SELECT count(*) FROM access_requests WHERE status='pending') AS r, "
+                        "(SELECT count(*) FROM materials WHERE status='pending_review') AS m")
+            r = cur.fetchone(); out["admin"] = {"pending_requests": r["r"], "pending_materials": r["m"]}
+    return out
