@@ -2,10 +2,10 @@
 Materials: upload, list-mine, and a visibility-checked file download (so a member
 can open a document another member shared into the forum or a DM).
 """
-import re, os, hashlib, datetime as dt, uuid, pathlib
+import re, os, hashlib, datetime as dt, uuid, pathlib, gzip
 from typing import Optional
 
-from fastapi import APIRouter, Request, UploadFile, File, Form, HTTPException, Depends
+from fastapi import APIRouter, Request, UploadFile, File, Form, HTTPException, Depends, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, constr
 
@@ -34,6 +34,18 @@ def _visible(cur, m, user) -> bool:
             or m["status"] == "approved"):
         return True
     return material_shared_with(cur, m["id"], user["id"])
+
+
+def material_text(m) -> Optional[str]:
+    """Decoded UTF-8 text of a material's stored file (gunzips bulk-imported .gz).
+    Returns None if the file is missing. Used by the Library reading view + translator."""
+    path = UPLOAD_DIR / m["storage_key"]
+    if not path.exists():
+        return None
+    raw = path.read_bytes()
+    if m["storage_key"].endswith(".gz"):
+        raw = gzip.decompress(raw)
+    return raw.decode("utf-8", "replace")
 
 
 @router.post("/api/materials")
@@ -101,8 +113,12 @@ def material_file(material_id: str, user=Depends(current_user)):
     path = UPLOAD_DIR / m["storage_key"]
     if not path.exists():
         raise HTTPException(410, "file missing")
-    return FileResponse(path, media_type=m["mime_type"] or "application/octet-stream",
-                        filename=m["original_filename"] or "material")
+    fname = m["original_filename"] or "material"
+    if m["storage_key"].endswith(".gz"):     # bulk-imported text is stored gzipped — serve decompressed
+        data = gzip.decompress(path.read_bytes())
+        return Response(content=data, media_type=m["mime_type"] or "text/plain",
+                        headers={"Content-Disposition": f'inline; filename="{fname}"'})
+    return FileResponse(path, media_type=m["mime_type"] or "application/octet-stream", filename=fname)
 
 
 # ── reviewer queue (role 'reviewer' or 'admin', from the member dashboard) ──────

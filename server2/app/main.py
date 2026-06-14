@@ -26,10 +26,10 @@ from pydantic import BaseModel, EmailStr, constr
 
 from core import (db, ph, audit, client_ip, make_token, set_cookie, current_user,
                   is_admin_email, COOKIE_NAME)
-import invites, materials, forum, social, copilot, admin
+import invites, materials, library, forum, social, copilot, admin
 
 app = FastAPI(title="OpenElpis portal API", docs_url=None, redoc_url=None)
-for module in (invites, materials, forum, social, copilot, admin):
+for module in (invites, materials, library, forum, social, copilot, admin):
     app.include_router(module.router)
 
 ORG_TYPES = {"clinic", "hospital", "lab", "university", "individual", "other"}

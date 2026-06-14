@@ -170,6 +170,68 @@
   .qa-btn:hover{border-color:var(--teal);background:var(--mint-2)}
   .qa-btn .ic{font-size:18px}
   .rev-act{display:flex;gap:7px;flex:none}
+  /* library */
+  .libask{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#fff,var(--mint-2));border:1.5px solid var(--teal);border-radius:12px;padding:6px 8px 6px 12px;margin:4px 0 12px}
+  .libask .ic{font-size:16px;flex:none}
+  .libask input{border:0;background:transparent;padding:6px 2px;flex:1}
+  .libask input:focus{outline:none}
+  .libask .btn-ghost{flex:none}
+  .asknote{background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2;border-radius:10px;padding:8px 12px;font-size:13px;margin:-6px 0 12px}
+  .libfilters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+  .libfilters input,.libfilters select{flex:1 1 130px;min-width:0;width:auto}
+  .favtoggle{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin:0;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
+  .favtoggle input{width:auto;flex:none}
+  .libitem{padding:13px 2px;border-top:1px solid var(--line)}
+  .libitem:first-child{border-top:0}
+  .libitem .t{color:var(--ink);font-weight:600;font-size:15px;line-height:1.4;cursor:pointer}
+  .libitem .t:hover{color:var(--teal-deep)}
+  .libitem .au{color:var(--ink-soft);font-size:12.5px;margin-top:3px}
+  .libitem .me{color:var(--muted);font-size:12.5px;margin-top:6px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .libitem .me.stats{gap:7px;margin-top:7px}
+  .lib-prev{background:var(--mint);color:var(--teal-deep);border:0;border-radius:999px;padding:3px 12px;font:inherit;font-weight:600;font-size:12.5px;cursor:pointer}
+  .lib-prev:hover{background:#d6ebe7}
+  .vc{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600;background:#f3f6f5;border-radius:999px;padding:2px 9px}
+  .vc.cm{cursor:pointer} .vc.cm:hover{background:var(--mint);color:var(--teal-deep)}
+  .vc.up.on{background:var(--mint);color:var(--teal-deep)} .vc.down.on{background:var(--rose-soft);color:var(--rose-dark)}
+  .vc.fav.on{background:var(--amber-soft);color:var(--amber)}
+  .ar{font-style:normal;font-size:11px;line-height:1}
+  .ar.up{color:#1a8f4c} .ar.down{color:var(--rose-deep)}
+  .libactions{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  #libTotal{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(180deg,var(--mint),#dcefe9);color:var(--teal-deep);border:1px solid #b9e2da;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;margin:2px 0 12px;box-shadow:0 1px 2px rgba(7,63,62,.06)}
+  #libTotal b{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-deep)}
+  .rh-actions{display:flex;gap:8px;flex-wrap:wrap;flex:none}
+  /* article reading modal */
+  .modal-card.art{max-width:820px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+  #artBody{display:flex;flex-direction:column;min-height:0;overflow:auto;flex:1}
+  .art-h{font-family:'Fraunces',serif;font-size:22px;font-weight:600;line-height:1.3;color:var(--ink);margin:2px 0 6px}
+  .art-meta{color:var(--muted);font-size:13px;display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .art-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:14px}
+  .art-bar .spacer{flex:1}
+  .vbtn{display:inline-flex;align-items:center;gap:5px;background:#f3f6f5;border:0;border-radius:999px;padding:6px 13px;font:inherit;font-weight:600;font-size:13px;color:var(--ink-soft);cursor:pointer}
+  .vbtn:hover{background:#e8eeec}
+  .vbtn.up.on{background:var(--mint);color:var(--teal-deep)} .vbtn.down.on{background:var(--rose-soft);color:var(--rose-dark)}
+  .vbtn.fav.on{background:var(--amber-soft);color:var(--amber)}
+  .art-tl{display:flex;align-items:center;gap:6px}
+  .art-tl select{width:auto;flex:none;padding:7px 10px;font-size:13px}
+  .reading{font-family:'Fraunces',Georgia,serif;font-size:16.5px;line-height:1.74;color:#1c2b28;padding-right:4px}
+  .frontmatter{margin:0 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--mint-2)}
+  .frontmatter summary{cursor:pointer;padding:9px 13px;font-size:12.5px;font-weight:700;color:var(--muted);list-style:none}
+  .frontmatter summary::-webkit-details-marker{display:none}
+  .frontmatter summary:before{content:'ⓘ '}
+  .frontmatter[open] summary{border-bottom:1px solid var(--line)}
+  .fm-body{padding:8px 14px 12px;font-family:'Inter',sans-serif;font-size:12px;line-height:1.6;color:var(--muted);max-height:300px;overflow:auto}
+  .fm-body p{margin:0 0 .7em}
+  .reading p{margin:0 0 1em}
+  .reading.tr{background:var(--mint-2);border-radius:10px;padding:14px 16px}
+  .trnote{font-size:12px;color:var(--muted);margin:8px 0 0;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .trnote .lnk{color:var(--teal-deep);cursor:pointer;font-weight:600}
+  .cmts{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
+  .cmt{border-top:1px solid var(--line);padding:11px 0}
+  .cmt:first-child{border-top:0}
+  .cmt .who{font-weight:700;color:var(--ink);font-size:13.5px}
+  .cmt .rsn{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;background:var(--mint);color:var(--teal-deep);margin-left:6px}
+  .cmt .bd{color:var(--ink-soft);font-size:14px;margin-top:4px;white-space:pre-wrap}
+  .cmt .dl{float:right;color:var(--muted);cursor:pointer;font-size:12px}
   @media(max-width:760px){
     .shell{flex-direction:column;gap:14px;padding:14px}
     .side{width:100%;flex-direction:row;overflow-x:auto;position:static;gap:6px;padding-bottom:4px}
@@ -211,6 +273,7 @@
   <nav class="side">
     <button class="navitem" data-tab="home" onclick="go('home')"><span class="ic">🏠</span><span class="lbl" data-i18n="nav_home">Home</span></button>
     <button class="navitem" data-tab="copilot" onclick="go('copilot')"><span class="ic">🔬</span><span class="lbl" data-i18n="nav_copilot">Copilot</span></button>
+    <button class="navitem" data-tab="library" onclick="go('library')"><span class="ic">📚</span><span class="lbl" data-i18n="nav_library">Library</span></button>
     <button class="navitem" data-tab="contribute" onclick="go('contribute')"><span class="ic">📤</span><span class="lbl" data-i18n="nav_contribute">Contribute</span></button>
     <button class="navitem" data-tab="forum" onclick="go('forum')"><span class="ic">💬</span><span class="lbl" data-i18n="nav_forum">Forum</span></button>
     <button class="navitem" data-tab="community" onclick="go('community')"><span class="ic">👥</span><span class="lbl" data-i18n="nav_community">Community</span><span id="bdg_comm" class="badge"></span></button>
@@ -276,6 +339,50 @@
           <p class="hint" data-i18n="d_contrib_hint">Everything you've uploaded and its review status.</p>
           <div id="matlist"><div class="empty" data-i18n="d_loading">Loading…</div></div>
         </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="panel hide" data-panel="library">
+      <div class="card">
+        <div class="rowhead">
+          <h2 data-i18n="lib_title">Article library</h2>
+          <div class="rh-actions">
+            <button class="btn-ghost btn-sm" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:8px 14px!important;font:inherit;font-weight:700!important;font-size:13.5px!important;cursor:pointer!important" onclick="toggleAsk()" data-i18n="lib_ask_toggle">🔬 Ask copilot</button>
+            <button class="btn btn-sm" onclick="go('contribute')" data-i18n="lib_upload">＋ Upload your article</button>
+          </div>
+        </div>
+        <span id="libTotal" class="sub"></span>
+        <form id="libAskBar" class="libask hide" onsubmit="return libAsk(event)">
+          <span class="ic">🔬</span>
+          <input id="lib_ask" data-i18n-ph="lib_ask_ph" placeholder="Ask the copilot to find articles…" autocomplete="off">
+          <button class="btn-ghost btn-sm" type="submit" style="border:1.5px solid var(--teal)!important;background:var(--teal-deep)!important;color:#fff!important;border-radius:999px!important;padding:8px 16px!important;font:inherit;font-weight:700!important;font-size:13.5px!important;cursor:pointer!important;flex:none" data-i18n="lib_ask_btn">Ask</button>
+        </form>
+        <div id="lib_asknote" class="asknote hide"></div>
+        <input id="lib_q" data-i18n-ph="lib_search_ph" placeholder="Search title, authors, abstract…" oninput="libSearch()">
+        <div class="libfilters">
+          <select id="lib_yf" onchange="libSearch()"><option value="" data-i18n="lib_year_from">Year from</option></select>
+          <select id="lib_yt" onchange="libSearch()"><option value="" data-i18n="lib_year_to">Year to</option></select>
+          <select id="lib_sort" onchange="libSearch()">
+            <option value="new" data-i18n="lib_newest">Newest</option>
+            <option value="old" data-i18n="lib_oldest">Oldest</option>
+            <option value="relevance" data-i18n="lib_relevance">Relevance</option>
+          </select>
+          <button type="button" class="btn-ghost btn-sm" id="lib_morebtn" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:8px 14px!important;font:inherit;font-weight:700!important;font-size:13.5px!important;cursor:pointer!important;flex:none" onclick="toggleFilters()" data-i18n="lib_more_filters">See all filters</button>
+        </div>
+        <div id="libAdv" class="libfilters hide">
+          <input id="lib_author" data-i18n-ph="lib_author" placeholder="Author" oninput="libSearch()">
+          <input id="lib_journal" data-i18n-ph="lib_journal" placeholder="Journal" oninput="libSearch()">
+          <select id="lib_license" onchange="libSearch()">
+            <option value="" data-i18n="lib_any">Any license</option>
+            <option value="cc by">CC BY</option><option value="cc by-nc">CC BY-NC</option>
+            <option value="cc by-sa">CC BY-SA</option><option value="cc by-nc-sa">CC BY-NC-SA</option>
+            <option value="cc by-nc-nd">CC BY-NC-ND</option><option value="cc by-nd">CC BY-ND</option><option value="cc0">CC0</option>
+          </select>
+          <label class="favtoggle"><input type="checkbox" id="lib_fav" onchange="libSearch()"> <span data-i18n="lib_favorites">★ Favorites</span></label>
+        </div>
+        <div id="libResults"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        <div id="libMore" style="text-align:center;margin-top:14px"></div>
       </div>
     </section>
 
@@ -375,6 +482,13 @@
     <div id="pickerList"><div class="empty" data-i18n="d_loading">Loading…</div></div>
   </div>
 </div>
+<!-- article reading view -->
+<div id="artModal" class="modal hide" onclick="if(event.target===this)closeArt()">
+  <div class="modal-card art">
+    <div class="modal-head"><b data-i18n="lib_preview">Preview</b><button class="btn-x" onclick="closeArt()">✕</button></div>
+    <div id="artBody"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+  </div>
+</div>
 <div id="toast" class="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
@@ -404,6 +518,7 @@ async function api(path, opt){
 }
 const get  = p => api(p);
 const post = (p,o) => api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o||{})});
+const del  = p => api(p,{method:'DELETE'});
 function setMsg(id,text,ok){ const m=$(id); m.className='msg'+(text?(ok?' ok':' err'):''); m.textContent=text||''; }
 
 /* ── nav ─────────────────────────────────────────────────────── */
@@ -414,6 +529,7 @@ function go(tab){
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hide', p.dataset.panel!==tab));
   document.querySelectorAll('.navitem[data-tab]').forEach(n=>n.classList.toggle('on', n.dataset.tab===tab));
   if(tab==='home') loadHome();
+  if(tab==='library') loadLibrary();
   if(tab==='copilot' && !state.copilotReady){ state.copilotReady=true; appendChat('assistant', T('co_hello'), T('co_hello_q')); }
   if(tab==='contribute') loadMaterials();
   if(tab==='forum') loadForum();
@@ -451,6 +567,7 @@ function reloadCurrent(){
   if(!state.me) return;
   const t=state.tab;
   if(t==='home') loadHome();
+  else if(t==='library') loadLibrary();
   else if(t==='contribute') loadMaterials();
   else if(t==='forum'){ if($('#forumDetail').classList.contains('hide')) loadTopics(); }
   else if(t==='community') loadCommunity();
@@ -487,6 +604,274 @@ async function loadReview(){
   }catch(e){ if(e.message!=='auth') $('#reviewList').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
 }
 async function reviewAct(id,status){ try{ await post('/api/review/materials/'+id,{status}); toast(status==='approved'?T('review_approve'):T('review_reject')); loadReview(); refreshBadges(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
+
+/* ── library (browse/search the corpus) ──────────────────────── */
+let libNext=null, libT;
+function trunc(s,n){ return s.length>n? s.slice(0,n)+'…':s; }
+function fillYears(){
+  const yf=$('#lib_yf'), yt=$('#lib_yt'); if(yf.options.length>1) return;
+  const now=new Date().getFullYear(); let html='';
+  for(let y=now;y>=1980;y--) html+='<option value="'+y+'">'+y+'</option>';
+  yf.insertAdjacentHTML('beforeend', html); yt.insertAdjacentHTML('beforeend', html);
+}
+function libParams(){
+  const p=new URLSearchParams();
+  const add=(k,id)=>{ const v=$(id).value.trim(); if(v) p.set(k,v); };
+  add('q','#lib_q'); add('author','#lib_author'); add('journal','#lib_journal');
+  add('year_from','#lib_yf'); add('year_to','#lib_yt');
+  const lic=$('#lib_license').value; if(lic) p.set('license',lic);
+  if($('#lib_fav').checked) p.set('favorites','1');
+  p.set('sort', $('#lib_sort').value);
+  return p;
+}
+function libSearch(){ clearTimeout(libT); libT=setTimeout(()=>loadLibrary(true),300); }
+function libMore(){ loadLibrary(false); }
+function toggleAsk(){ const b=$('#libAskBar'); b.classList.toggle('hide'); if(!b.classList.contains('hide')) $('#lib_ask').focus(); }
+function toggleFilters(){
+  const a=$('#libAdv'); a.classList.toggle('hide');
+  $('#lib_morebtn').textContent = a.classList.contains('hide') ? T('lib_more_filters') : T('lib_less_filters');
+}
+async function libAsk(e){
+  e.preventDefault();
+  const q=$('#lib_ask').value.trim(); if(!q) return false;
+  const note=$('#lib_asknote'); note.classList.remove('hide'); note.className='asknote'; note.textContent=T('lib_asking');
+  try{
+    const d=await post('/api/library/ask',{question:q});
+    const p=d.params||{};
+    $('#lib_q').value=p.q||''; $('#lib_author').value=p.author||''; $('#lib_journal').value=p.journal||'';
+    $('#lib_yf').value=p.year_from||''; $('#lib_yt').value=p.year_to||'';
+    $('#lib_sort').value = p.q ? 'relevance' : 'new';
+    note.textContent = d.interpreted ? T('lib_ask_done') : T('lib_ask_kw');
+    loadLibrary(true);
+  }catch(err){ if(err.message!=='auth'){ note.className='asknote err'; note.textContent=err.message; } }
+  return false;
+}
+function libCard(it){
+  const meta=[it.journal,it.year].filter(Boolean).map(esc).join(' · ');
+  const lic=it.license?'<span class="pill approved" style="text-transform:uppercase">'+esc(it.license)+'</span>':'';
+  const au=it.authors?'<div class="au">'+esc(trunc(it.authors,170))+'</div>':'';
+  const doi=it.doi?'<a href="https://doi.org/'+esc(it.doi)+'" target="_blank" rel="noopener">doi</a>':'';
+  const stats='<span class="vc up'+(it.my_vote===1?' on':'')+'"><i class="ar up">▲</i> '+(it.up||0)+'</span>'+
+              '<span class="vc down'+(it.my_vote===-1?' on':'')+'"><i class="ar down">▼</i> '+(it.down||0)+'</span>'+
+              '<span class="vc cm" id="cmc_'+it.id+'" onclick="openArt(\''+it.id+'\',\'comments\')">💬 '+(it.comments||0)+'</span>'+
+              (it.favorited?'<span class="vc fav on">★</span>':'');
+  return '<div class="libitem">'+
+    '<div class="t" onclick="openArt(\''+it.id+'\')">'+esc(it.title)+'</div>'+au+
+    '<div class="me">'+(meta?'<span>'+meta+'</span>':'')+lic+doi+
+      '<span class="libactions">'+stats+
+        '<button class="lib-prev" onclick="openArt(\''+it.id+'\')">'+esc(T('lib_preview'))+'</button>'+
+      '</span></div></div>';
+}
+function refreshLibCard(id,n){ const e=$('#cmc_'+id); if(e) e.innerHTML='💬 '+(n!=null?n:''); }
+async function loadLibrary(reset=true){
+  fillYears();
+  if(reset){ libNext=null; $('#libResults').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>'; }
+  const p=libParams(); if(!reset && libNext) p.set('cursor', libNext);
+  try{
+    const d=await get('/api/library?'+p.toString());
+    libNext=d.next;
+    const lt=$('#libTotal');
+    if(d.total!=null){ lt.style.display='inline-flex'; lt.innerHTML='📚 <b>'+Number(d.total).toLocaleString(window.OE_LANG||'en')+'</b> '+esc(T('lib_count')); }
+    else lt.style.display='none';
+    const html=d.items.map(libCard).join('');
+    if(reset) $('#libResults').innerHTML = d.items.length?html:'<div class="empty">'+esc(T('lib_none'))+'</div>';
+    else $('#libResults').insertAdjacentHTML('beforeend', html);
+    $('#libMore').innerHTML = libNext?'<button class="btn-ghost btn-sm" onclick="libMore()">'+esc(T('lib_loadmore'))+'</button>':'';
+  }catch(e){ if(e.message!=='auth') $('#libResults').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+
+/* ── article reading view (preview + translate + vote/fav/comments) ── */
+let art={id:null, data:null};
+function closeArt(){ $('#artModal').classList.add('hide'); art={id:null,data:null}; }
+function groupSentences(txt){
+  // one flat blob → split into sentences (abbreviation-tolerant) and group into paragraphs
+  const parts=txt.replace(/([.?!])\s+(?=[A-Z0-9“"])/g,'$1').split('');
+  const out=[]; let cur=[];
+  for(const s of parts){ const v=s.trim(); if(!v) continue; cur.push(v); if(cur.length>=4){ out.push(cur.join(' ')); cur=[]; } }
+  if(cur.length) out.push(cur.join(' '));
+  return out;
+}
+function stripHeader(t){
+  t=(t||'').replace(/\r\n/g,'\n').trim();
+  // drop the importer's provenance header (title/authors/citation/license/source + ==== rule)
+  const m=t.match(/\n={5,}\s*\n/);
+  if(m) t=t.slice(m.index+m[0].length).trim();
+  return t;
+}
+function paraBlocks(t){
+  t=(t||'').trim(); if(!t) return [];
+  let blocks=t.split(/\n[ \t]*\n+/);                 // 1) blank-line paragraphs
+  if(blocks.length<2){
+    const lines=t.split(/\n+/);
+    blocks = lines.length>=3 ? lines : groupSentences(t);   // 2) per-line  3) sentence grouping
+  }
+  return blocks.map(p=>p.trim()).filter(Boolean);
+}
+function wrapParas(blocks){
+  return blocks.length ? blocks.map(p=>'<p>'+esc(p)+'</p>').join('') : '<p class="empty">'+esc(T('lib_nocontent'))+'</p>';
+}
+// The flattened JATS front-matter (journal IDs, affiliations, author-contributions, license)
+// precedes the body. It reliably ENDS at the licence URL (creativecommons.org/licenses/… or a
+// publisher /license URL); cut there. Fallback: a repeated standalone title line.
+// Many PMC articles carry a 2nd metadata run (the bioRxiv/medRxiv preprint version's IDs/dates)
+// glued to the body start, ending right before the first real section heading. Fold it into front.
+function trimPreprint(front, body){
+  const mk=body.slice(0,700).search(/\b(bioRxiv|medRxiv|Preprint|Research Square|ChemRxiv)\b/i);
+  if(mk<0) return {front, body};
+  let cut=-1;
+  const h=body.match(/\b(INTRODUCTION|Introduction|ABSTRACT|Abstract|BACKGROUND|Background|MAIN|Main|RESULTS|METHODS|SIGNIFICANCE|Significance)\b/);
+  if(h && h.index>mk && h.index<2600) cut=h.index;
+  if(cut<0){                                   // no heading → cut where real prose begins (8+ word tokens)
+    const pm=body.slice(mk).match(/(?:[A-Za-z][A-Za-z'’-]{1,}[ ,]+){8,}/);
+    if(pm && (mk+pm.index)<2600) cut=mk+pm.index;
+  }
+  if(cut>0) return {front:((front?front+'\n\n':'')+body.slice(0,cut)).trim(), body:body.slice(cut).trim()};
+  return {front, body};
+}
+function findFrontMatter(t, title){
+  let res=null;
+  // 1) a repeated standalone title line cleanly marks the body start (cleanest when present)
+  const norm=s=>(s||'').replace(/<[^>]+>/g,'').toLowerCase().replace(/\s+/g,' ').replace(/[.,;:]+$/,'').trim();
+  const nt=norm(title);
+  if(nt && nt.length>=8){
+    const lines=t.split('\n');
+    for(let i=0;i<lines.length && i<40;i++){
+      const nb=norm(lines[i]);
+      if(nb===nt || (nb.startsWith(nt) && nb.length-nt.length<4)){
+        const front=lines.slice(0,i).join('\n').trim();
+        if(front.length>120) res={front, body:lines.slice(i+1).join('\n').trim()};
+        break;
+      }
+    }
+  }
+  // 2) fallback: front-matter ends at the licence URL (creativecommons.org/licenses/… or publisher /license)
+  if(!res){
+    const lic=/https?:\/\/[^\s)]*(?:creativecommons\.org\/licenses|licen[sc]e)[^\s)]*/gi;
+    let last=null, mm;
+    while((mm=lic.exec(t))){ if(mm.index<10000) last=mm; else break; }
+    if(last){
+      let cut=last.index+last[0].length;
+      const adj=t.slice(cut, cut+6).match(/^[\s.]*/); if(adj) cut+=adj[0].length;
+      const front=t.slice(0,cut).trim(), body=t.slice(cut).trim();
+      if(front.length>200 && body.length>40) res={front, body};
+    }
+  }
+  if(!res) res={front:'', body:t};
+  return trimPreprint(res.front, res.body);
+}
+function renderContent(content, title, clean){
+  const t=stripHeader(content);
+  // clean = re-extracted <body>-only text: real paragraphs are already present, just render them.
+  if(clean) return wrapParas(paraBlocks(t));
+  // legacy flattened text (not yet re-extracted) → best-effort front-matter strip, transitional.
+  const fm=findFrontMatter(t, title);
+  const meta = fm.front
+    ? '<details class="frontmatter"><summary>'+esc(T('lib_frontmatter'))+'</summary><div class="fm-body">'+wrapParas(paraBlocks(fm.front))+'</div></details>'
+    : '';
+  return meta + wrapParas(paraBlocks(fm.body));
+}
+async function openArt(id, focus){
+  art={id, data:null};
+  $('#artBody').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  $('#artModal').classList.remove('hide');
+  try{
+    art.data=await get('/api/library/'+id); renderArt();
+    await loadComments(id);
+    if(focus==='comments'){ const c=$('#artCmts'); if(c) c.scrollIntoView({block:'start'}); }
+  }catch(e){ if(e.message!=='auth') $('#artBody').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function renderArt(){
+  const d=art.data; if(!d) return;
+  const meta=[d.authors,[d.journal,d.year].filter(Boolean).join(' · ')].filter(Boolean);
+  const lic=d.license?'<span class="pill approved" style="text-transform:uppercase">'+esc(d.license)+'</span>':'';
+  const links=[];
+  if(d.doi) links.push('<a href="https://doi.org/'+esc(d.doi)+'" target="_blank" rel="noopener">DOI</a>');
+  if(d.url) links.push('<a href="'+esc(d.url)+'" target="_blank" rel="noopener">'+esc(T('lib_source'))+'</a>');
+  links.push('<a href="/api/materials/'+d.id+'/file" target="_blank" rel="noopener">'+esc(T('lib_open'))+'</a>');
+  const langs=[['en','English'],['tr','Türkçe'],['es','Español'],['de','Deutsch'],['fr','Français'],['it','Italiano'],['ru','Русский'],['nl','Nederlands']];
+  const def=(window.OE_LANG||'en');
+  const opts=langs.map(l=>'<option value="'+l[0]+'"'+(l[0]===def?' selected':'')+'>'+l[1]+'</option>').join('');
+  $('#artBody').innerHTML=
+    '<div class="art-h">'+esc(d.title)+'</div>'+
+    '<div class="art-meta">'+meta.map(m=>'<span>'+esc(m)+'</span>').join('')+lic+'</div>'+
+    '<div class="art-bar">'+
+      '<button class="vbtn up'+(d.my_vote===1?' on':'')+'" id="av_up" onclick="artVote(1)"><i class="ar up">▲</i> <span id="av_upn">'+(d.up||0)+'</span></button>'+
+      '<button class="vbtn down'+(d.my_vote===-1?' on':'')+'" id="av_down" onclick="artVote(-1)"><i class="ar down">▼</i> <span id="av_downn">'+(d.down||0)+'</span></button>'+
+      '<button class="vbtn fav'+(d.favorited?' on':'')+'" id="av_fav" onclick="artFav()">★ <span>'+esc(T(d.favorited?'lib_faved':'lib_fav'))+'</span></button>'+
+      '<span class="spacer"></span>'+
+      '<span class="art-tl"><select id="art_lang">'+opts+'</select>'+
+        '<button class="btn-mini" onclick="artTranslate()">'+esc(T('lib_translate'))+'</button></span>'+
+    '</div>'+
+    '<div class="reading" id="art_read">'+renderContent(d.content, d.title, d.clean)+'</div>'+
+    '<div id="art_trnote"></div>'+
+    '<div class="cmts" id="artCmts"></div>'+
+    '<div style="margin-top:12px;font-size:13px;display:flex;gap:14px;flex-wrap:wrap">'+links.join('')+'</div>';
+}
+async function artVote(v){
+  const d=art.data; if(!d) return;
+  const nv=(d.my_vote===v)?0:v;
+  try{
+    const r=await post('/api/library/'+d.id+'/vote',{value:nv});
+    d.my_vote=r.my_vote; d.up=r.up; d.down=r.down;
+    $('#av_upn').textContent=r.up; $('#av_downn').textContent=r.down;
+    $('#av_up').classList.toggle('on', r.my_vote===1);
+    $('#av_down').classList.toggle('on', r.my_vote===-1);
+  }catch(e){ if(e.message!=='auth') toast(e.message); }
+}
+async function artFav(){
+  const d=art.data; if(!d) return;
+  try{
+    const r=await post('/api/library/'+d.id+'/favorite',{});
+    d.favorited=r.favorited;
+    $('#av_fav').classList.toggle('on', r.favorited);
+    $('#av_fav').querySelector('span').textContent=T(r.favorited?'lib_faved':'lib_fav');
+    toast(T(r.favorited?'lib_faved':'lib_unfaved'));
+  }catch(e){ if(e.message!=='auth') toast(e.message); }
+}
+async function artTranslate(){
+  const d=art.data; if(!d) return;
+  const lang=$('#art_lang').value, read=$('#art_read'), note=$('#art_trnote');
+  if(lang===(d.language||'en')){ read.classList.remove('tr'); read.innerHTML=renderContent(d.content, d.title, d.clean); note.innerHTML=''; return; }
+  note.innerHTML='<div class="trnote">'+esc(T('lib_translating'))+'</div>';
+  try{
+    const r=await post('/api/library/'+d.id+'/translate',{lang});
+    if(!r.available){ note.innerHTML='<div class="trnote">'+esc(T('lib_tr_soon'))+'</div>'; return; }
+    read.classList.add('tr'); read.innerHTML=renderContent(r.content, r.title||d.title, d.clean);
+    let n=T('lib_tr_note')+(r.truncated?' · '+T('lib_tr_trunc'):'');
+    note.innerHTML='<div class="trnote">'+esc(n)+' <span class="lnk" onclick="artShowOrig()">'+esc(T('lib_tr_orig'))+'</span></div>';
+  }catch(e){ if(e.message!=='auth') note.innerHTML='<div class="trnote">'+esc(e.message)+'</div>'; }
+}
+function artShowOrig(){ const d=art.data; $('#art_read').classList.remove('tr'); $('#art_read').innerHTML=renderContent(d.content, d.title, d.clean); $('#art_trnote').innerHTML=''; }
+async function loadComments(id){
+  const box=$('#artCmts'); if(!box) return;
+  let comments=[];
+  try{ comments=(await get('/api/library/'+id+'/comments')).comments; }catch(e){ if(e.message==='auth') return; }
+  refreshLibCard(id, comments.length);
+  box.innerHTML=
+    '<h2 style="font-size:16px;margin-bottom:10px">'+esc(T('lib_comments'))+' ('+comments.length+')</h2>'+
+    '<input id="cmt_reason" placeholder="'+esc(T('lib_reason_ph'))+'" maxlength="60">'+
+    '<textarea id="cmt_body" maxlength="4000" placeholder="'+esc(T('lib_comment_ph'))+'" style="margin-top:8px"></textarea>'+
+    '<button class="btn btn-sm" style="margin-top:8px" onclick="addComment()">'+esc(T('lib_post_comment'))+'</button>'+
+    '<div id="cmtList" style="margin-top:12px">'+(comments.length?comments.map(cmtRow).join(''):'<div class="empty">'+esc(T('lib_no_comments'))+'</div>')+'</div>';
+}
+function cmtRow(c){
+  const rsn=c.reason?'<span class="rsn">'+esc(c.reason)+'</span>':'';
+  const dl=c.mine?'<span class="dl" onclick="delComment(\''+c.id+'\')">'+esc(T('act_delete'))+'</span>':'';
+  const sp=c.specialty?' · '+esc(c.specialty):'';
+  return '<div class="cmt">'+dl+'<div class="who">'+esc(c.author)+rsn+'</div>'+
+    '<div class="bd">'+esc(c.body)+'</div>'+
+    '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">'+esc(fdate(c.created_at))+sp+'</div></div>';
+}
+async function addComment(){
+  const body=$('#cmt_body').value.trim(); if(!body){ return; }
+  const reason=$('#cmt_reason').value.trim();
+  try{ await post('/api/library/'+art.id+'/comments',{body, reason:reason||null}); loadComments(art.id); }
+  catch(e){ if(e.message!=='auth') toast(e.message); }
+}
+async function delComment(id){
+  try{ await del('/api/library/comments/'+id); loadComments(art.id); }
+  catch(e){ if(e.message!=='auth') toast(e.message); }
+}
 
 /* ── copilot ─────────────────────────────────────────────────── */
 function appendChat(role, text, q){
@@ -754,7 +1139,7 @@ async function logout(){ try{ await post('/api/logout'); }catch(e){} location.hr
 async function boot(){
   try{ state.me=await get('/api/me'); }catch(e){ location.href='/portal/'; return; }
   renderUser(); refreshBadges(); setInterval(refreshBadges,20000);
-  const valid=['home','copilot','contribute','forum','community','messages','review','invite'];
+  const valid=['home','copilot','library','contribute','forum','community','messages','review','invite'];
   let start=(location.hash||'').replace('#','');
   if(!valid.includes(start)) start='home';
   if(start==='review' && !(state.me.role==='reviewer'||state.me.role==='admin')) start='home';

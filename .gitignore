@@ -16,6 +16,7 @@ CLAUDE.md
 # Operational runbooks & infra (contain server IPs, Oracle OCIDs, emails) — keep private
 server1-README.md
 server2-README.md
+seeding.md
 deploy/
 server2/setup-db.sh
 server2/app/deploy-app.sh

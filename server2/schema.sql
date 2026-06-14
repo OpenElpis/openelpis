@@ -99,6 +99,19 @@ CREATE TABLE IF NOT EXISTS materials (
 CREATE INDEX IF NOT EXISTS materials_status_idx     ON materials(status);
 CREATE INDEX IF NOT EXISTS materials_uploader_idx   ON materials(uploaded_by);
 CREATE INDEX IF NOT EXISTS materials_metadata_idx   ON materials USING gin (metadata jsonb_path_ops);
+-- Member Library (browse/search the approved corpus). Partial indexes on approved
+-- so the flood of pending uploads never bloats them. On a live/growing table apply
+-- these with CREATE INDEX CONCURRENTLY (see seeding.md); IF NOT EXISTS here for fresh setup.
+CREATE INDEX IF NOT EXISTS materials_lib_browse ON materials (created_at DESC, id DESC) WHERE status='approved';
+CREATE INDEX IF NOT EXISTS materials_lib_year   ON materials ((metadata->>'pub_year')) WHERE status='approved';
+-- keyset sort by PUBLISHED date (newest/oldest), with a pub_year fallback (see library.py _PUBDATE)
+CREATE INDEX IF NOT EXISTS materials_lib_pubdate ON materials (
+  (coalesce(metadata->>'first_pub_date', nullif(metadata->>'pub_year','')||'-01-01', '0001-01-01')), id
+) WHERE status='approved';
+CREATE INDEX IF NOT EXISTS materials_lib_fts    ON materials USING gin (
+  to_tsvector('english', coalesce(title,'') || ' ' || coalesce(metadata->>'author_string','')
+    || ' ' || coalesce(metadata->'journal'->>'title','') || ' ' || coalesce(description,''))
+) WHERE status='approved';
 
 -- ── Material chunks: the retrieval units (passages). This is what the copilot
 --    searches and feeds to Groq. tsv = keyword (v0); embedding = semantic (v1). ──
@@ -262,6 +275,60 @@ CREATE INDEX IF NOT EXISTS forum_posts_topic_idx ON forum_posts(topic_id, create
 ALTER TABLE users ADD COLUMN IF NOT EXISTS invited_by uuid REFERENCES users(id) ON DELETE SET NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS specialty  text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS bio        text;
+
+-- ============================================================================
+-- LIBRARY ENGAGEMENT (added June 2026): per-article reading view extras —
+-- cached machine translations, up/down votes, favorites, and member comments.
+-- All additive + idempotent. Stats are read per-page (only the ids on screen),
+-- never aggregated across the whole corpus, so they stay cheap as it grows.
+-- ============================================================================
+
+-- ── Article translations: machine translation cached per (article, language).
+--    English originals stay canonical; a translation is a reading aid produced
+--    on first request (Groq) and reused after. content = translated body. ──
+CREATE TABLE IF NOT EXISTS article_translations (
+  material_id  uuid NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+  lang         text NOT NULL,                 -- en/tr/es/de/fr/it/ru/nl
+  title        text,
+  content      text NOT NULL,
+  engine       text,                          -- e.g. 'groq:llama-3.3-70b-versatile'
+  truncated    boolean NOT NULL DEFAULT false,-- long bodies are capped for cost/latency
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (material_id, lang)
+);
+
+-- ── Votes: one row per (article, member); value +1 (up) or -1 (down). ──
+CREATE TABLE IF NOT EXISTS material_votes (
+  material_id  uuid NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+  user_id      uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  value        smallint NOT NULL CHECK (value IN (-1, 1)),
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (material_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS material_votes_mat_idx ON material_votes(material_id);
+
+-- ── Favorites: a member's saved/bookmarked articles. ──
+CREATE TABLE IF NOT EXISTS material_favorites (
+  user_id      uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  material_id  uuid NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, material_id)
+);
+CREATE INDEX IF NOT EXISTS material_favorites_mat_idx ON material_favorites(material_id);
+
+-- ── Comments: a member's note (+ optional structured reason) on an article. ──
+CREATE TABLE IF NOT EXISTS material_comments (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  material_id  uuid NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+  user_id      uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body         text NOT NULL,
+  reason       text,                          -- optional: 'methodology','clinical_relevance'…
+  status       text NOT NULL DEFAULT 'visible' CHECK (status IN ('visible','removed')),
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  edited_at    timestamptz
+);
+CREATE INDEX IF NOT EXISTS material_comments_mat_idx ON material_comments(material_id, created_at);
 
 -- ── Privileges: the app connects as openelpis_app (DML only; not table owner) ──
 GRANT USAGE ON SCHEMA public TO openelpis_app;
