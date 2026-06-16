@@ -10,22 +10,34 @@ Scales with continuous inserts + concurrent uploads:
   - Social stats (votes/comments/favorite) are fetched only for the ≤50 ids on the
     current page — never an aggregate join across the whole growing table.
 """
-import json, base64
+import json, re, threading, time as _time
+from collections import Counter
 from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException, Depends
 from pydantic import BaseModel, constr, conint
 
 from core import db, audit, client_ip, current_user
+from chat import record_exchange
 from materials import _visible, material_text          # reuse storage + visibility
-from llm import groq_chat, GROQ_ENABLED, GROQ_MODEL
+from llm import groq_chat, GROQ_ENABLED, GROQ_FAST_MODEL, GroqRateLimited, GroqUnavailable
 
 router = APIRouter()
 
 LANGS = {"en", "tr", "es", "de", "fr", "it", "ru", "nl"}
 LANG_NAMES = {"en": "English", "tr": "Turkish", "es": "Spanish", "de": "German",
               "fr": "French", "it": "Italian", "ru": "Russian", "nl": "Dutch"}
-TRANSLATE_CAP = 30000   # chars of body translated on demand (English original stays canonical)
+TRANSLATE_CAP = 60000   # generous — the whole body is translated for ~90% of articles (median ~30k,
+                        # p90 ~54k chars); only the rare giants are capped + flagged `truncated`. The
+                        # English original always stays canonical.
+TR_BLOCK = 2500         # chars per Groq translate call → a "chunk" that streams to the reader as it lands
+# Streaming translation: a background thread translates the article block-by-block (rate-limit-aware)
+# and appends each finished chunk to _TR_PROGRESS; the frontend polls and renders chunks as they
+# arrive (so the reader can start reading the top while the rest translates). On completion the full
+# text is cached in article_translations, so later views are instant.
+_TR_PROGRESS = {}       # (material_id, lang) -> {chunks:[str], total:int, title:str|None,
+                        #                          truncated:bool, done:bool, error:bool}
+_TR_LOCK = threading.Lock()
 
 # Same searchable vector as the partial GIN index materials_lib_fts (title + authors
 # + journal + abstract/description). One box → all of those for a keyword.
@@ -34,17 +46,40 @@ _FTS = ("to_tsvector('english', coalesce(m.title,'')||' '||coalesce(m.metadata->
 # Sort key for new/old = the article's PUBLISHED date (not the row's DB insert time).
 # ISO 'YYYY-MM-DD' sorts chronologically as text; fall back to pub_year, then epoch-floor.
 _PUBDATE = ("coalesce(m.metadata->>'first_pub_date', nullif(m.metadata->>'pub_year','')||'-01-01', '0001-01-01')")
+# Library full-content search. Strategy (keeps every query fast):
+#   • BROAD term (≥ _ESCALATE metadata matches) → metadata FTS only, via the partial GIN index
+#     (the body would add little — there are already plenty of hits — and scanning it is slow).
+#   • SPECIFIC term (< _ESCALATE metadata matches, e.g. "RhoC K188") → also search the BODY
+#     (chunks), union the matching ids, and query by id (PK). Both id sets are small → fast.
+# This gives the copilot's full-content reach exactly where it matters (specific terms metadata
+# can't see) without the seconds-long scans broad-term body search would cost.
+_BODY_HIT_CAP = 400      # max body-matched articles folded in for a specific term
+_ESCALATE     = 400      # metadata-match count above which we skip the body search
+
+# Filter the list by display-kind (the same taxonomy the counters show). Kept index-friendly:
+# pmc ⟺ source='europepmc' (PMC rows never carry metadata.kind); the non-PMC kinds live in the
+# small `materials_nonbulk` partial-index set, so we add that predicate to keep the scan tiny.
+_KIND_KNOWN = {"pmc", "article", "preprint", "clinical_trial", "book", "dataset"}
 
 
-def _enc(obj):
-    return base64.urlsafe_b64encode(json.dumps(obj).encode()).decode()
+def _kind_filter(kind, where, params):
+    if kind == "pmc":
+        where.append("(m.metadata->>'source')='europepmc'")
+    else:
+        where.append("(m.metadata->>'source') IS DISTINCT FROM 'europepmc' "
+                     "AND coalesce(m.metadata->>'kind','article')=%(kind)s")
+        params["kind"] = kind
 
 
-def _dec(s):
-    try:
-        return json.loads(base64.urlsafe_b64decode(s.encode()).decode())
-    except Exception:
-        return None
+def _title_tr(cur, ids, lang):
+    """Bulk-translated titles for the given ids in `lang`. English is included on purpose:
+    an English-source article simply has no row (→ caller keeps the original title), while a
+    non-English upload DOES have an 'en' row so it shows in English to English users."""
+    if not ids or not lang or lang not in LANGS:
+        return {}
+    cur.execute("SELECT material_id, title FROM material_title_translations "
+                "WHERE lang=%s AND material_id = ANY(%s::uuid[])", (lang, ids))
+    return {str(r["material_id"]): r["title"] for r in cur.fetchall()}
 
 
 def _stats(cur, ids, uid):
@@ -76,20 +111,32 @@ def _stats(cur, ids, uid):
 @router.get("/api/library")
 def library(q: Optional[str] = None, author: Optional[str] = None, journal: Optional[str] = None,
             license: Optional[str] = None, source_type: Optional[str] = None,
-            year_from: Optional[str] = None, year_to: Optional[str] = None,
-            favorites: int = 0, sort: str = "new", cursor: Optional[str] = None,
-            limit: int = 24, user=Depends(current_user)):
-    limit = max(1, min(limit, 50))
+            year_from: Optional[str] = None, year_to: Optional[str] = None, kind: Optional[str] = None,
+            favorites: int = 0, sort: str = "new", page: int = 1,
+            limit: int = 24, lang: Optional[str] = None, user=Depends(current_user)):
+    limit = max(1, min(limit, 100))
+    page = max(1, page)
     where = ["m.status='approved'"]
     params = {}
-    tsq_parts = []
-    if q:       tsq_parts.append("websearch_to_tsquery('english', %(q)s)");  params["q"] = q
-    if author:  tsq_parts.append("plainto_tsquery('english', %(author)s)");  params["author"] = author
-    if journal: tsq_parts.append("plainto_tsquery('english', %(journal)s)"); params["journal"] = journal
-    has_fts = bool(tsq_parts)
-    tsq = " && ".join(tsq_parts) if has_fts else None
-    if has_fts:
-        where.append(f"{_FTS} @@ ({tsq})")
+    if q:
+        params["q"] = q                                   # used by the relevance ORDER BY
+        meta_cond = f"{_FTS} @@ websearch_to_tsquery('english', %(q)s)"
+        with db() as c0:
+            c0.execute(f"SELECT count(*) AS n FROM materials m WHERE m.status='approved' AND "
+                       f"{_FTS} @@ websearch_to_tsquery('english', %s)", (q,))
+            meta_n = c0.fetchone()["n"]
+            if meta_n >= _ESCALATE:                        # broad term → fast metadata-index path
+                where.append(meta_cond)
+            else:                                          # specific term → also search the BODY
+                c0.execute(f"SELECT m.id FROM materials m WHERE m.status='approved' AND "
+                           f"{_FTS} @@ websearch_to_tsquery('english', %s)", (q,))
+                ids = {str(r["id"]) for r in c0.fetchall()}
+                c0.execute("SELECT DISTINCT material_id FROM material_chunks "
+                           "WHERE tsv @@ websearch_to_tsquery('english', %s) LIMIT %s", (q, _BODY_HIT_CAP))
+                ids |= {str(r["material_id"]) for r in c0.fetchall()}
+                where.append("m.id = ANY(%(ids)s::uuid[])"); params["ids"] = list(ids)
+    if author:  where.append(f"{_FTS} @@ plainto_tsquery('english', %(author)s)");  params["author"] = author
+    if journal: where.append(f"{_FTS} @@ plainto_tsquery('english', %(journal)s)"); params["journal"] = journal
     if license:
         where.append("m.metadata @> %(licj)s::jsonb"); params["licj"] = json.dumps({"license": license})
     if source_type:
@@ -102,53 +149,88 @@ def library(q: Optional[str] = None, author: Optional[str] = None, journal: Opti
     if only_favs:
         where.append("EXISTS (SELECT 1 FROM material_favorites f WHERE f.material_id=m.id "
                      "AND f.user_id=%(uid)s)"); params["uid"] = user["id"]
+    if kind in _KIND_KNOWN:
+        _kind_filter(kind, where, params)
+    # When kind is the ONLY filter, the (un-indexed) count over the whole corpus is slow — reuse
+    # the cached corpus counts instead. Any other filter narrows it enough to count directly.
+    kind_only = (kind in _KIND_KNOWN and not (q or author or journal or license
+                 or source_type or year_from or year_to or only_favs))
+    cached_total = kind_counts()["counts"].get(kind, 0) if kind_only else None
 
-    relevance = (sort == "relevance" and has_fts)
+    relevance = (sort == "relevance" and bool(q))
     if relevance:
-        off = 0
-        if cursor:
-            d = _dec(cursor)
-            if isinstance(d, int): off = max(0, min(d, 5000))
-        page = f"ORDER BY ts_rank({_FTS}, ({tsq})) DESC, m.id DESC LIMIT {limit+1} OFFSET {off}"
+        order = f"ORDER BY ts_rank({_FTS}, websearch_to_tsquery('english', %(q)s)) DESC, m.id DESC"
     else:
-        desc = (sort != "old")
-        if cursor:
-            d = _dec(cursor) or {}
-            if d.get("ca"):
-                where.append(f"({_PUBDATE}, m.id) {'<' if desc else '>'} (%(cca)s, %(cci)s::uuid)")
-                params["cca"] = d["ca"]; params["cci"] = d["ci"]
-        page = (f"ORDER BY {_PUBDATE} {'DESC' if desc else 'ASC'}, m.id {'DESC' if desc else 'ASC'} "
-                f"LIMIT {limit+1}")
-
-    sql = ("SELECT m.id,m.title,m.source_type,m.created_at,m.size_bytes,"
-           f"{_PUBDATE} AS sort_date,"
+        d = "DESC" if sort != "old" else "ASC"
+        order = f"ORDER BY {_PUBDATE} {d}, m.id {d}"
+    where_sql = " AND ".join(where)
+    offset = min((page - 1) * limit, 200000)         # guard pathological deep scans
+    sel = ("SELECT m.id,m.title,m.source_type,m.created_at,m.size_bytes,"
            "m.metadata->>'author_string' AS authors,m.metadata->'journal'->>'title' AS journal,"
            "m.metadata->>'pub_year' AS year,m.metadata->>'license' AS license,"
-           "m.metadata->>'doi' AS doi,m.metadata->>'url' AS url "
-           f"FROM materials m WHERE {' AND '.join(where)} {page}")
+           "m.metadata->>'doi' AS doi,m.metadata->>'url' AS url,"
+           "coalesce(m.metadata->>'kind', case when m.metadata->>'source'='europepmc' then 'pmc' else 'article' end) AS kind "
+           f"FROM materials m WHERE {where_sql} {order} LIMIT {limit} OFFSET {offset}")
     with db() as cur:
-        cur.execute(sql, params)
+        if cached_total is not None:
+            total = cached_total
+        else:
+            cur.execute(f"SELECT count(*) AS n FROM materials m WHERE {where_sql}", params)
+            total = cur.fetchone()["n"]
+        cur.execute(sel, params)
         rows = cur.fetchall()
-        more = len(rows) > limit
-        rows = rows[:limit]
         ids = [str(r["id"]) for r in rows]
         stats = _stats(cur, ids, user["id"])
-        total = None
-        if not (has_fts or license or source_type or year_from or year_to or only_favs):
+        titles = _title_tr(cur, ids, lang)           # localized titles (English → original)
+    pages = max(1, -(-total // limit))               # ceil division
+    items = [{"id": str(r["id"]), "title": titles.get(str(r["id"])) or r["title"],
+              "authors": r["authors"], "journal": r["journal"],
+              "year": r["year"], "license": r["license"], "doi": r["doi"], "url": r["url"],
+              "source_type": r["source_type"], "size_bytes": r["size_bytes"], "kind": r["kind"],
+              "created_at": r["created_at"].isoformat(), **stats[str(r["id"])]} for r in rows]
+    return {"items": items, "total": total, "page": page, "pages": pages, "limit": limit}
+
+
+# ── corpus-wide counts per content kind (for the Library + admin counters) ─────────
+_KIND_CACHE = {"t": 0.0, "v": None}
+
+
+def kind_counts():
+    """{total, counts:{pmc,article,…}, recent} over approved materials. Cached ~10 min.
+    Fast path: the non-PMC rows are few and covered by the partial index `materials_nonbulk`
+    (GROUP BY only those); PMC = total − non-PMC (avoids a full jsonb scan). `recent` = items
+    added in the last 24h (the live "+N added" delta). Serves the STALE cache on any DB error
+    (e.g. a momentary pool spike) so the counters never disappear from the UI."""
+    now = _time.time()
+    c = _KIND_CACHE
+    if c["v"] and now - c["t"] < 600:
+        return c["v"]
+    try:
+        with db() as cur:
             cur.execute("SELECT count(*) AS n FROM materials WHERE status='approved'")
             total = cur.fetchone()["n"]
-    nxt = None
-    if more:
-        if relevance:
-            nxt = _enc(off + limit)
-        else:
-            last = rows[-1]
-            nxt = _enc({"ca": last["sort_date"], "ci": str(last["id"])})
-    items = [{"id": str(r["id"]), "title": r["title"], "authors": r["authors"], "journal": r["journal"],
-              "year": r["year"], "license": r["license"], "doi": r["doi"], "url": r["url"],
-              "source_type": r["source_type"], "size_bytes": r["size_bytes"],
-              "created_at": r["created_at"].isoformat(), **stats[str(r["id"])]} for r in rows]
-    return {"items": items, "next": nxt, "total": total}
+            cur.execute("SELECT coalesce(metadata->>'kind','article') AS kind, count(*) AS n "
+                        "FROM materials WHERE status='approved' "
+                        "AND (metadata->>'source') IS DISTINCT FROM 'europepmc' GROUP BY 1")
+            counts = {r["kind"]: r["n"] for r in cur.fetchall()}
+            cur.execute("SELECT count(*) AS n FROM materials "
+                        "WHERE status='approved' AND created_at > now() - interval '24 hours'")
+            recent = cur.fetchone()["n"]
+        counts["pmc"] = total - sum(counts.values())
+        c["v"] = {"total": total, "counts": counts, "recent": recent, "recent_window": "24h"}
+        c["t"] = now
+        return c["v"]
+    except Exception:
+        if c["v"]:
+            return c["v"]              # stale-but-present beats a 500 that blanks the counters
+        raise
+
+
+# NOTE: must be declared BEFORE the /api/library/{material_id} route below, or "kinds"
+# would be captured as a material_id.
+@router.get("/api/library/kinds")
+def library_kinds(user=Depends(current_user)):
+    return kind_counts()
 
 
 # ── article reading view (preview) ───────────────────────────────────────────────
@@ -179,7 +261,10 @@ def article(material_id: str, user=Depends(current_user)):
         "journal": (md.get("journal") or {}).get("title") if isinstance(md.get("journal"), dict) else None,
         "year": md.get("pub_year"), "license": md.get("license"),
         "doi": md.get("doi"), "url": md.get("url"), "pmcid": md.get("pmcid"),
-        "copyright": md.get("copyright"), **st,
+        "copyright": md.get("copyright"),
+        "kind": md.get("kind") or ("pmc" if md.get("source") == "europepmc" else "article"),
+        "source": md.get("source"), "peer_reviewed": md.get("peer_reviewed"), "nct": md.get("nct"),
+        **st,
     }
 
 
@@ -199,56 +284,152 @@ def _split(text, cap):
     return out
 
 
+def _groq_backoff(messages, *, retries=6, **kw):
+    """groq_chat with bounded waits on 429. ONLY called inside the background translate
+    thread (never a request thread), so the sleeps don't block the API for other users."""
+    for _ in range(retries):
+        try:
+            return groq_chat(messages, **kw)
+        except GroqRateLimited as e:
+            _time.sleep(min((e.retry_after or 18) + 1, 35))
+    raise GroqUnavailable("rate limited too long")
+
+
+def _is_degenerate(text, src_len):
+    """True if a translation looks like an LLM repetition loop (e.g. the same phrase emitted
+    over and over until the token limit) or is otherwise garbage — so it never gets cached."""
+    t = (text or "").strip()
+    if not t:
+        return True
+    if src_len and len(t) > src_len * 3 + 200:          # length blow-up from a loop
+        return True
+    words = t.split()
+    if len(words) < 12:
+        return False                                     # too short to judge
+    if len(set(words)) / len(words) < 0.25:             # almost no unique words
+        return True
+    grams = [" ".join(words[i:i + 4]) for i in range(len(words) - 3)]
+    if grams:
+        _, cnt = Counter(grams).most_common(1)[0]        # most-repeated 4-word phrase
+        if cnt >= 8 or cnt / len(grams) > 0.2:
+            return True
+    return False
+
+
+def _translate_block(messages_base, block, src_len):
+    """Translate one block; if the model loops/garbles, retry at a higher temperature to break
+    the loop. Returns clean text, or None if it couldn't produce a sane translation."""
+    for temp in (0.1, 0.5, 0.9):
+        out = _groq_backoff(messages_base + [{"role": "user", "content": block}],
+                            model=GROQ_FAST_MODEL, max_tokens=4096, temperature=temp)
+        if out and not _is_degenerate(out, src_len):
+            return out
+    return None
+
+
+def _do_translate(material_id, lang, blocks, src_title, name, truncated):
+    """Background worker: translate the title, then each block, appending finished chunks to
+    _TR_PROGRESS so the frontend can stream them in. Caches the full result when complete."""
+    key = (material_id, lang)
+    try:
+        if src_title:
+            tt = _groq_backoff(
+                [{"role": "system", "content": f"Translate into {name}. Output only the translation."},
+                 {"role": "user", "content": src_title}], model=GROQ_FAST_MODEL, max_tokens=256, temperature=0.1)
+            with _TR_LOCK:
+                if key in _TR_PROGRESS:
+                    _TR_PROGRESS[key]["title"] = tt if (tt and not _is_degenerate(tt, len(src_title))) else src_title
+        sysmsg = (f"You are a professional medical translator. Translate the user's text into {name}, "
+                  "preserving meaning and clinical/medical terminology precisely. Keep paragraph breaks. "
+                  "Do NOT repeat any phrase or sentence; translate the text once, faithfully. "
+                  "Output ONLY the translation — no preamble, notes, or quotes.")
+        base = [{"role": "system", "content": sysmsg}]
+        for block in blocks:
+            out = _translate_block(base, block, len(block))
+            if out is None:                    # model kept looping/garbling → fail (do NOT cache garbage)
+                raise GroqUnavailable("degenerate translation output")
+            with _TR_LOCK:
+                if key not in _TR_PROGRESS:    # cancelled / evicted
+                    return
+                _TR_PROGRESS[key]["chunks"].append(out)
+        with _TR_LOCK:
+            p = _TR_PROGRESS.get(key)
+            title = (p and p.get("title")) or src_title
+            content = "\n\n".join(c for c in (p["chunks"] if p else []) if c).strip()
+        engine = f"groq:{GROQ_FAST_MODEL}"
+        with db() as cur:
+            cur.execute("INSERT INTO article_translations(material_id,lang,title,content,engine,truncated) "
+                        "VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (material_id,lang) DO UPDATE SET "
+                        "title=EXCLUDED.title,content=EXCLUDED.content,engine=EXCLUDED.engine,"
+                        "truncated=EXCLUDED.truncated,created_at=now()",
+                        (material_id, lang, title, content, engine, truncated))
+        with _TR_LOCK:
+            if key in _TR_PROGRESS:
+                _TR_PROGRESS[key]["done"] = True
+    except Exception:
+        with _TR_LOCK:
+            if key in _TR_PROGRESS:
+                _TR_PROGRESS[key]["error"] = True
+
+
 @router.post("/api/library/{material_id}/translate")
 def translate(material_id: str, body: TranslateIn, user=Depends(current_user)):
+    """Start or poll a streaming translation. Statuses: done (full content) | translating
+    (partial chunks so far) | unavailable | error. The frontend polls until done."""
     lang = body.lang if body.lang in LANGS else None
     if not lang:
         raise HTTPException(400, "unsupported language")
     with db() as cur:
         m = _fetch_visible(cur, material_id, user)
         if lang == (m["language"] or "en"):     # already in this language → original is canonical
-            return {"available": True, "lang": lang, "engine": "original",
+            return {"status": "done", "available": True, "lang": lang, "engine": "original",
                     "title": m["title"], "content": material_text(m), "cached": True}
         cur.execute("SELECT title,content,engine,truncated FROM article_translations "
                     "WHERE material_id=%s AND lang=%s", (material_id, lang))
         cached = cur.fetchone()
         if cached:
-            return {"available": True, "lang": lang, "cached": True, "engine": cached["engine"],
-                    "title": cached["title"], "content": cached["content"], "truncated": cached["truncated"]}
+            return {"status": "done", "available": True, "lang": lang, "cached": True,
+                    "engine": cached["engine"], "title": cached["title"],
+                    "content": cached["content"], "truncated": cached["truncated"]}
     if not GROQ_ENABLED:
-        # Groq key not configured yet — the English original stays available.
-        return {"available": False, "lang": lang}
+        return {"status": "unavailable", "available": False, "lang": lang}
+
+    key = (material_id, lang)
+    with _TR_LOCK:
+        p = _TR_PROGRESS.get(key)
+        if p:
+            if p.get("error"):
+                _TR_PROGRESS.pop(key, None)
+                return {"status": "error", "lang": lang}
+            if p["done"]:
+                content = "\n\n".join(c for c in p["chunks"] if c).strip()
+                title, truncated = p.get("title"), p["truncated"]
+                _TR_PROGRESS.pop(key, None)        # cached now → free memory
+                return {"status": "done", "available": True, "lang": lang, "title": title,
+                        "content": content, "truncated": truncated}
+            return {"status": "translating", "lang": lang, "title": p.get("title"),
+                    "chunks": list(p["chunks"]), "total": p["total"], "truncated": p["truncated"]}
 
     text = material_text(m) or ""
+    hm = re.search(r'\n={5,}\s*\n', text)   # drop our provenance header → translate the body, not metadata
+    if hm:
+        text = text[hm.end():].lstrip()
     truncated = len(text) > TRANSLATE_CAP
-    text = text[:TRANSLATE_CAP]
+    blocks = _split(text[:TRANSLATE_CAP], TR_BLOCK)
     name = LANG_NAMES.get(lang, lang)
-    sys = (f"You are a professional medical translator. Translate the user's text into {name}, "
-           "preserving meaning and clinical/medical terminology precisely. Keep paragraph breaks. "
-           "Output ONLY the translation — no preamble, notes, or quotes.")
-    parts = []
-    for block in _split(text, 3500):
-        out = groq_chat([{"role": "system", "content": sys}, {"role": "user", "content": block}],
-                        max_tokens=4096, temperature=0.1)
-        if out is None:
-            raise HTTPException(503, "translation_failed")
-        parts.append(out)
-    content = "\n\n".join(parts).strip()
-    title = m["title"]
-    if title:
-        tt = groq_chat([{"role": "system", "content": f"Translate into {name}. Output only the translation."},
-                        {"role": "user", "content": title}], max_tokens=256, temperature=0.1)
-        title = tt or m["title"]
-    engine = f"groq:{GROQ_MODEL}"
+    with _TR_LOCK:
+        if key in _TR_PROGRESS:                  # lost a race → report current progress
+            p = _TR_PROGRESS[key]
+            return {"status": "translating", "lang": lang, "title": p.get("title"),
+                    "chunks": list(p["chunks"]), "total": p["total"], "truncated": p["truncated"]}
+        _TR_PROGRESS[key] = {"chunks": [], "total": len(blocks), "title": None,
+                             "truncated": truncated, "done": False, "error": False}
     with db() as cur:
-        cur.execute("INSERT INTO article_translations(material_id,lang,title,content,engine,truncated) "
-                    "VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (material_id,lang) DO UPDATE SET "
-                    "title=EXCLUDED.title,content=EXCLUDED.content,engine=EXCLUDED.engine,"
-                    "truncated=EXCLUDED.truncated,created_at=now()",
-                    (material_id, lang, title, content, engine, truncated))
         audit(cur, user["id"], "translate", "material", material_id, {"lang": lang}, None)
-    return {"available": True, "lang": lang, "cached": False, "engine": engine,
-            "title": title, "content": content, "truncated": truncated}
+    threading.Thread(target=_do_translate,
+                     args=(material_id, lang, blocks, m["title"], name, truncated), daemon=True).start()
+    return {"status": "translating", "lang": lang, "title": None,
+            "chunks": [], "total": len(blocks), "truncated": truncated}
 
 
 # ── votes / favorites ────────────────────────────────────────────────────────────
@@ -336,8 +517,19 @@ def delete_comment(comment_id: str, user=Depends(current_user)):
 
 
 # ── natural-language search ("ask the copilot to search the library") ─────────────
+# Localized lead-in for the chat-history record of a library search (the assistant
+# "turn" we store so this surface shows up in the member's copilot history too).
+_ASK_NOTE = {
+    "en": "🔎 Searched the library", "tr": "🔎 Kütüphanede arama yapıldı",
+    "es": "🔎 Se buscó en la biblioteca", "de": "🔎 Bibliothek durchsucht",
+    "fr": "🔎 Recherche dans la bibliothèque", "it": "🔎 Ricerca nella biblioteca",
+    "ru": "🔎 Поиск по библиотеке", "nl": "🔎 Bibliotheek doorzocht",
+}
+
+
 class AskIn(BaseModel):
     question: constr(min_length=1, max_length=500)
+    lang: Optional[str] = None      # member UI language (for the history record)
 
 
 @router.post("/api/library/ask")
@@ -352,8 +544,13 @@ def library_ask(body: AskIn, user=Depends(current_user)):
         sys = ("Extract search filters from a clinician's request about a breast-cancer article "
                "library. Reply with ONLY compact JSON, keys (all optional): q (main keywords), "
                "author, journal, year_from, year_to. Omit keys you can't infer. No prose.")
-        raw = groq_chat([{"role": "system", "content": sys}, {"role": "user", "content": q}],
-                        max_tokens=200, temperature=0)
+        try:
+            raw = groq_chat([{"role": "system", "content": sys}, {"role": "user", "content": q}],
+                            model=GROQ_FAST_MODEL, max_tokens=200, temperature=0)
+        except GroqRateLimited:
+            raise HTTPException(429, "rate_limited")
+        except GroqUnavailable:
+            raw = None
         if raw:
             try:
                 j = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
@@ -363,4 +560,14 @@ def library_ask(body: AskIn, user=Depends(current_user)):
                     params = cleaned; interpreted = True
             except (ValueError, AttributeError):
                 pass
+    # Record this search in the member's copilot chat history (its own single-turn
+    # conversation, badged source='library'). Best-effort — never block the search.
+    note = _ASK_NOTE.get(body.lang if body.lang in LANGS else "en", _ASK_NOTE["en"])
+    summary = "; ".join(f"{k}: {v}" for k, v in params.items() if v)
+    content = f"{note} — {summary}" if summary else note
+    try:
+        with db() as cur:
+            record_exchange(cur, user["id"], None, "library", q, content, [])
+    except Exception:
+        pass
     return {"params": params, "interpreted": interpreted, "groq": GROQ_ENABLED}

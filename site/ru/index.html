@@ -52,19 +52,33 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   "email": "hello@openelpis.com",
   "foundingLocation": { "@type": "Place", "name": "Türkiye" },
   "description": "OpenElpis is a non-profit, open-source platform building a trustworthy, citation-grounded AI research copilot for breast cancer — powered by validated, expert-reviewed medical knowledge.",
-  "founder": {
-    "@type": "Person",
-    "@id": "https://openelpis.com/#ali-tajbakhsh",
-    "name": "Ali Tajbakhsh",
-    "alternateName": ["Mohammadali Tajbakhsh", "Mohammad Ali Tajbakhsh", "Alan Tajbakhsh"],
-    "jobTitle": "Founder of OpenElpis · Technical Business Analyst & Project Manager",
-    "image": "https://openelpis.com/ali-tajbakhsh.jpg",
-    "url": "https://openelpis.com/founder/",
-    "sameAs": [
-      "https://www.linkedin.com/in/alan-tajbakhsh/",
-      "https://github.com/alitajbakhsh"
-    ]
-  },
+  "founder": [
+    {
+      "@type": "Person",
+      "@id": "https://openelpis.com/#ali-tajbakhsh",
+      "name": "Ali Tajbakhsh",
+      "alternateName": ["Mohammadali Tajbakhsh", "Mohammad Ali Tajbakhsh", "Alan Tajbakhsh"],
+      "jobTitle": "Founder of OpenElpis · Technical Business Analyst & Project Manager",
+      "image": "https://openelpis.com/ali-tajbakhsh.jpg",
+      "url": "https://openelpis.com/founder/",
+      "sameAs": [
+        "https://www.linkedin.com/in/alan-tajbakhsh/",
+        "https://github.com/alitajbakhsh"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://openelpis.com/#tugce-sahin",
+      "name": "Tuğçe Şahin",
+      "jobTitle": "Co-founder of OpenElpis",
+      "image": "https://openelpis.com/tugce-sahin.jpg",
+      "url": "https://openelpis.com/cofounder/",
+      "sameAs": [
+        "https://www.linkedin.com/in/tugcesahin0000/",
+        "https://github.com/tugcesahiint"
+      ]
+    }
+  ],
   "sameAs": ["https://openelpis.life/", "https://github.com/OpenElpis", "https://huggingface.co/OpenElpis"]
 }
 </script>
@@ -139,6 +153,23 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   .hero-art{position:absolute;right:-30px;top:34px;width:360px;opacity:.95;pointer-events:none}
   @media(max-width:900px){.hero-art{display:none}}
 
+  /* live library stats bar (under the hero) — compact; tiles fill the width */
+  .libstats{background:#fff;border-bottom:1px solid var(--line)}
+  .libstats .wrap{display:flex;padding:11px 24px}
+  .ls-tiles{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+  .ls-tile{flex:1 1 0;min-width:118px;display:flex;flex-direction:column;justify-content:center;gap:1px;background:var(--mint-2);border:1px solid var(--line);border-radius:11px;padding:7px 13px;transition:.15s}
+  .ls-tile[hidden]{display:none}
+  .ls-tile:hover{border-color:var(--teal);transform:translateY(-1px);color:inherit}
+  .ls-tile .n{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--ink);line-height:1.12}
+  .ls-tile .l{font-size:11.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .ls-tile .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .ls-tile.total{background:var(--teal-deep);border-color:var(--teal-deep)}
+  .ls-tile.total .n{color:#fff} .ls-tile.total .l{color:#cdeae6}
+  .ls-new{display:inline-flex;align-items:center;gap:4px;margin-left:5px;font-size:10.5px;font-weight:800;color:#bbf7d0;background:rgba(255,255,255,.13);border-radius:999px;padding:1px 7px 1px 6px}
+  .ls-new .pulse{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:lspulse 1.7s infinite}
+  @keyframes lspulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.6)}70%{box-shadow:0 0 0 6px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+  @media(max-width:680px){.libstats .wrap{padding:10px 14px}.ls-tiles{gap:6px}.ls-tile{min-width:0;flex:1 1 30%;padding:7px 9px}.ls-tile .n{font-size:16px}}
+
   section{padding:84px 0}
   .sec-head{max-width:62ch}
   .sec-head h2{font-size:clamp(30px,4.2vw,44px);margin:12px 0 0}
@@ -171,6 +202,42 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   .chat-input input:disabled{cursor:not-allowed;color:var(--muted)}
   .chat-input .send{width:42px;height:42px;border-radius:50%;background:var(--rose-dark);color:#fff;border:none;display:grid;place-items:center;flex:none;opacity:.9;cursor:not-allowed}
   .chat-note{max-width:640px;margin:16px auto 0;text-align:center;font-size:13px;color:var(--muted)}
+  /* hero access note + gated copilot CTA */
+  .hero-access{margin-top:20px;font-size:14.5px;color:var(--ink-soft);max-width:54ch}
+  .hero-access b{color:var(--teal-deep);font-weight:700}
+  .hero-access a{color:var(--rose-deep);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+  .chat-gate{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:var(--mint-2)}
+  .chat-gate .gate-lock{font-size:18px;flex:none}
+  .chat-gate .gate-txt{font-size:13.5px;font-weight:600;color:var(--ink-soft);flex:1;min-width:150px}
+  .chat-gate .gate-btn{flex:none;padding:10px 18px;font-size:14px}
+
+  /* why OpenElpis vs general AI */
+  .why{background:linear-gradient(180deg,#fff,var(--mint-2))}
+  .why .sec-head{max-width:64ch;margin:0 auto;text-align:center}
+  .why .sec-head p{margin:14px auto 0}
+  .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:44px auto 0}
+  .why-col{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow)}
+  .why-col.good{border-color:#bfe0dc;background:linear-gradient(180deg,#fff,var(--mint))}
+  .why-h{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+  .why-h h3{font-size:18px;margin:0}
+  .why-ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:none}
+  .why-col.bad .why-ic{background:var(--rose-soft)}
+  .why-col.good .why-ic{background:var(--mint);color:var(--teal-deep);font-weight:800}
+  .why-col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .why-col li{position:relative;padding-left:26px;font-size:15px;color:var(--ink-soft);line-height:1.5}
+  .why-col li::before{position:absolute;left:0;top:-1px;font-weight:800}
+  .why-col.bad li::before{content:"✕";color:var(--rose-deep)}
+  .why-col.good li::before{content:"✓";color:var(--teal-deep)}
+  .why-foot{max-width:60ch;margin:32px auto 0;text-align:center;font-size:16.5px;color:var(--ink);font-weight:600}
+  @media(max-width:680px){.why-grid{grid-template-columns:1fr}}
+
+  .libband{background:
+     radial-gradient(700px 320px at 84% -30%,rgba(14,124,123,.14),transparent 60%),
+     linear-gradient(180deg,var(--mint-2),#fff)}
+  .libband .wrap{padding:64px 24px;text-align:center}
+  .libband h2{max-width:20ch;margin:14px auto 0}
+  .libband p{max-width:64ch;margin:16px auto 0;color:var(--ink-soft);font-size:17px}
+  .libband-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
 
   .road{background:linear-gradient(180deg,var(--mint-2),#fff)}
   .timeline{margin-top:48px;display:grid;gap:18px}
@@ -209,20 +276,22 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   .copy{margin-top:18px;font-size:13px;color:#6f9893;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
   .pill-soft{background:rgba(227,93,138,.16);color:#f3a9c4;border:1px solid rgba(227,93,138,.32);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
 
-  /* founder */
-  .founder{background:linear-gradient(180deg,#fff,var(--mint-2))}
-  .founder-card{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;margin-top:44px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:36px 40px;box-shadow:var(--shadow)}
-  .founder-photo{width:172px;height:172px;border-radius:22px;object-fit:cover;display:block;border:4px solid #fff;box-shadow:0 22px 44px -20px rgba(7,63,62,.45),0 0 0 1px var(--line)}
-  .founder-card h3{font-size:26px;margin-top:2px}
-  .founder-card .role{margin-top:8px;font-size:14px;font-weight:600;color:var(--teal-deep)}
-  .founder-card .alt{margin-top:8px;font-size:14px;color:var(--muted)}
-  .founder-card .alt b{color:var(--ink-soft);font-weight:600}
-  .founder-card p.f-lead{color:var(--ink-soft);font-size:16px;margin-top:14px;max-width:60ch}
-  .founder-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:22px}
-  .founder-actions .slink{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);transition:.18s}
-  .founder-actions .slink:hover{transform:translateY(-1px);border-color:var(--teal);color:var(--teal-deep);box-shadow:var(--shadow)}
-  .founder-actions .slink svg{width:17px;height:17px;flex:none}
-  @media(max-width:680px){.founder-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:30px 24px}.founder-actions{justify-content:center}}
+  /* team */
+  .team{background:linear-gradient(180deg,#fff,var(--mint-2))}
+  .team-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:22px;margin-top:42px}
+  .tm-card{flex:0 1 330px;max-width:380px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px 26px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center}
+  .tm-photo,.tm-ph{width:116px;height:116px;border-radius:50%;border:4px solid #fff;box-shadow:0 16px 36px -18px rgba(7,63,62,.5),0 0 0 1px var(--line)}
+  .tm-photo{object-fit:cover;background:var(--mint)}
+  .tm-ph{align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:36px;color:#fff;background:linear-gradient(135deg,var(--teal),var(--rose-deep))}
+  .tm-card h3{font-size:21px;margin-top:16px}
+  .tm-role{margin-top:5px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--rose-deep)}
+  .tm-bio{margin-top:12px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)}
+  .tm-links{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;align-items:center;margin-top:18px}
+  .tm-links a{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;transition:.18s}
+  .tm-links a:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-1px)}
+  .tm-links a svg{width:16px;height:16px;flex:none}
+  .tm-links .tm-more{color:var(--teal-deep);font-weight:700}
+  @media(max-width:680px){.tm-card{flex:1 1 100%}}
 
   .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
@@ -235,6 +304,7 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   <div class="wrap">
     <a class="brand" href="/"><img class="mark" src="/logo.svg" alt="OpenElpis" width="40" height="40"> <span class="bn">OpenElpis</span></a>
     <nav class="navlinks">
+      <a class="nl" href="/library/" data-i18n="nav_library">Библиотека</a>
       <a class="nl" href="#vision" data-i18n="nav_vision">Концепция</a>
       <a class="nl" href="#future" data-i18n="nav_future">Будущее</a>
       <a class="nl" href="#sponsors" data-i18n="nav_sponsors">Спонсоры</a>
@@ -251,7 +321,7 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
         <option value="nl">🇳🇱</option>
       </select>
       <a class="btn btn-primary" href="/ru/sponsor/" target="_blank" rel="noopener" style="color:#fff !important" data-i18n="nav_sponsor_btn">Стать спонсором</a>
-      <a class="btn btn-portal" href="/portal/" data-i18n="nav_portal">Для врачей</a>
+      <a class="btn btn-portal" href="/portal/" data-i18n="nav_portal">Доступ для участников</a>
     </div>
   </div>
 </header>
@@ -271,11 +341,12 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   <div class="wrap">
     <span class="badge"><span class="dot"></span> <span data-i18n="hero_badge">Некоммерческий · С открытым исходным кодом · Рак молочной железы</span></span>
     <h1 class="title" data-i18n="hero_title_html">Открытая <span class="accent">надежда</span> для исследований рака молочной железы.</h1>
-    <p class="lead" data-i18n="hero_lead_html">OpenElpis создаёт надёжного ИИ-помощника для исследований <strong>рака молочной железы</strong> — на основе проверенных, отрецензированных экспертами медицинских знаний, открытого для каждого квалифицированного участника и бесплатного для исследовательского сообщества.</p>
+    <p class="lead" data-i18n="hero_lead_html">OpenElpis создаёт надёжный ИИ-помощник для исследований <strong>рака молочной железы</strong> — на основе проверенных, отрецензированных экспертами медицинских знаний от клиницистов, исследователей и университетов, и бесплатно для научного сообщества.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="/ru/sponsor/" target="_blank" rel="noopener" style="color:#fff !important" data-i18n="hero_cta_sponsor">Поддержать OpenElpis →</a>
       <a class="btn btn-ghost" href="#vision" data-i18n="hero_cta_vision">Узнать о концепции</a>
     </div>
+    <p class="hero-access" data-i18n="hero_access_html">🔒 <b>Присоединяйтесь по приглашению или по заявке.</b> OpenElpis — для проверенных клиницистов, исследователей и университетов — <a href="/portal/?request=1">запросите доступ</a>, и мы рассмотрим заявку.</p>
     <div class="hero-meta">
       <span data-i18n="hero_meta1_html">🔬 <b>Проверенные</b> материалы</span>
       <span data-i18n="hero_meta2_html">📑 Ответы <b>со ссылками на источники</b></span>
@@ -284,19 +355,56 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   </div>
 </section>
 
+<!-- LIVE LIBRARY STATS (counts fetched from the public API at runtime) -->
+<!-- inline styles + !important so nothing in the page CSS can override the flex layout -->
+<section id="libstats" hidden aria-label="Library composition" style="background:#fff;border-bottom:1px solid #dde7e4;padding:0!important">
+  <div style="max-width:1120px;margin:0 auto;padding:11px 24px;display:flex!important;flex-wrap:wrap;gap:8px!important;align-items:stretch">
+    <a class="ls-tile" href="/library/" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#0a5b5a;border:1px solid #0a5b5a;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="total" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#fff">—</span>
+      <span data-i18n="ls_total" style="font-size:11.5px;font-weight:600;color:#cdeae6;white-space:nowrap">Всего источников</span>
+      <span data-ls-live style="display:none!important;align-self:flex-start!important;margin-top:3px!important;align-items:center;gap:3px;font-size:10px;font-weight:800;color:#bbf7d0;background:rgba(255,255,255,.15);border-radius:999px;padding:1px 6px">+<span data-ls="recent">0</span></span>
+      <span class="ls-reclbl" data-i18n="ls_recent" hidden>добавлено за последние 24 ч</span>
+    </a>
+    <a class="ls-tile" data-ls-tile="pmc" href="/library/?kind=pmc" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="pmc" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#0a5b5a"></span><span data-i18n="ls_pmc">Рецензируемые</span></span>
+    </a>
+    <a class="ls-tile" data-ls-tile="article" href="/library/?kind=article" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="article" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#5b21b6"></span><span data-i18n="ls_article">Статьи (не PMC)</span></span>
+    </a>
+    <a class="ls-tile" data-ls-tile="preprint" href="/library/?kind=preprint" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="preprint" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#9a3412"></span><span data-i18n="ls_preprint">Препринты</span></span>
+    </a>
+    <a class="ls-tile" data-ls-tile="clinical_trial" href="/library/?kind=clinical_trial" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="clinical_trial" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#9d174d"></span><span data-i18n="ls_trial">Клинические исследования</span></span>
+    </a>
+    <a class="ls-tile" data-ls-tile="book" href="/library/?kind=book" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="book" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#1e40af"></span><span data-i18n="ls_book">Книги</span></span>
+    </a>
+    <a class="ls-tile" data-ls-tile="dataset" href="/library/?kind=dataset" style="flex:1 1 0!important;min-width:104px;display:flex!important;flex-direction:column!important;justify-content:center;gap:2px;background:#f4faf8;border:1px solid #dde7e4;border-radius:11px;padding:8px 13px;text-decoration:none">
+      <span data-ls="dataset" style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;line-height:1.15;color:#13211e">—</span>
+      <span style="font-size:11.5px;font-weight:600;color:#6c7d78;display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:#3f6212"></span><span data-i18n="ls_dataset">Наборы данных</span></span>
+    </a>
+  </div>
+</section>
+
 <!-- COPILOT PREVIEW -->
 <section id="preview" class="preview">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="eyebrow" data-i18n="chat_eyebrow">Предварительный просмотр</span>
-      <h2 data-i18n="chat_heading">Посмотрите, как работает помощник.</h2>
-      <p data-i18n="chat_body">Краткий пример того, как OpenElpis будет отвечать на вопросы исследователей — опираясь на проверенные источники, со ссылками.</p>
+      <span class="eyebrow" data-i18n="chat_eyebrow">Посмотрите в действии</span>
+      <h2 data-i18n="chat_heading">Ответы со ссылками на источники — уже в портале.</h2>
+      <p data-i18n="chat_body">Вот как копилот OpenElpis отвечает на исследовательские вопросы: на основе проверенных источников, со ссылками. Уже работает в портале для участников.</p>
     </div>
     <div class="chat-card reveal">
       <div class="chat-head">
         <img src="/logo.svg" width="26" height="26" alt="">
         <span class="nm">OpenElpis copilot</span>
-        <span class="pv" data-i18n="chat_eyebrow">Предварительный просмотр</span>
+        <span class="pv" data-i18n="chat_badge">Пример</span>
       </div>
       <div class="chat-body">
         <div class="bubble user" data-i18n="chat_user">Что известно об эндокринной резистентности при HR-положительном раке молочной железы?</div>
@@ -305,12 +413,56 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
           <div class="chat-srcs"><span data-i18n="chat_sources">Источники: 2 проверенные ссылки</span><span class="cite">[1]</span><span class="cite">[2]</span></div>
         </div>
       </div>
-      <div class="chat-input">
-        <input type="text" disabled data-i18n-ph="chat_input_ph" placeholder="Спросите об исследованиях рака молочной железы…">
-        <button class="send" disabled aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+      <div class="chat-gate">
+        <span class="gate-lock" aria-hidden="true">🔒</span>
+        <span class="gate-txt" data-i18n="chat_gate_t">Доступно участникам — по приглашению или одобренной заявке.</span>
+        <a class="btn btn-primary gate-btn" href="/portal/?request=1" style="color:#fff !important" data-i18n="chat_gate_cta">Запросить доступ →</a>
       </div>
     </div>
-    <p class="chat-note reveal" data-i18n="chat_note">⚠️ Только предварительный просмотр — это статичная иллюстрация для демонстрации. Действующий помощник находится в разработке.</p>
+    <p class="chat-note reveal" data-i18n="chat_note">🔒 Копилот работает в портале для участников — для проверенных клиницистов, исследователей и университетов, по приглашению или одобренной заявке.</p>
+  </div>
+</section>
+
+<!-- WHY OPENELPIS -->
+<section id="why" class="why">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow" data-i18n="why_eyebrow">Почему OpenElpis</span>
+      <h2 data-i18n="why_heading">Почему недостаточно просто ChatGPT или Gemini?</h2>
+      <p data-i18n="why_body">Обычные чат-боты созданы, чтобы звучать убедительно, — и они уверенно выдумывают исследования, цифры и ссылки, которых не существует. В науке и медицине правдоподобный неверный ответ опаснее, чем его отсутствие. OpenElpis работает наоборот: он отвечает только на основе библиотеки проверенных, отрецензированных экспертами статей, и каждое утверждение указывает на реальный источник, который можно открыть и проверить. Если доказательств нет, он так и говорит — и никогда не гадает.</p>
+    </div>
+    <div class="why-grid reveal">
+      <div class="why-col bad">
+        <div class="why-h"><span class="why-ic" aria-hidden="true">⚠️</span><h3 data-i18n="why_them_t">Обычный ИИ-чат-бот</h3></div>
+        <ul>
+          <li data-i18n="why_them_1">Звучит уверенно — даже когда ошибается</li>
+          <li data-i18n="why_them_2">Может выдумывать исследования, цифры и ссылки</li>
+          <li data-i18n="why_them_3">Берёт данные со всего интернета — качество неизвестно</li>
+        </ul>
+      </div>
+      <div class="why-col good">
+        <div class="why-h"><span class="why-ic" aria-hidden="true">✓</span><h3 data-i18n="why_us_t">Копилот OpenElpis</h3></div>
+        <ul>
+          <li data-i18n="why_us_1">Отвечает только из проверенных, отрецензированных источников</li>
+          <li data-i18n="why_us_2">Каждое утверждение ссылается на реальный источник, который можно открыть</li>
+          <li data-i18n="why_us_3">Говорит «в источниках этого нет» вместо догадок</li>
+        </ul>
+      </div>
+    </div>
+    <p class="why-foot reveal" data-i18n="why_foot">Он не заменяет ваше суждение — это копилот, который кладёт доказательства перед вами, оставляя контроль за вами.</p>
+  </div>
+</section>
+
+<!-- OPEN LIBRARY -->
+<section id="library" class="libband">
+  <div class="wrap reveal">
+    <span class="eyebrow" data-i18n="libband_eyebrow">Открыта для всех</span>
+    <h2 data-i18n="libband_heading">Открытая исследовательская библиотека — без аккаунта.</h2>
+    <p data-i18n="libband_body">Тот же проверенный корпус, на котором работает ИИ-помощник, открыт для поиска и чтения всем: растущая библиотека рецензируемых статей, препринтов, клинических исследований и книг о раке молочной железы. ИИ-помощник, перевод и инструменты сообщества доступны членам.</p>
+    <div class="libband-cta">
+      <a class="btn btn-primary" href="/library/" style="color:#fff !important" data-i18n="libband_btn">Открыть библиотеку →</a>
+      <a class="btn btn-ghost" href="/portal/?request=1" data-i18n="libband_req">Запросить доступ для членов</a>
+    </div>
   </div>
 </section>
 
@@ -407,25 +559,40 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
   </div>
 </section>
 
-<!-- FOUNDER -->
-<section id="founder" class="founder">
+<!-- TEAM -->
+<section id="founder" class="team">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="eyebrow" data-i18n="founder_eyebrow">Основатель</span>
-      <h2 data-i18n="founder_heading">Познакомьтесь с основателем OpenElpis.</h2>
+      <span class="eyebrow" data-i18n="founder_eyebrow">Команда</span>
+      <h2 data-i18n="founder_heading">Люди, стоящие за OpenElpis.</h2>
     </div>
-    <div class="founder-card reveal">
-      <img class="founder-photo" src="/ali-tajbakhsh.jpg" width="172" height="172"
-           alt="Ali Tajbakhsh — founder of OpenElpis (also known as Mohammadali Tajbakhsh and Alan Tajbakhsh)">
-      <div>
+    <div class="team-grid reveal">
+      <div class="tm-card">
+        <img class="tm-photo" src="/ali-tajbakhsh.jpg" width="116" height="116"
+             alt="Ali Tajbakhsh — founder of OpenElpis (also known as Mohammadali Tajbakhsh and Alan Tajbakhsh)"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-ph" style="display:none" aria-hidden="true">AT</div>
         <h3>Ali Tajbakhsh</h3>
-        <div class="role" data-i18n="founder_role">Основатель · Технический бизнес-аналитик и руководитель проектов · Турция</div>
-        <div class="alt" data-i18n="founder_alt_html">Также известен как <b>Alan Tajbakhsh</b></div>
-        <p class="f-lead" data-i18n="founder_bio">Я основал OpenElpis, чтобы сделать всё, что в моих силах, и помочь людям, столкнувшимся с раком молочной железы, — чтобы надёжные, основанные на доказательствах знания были открытыми и бесплатными для всех, кто за них борется. Это маленький вклад в трудную борьбу, но я отдаю ему всё, что у меня есть.</p>
-        <div class="founder-actions">
-          <a class="slink" href="/founder/" data-i18n="founder_more">Читать историю Ali полностью →</a>
-          <a class="slink" href="https://www.linkedin.com/in/alan-tajbakhsh/" target="_blank" rel="me noopener" aria-label="Ali Tajbakhsh on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.24 8h4.52v14H.24V8zm7.2 0h4.33v1.92h.06c.6-1.14 2.07-2.34 4.27-2.34 4.57 0 5.41 3 5.41 6.9V22h-4.52v-6.62c0-1.58-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V22H7.44V8z"/></svg> LinkedIn</a>
-          <a class="slink" href="https://github.com/alitajbakhsh" target="_blank" rel="me noopener" aria-label="Ali Tajbakhsh on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.32.47-2.39 1.24-3.23-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.23 0 4.62-2.81 5.65-5.49 5.95.43.37.82 1.1.82 2.22 0 1.61-.02 2.9-.02 3.29 0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5z"/></svg> GitHub</a>
+        <div class="tm-role" data-i18n="role_cofounder_m">Сооснователь</div>
+        <p class="tm-bio" data-i18n="founder_bio">Создаёт OpenElpis, чтобы сделать достоверные, основанные на доказательствах знания о раке молочной железы открытыми и бесплатными для всех.</p>
+        <div class="tm-links">
+          <a class="tm-more" href="/founder/" data-i18n="founder_more">Читать историю Ali полностью →</a>
+          <a href="https://www.linkedin.com/in/alan-tajbakhsh/" target="_blank" rel="me noopener" aria-label="Ali Tajbakhsh on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.24 8h4.52v14H.24V8zm7.2 0h4.33v1.92h.06c.6-1.14 2.07-2.34 4.27-2.34 4.57 0 5.41 3 5.41 6.9V22h-4.52v-6.62c0-1.58-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V22H7.44V8z"/></svg> LinkedIn</a>
+          <a href="https://github.com/alitajbakhsh" target="_blank" rel="me noopener" aria-label="Ali Tajbakhsh on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.32.47-2.39 1.24-3.23-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.23 0 4.62-2.81 5.65-5.49 5.95.43.37.82 1.1.82 2.22 0 1.61-.02 2.9-.02 3.29 0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5z"/></svg> GitHub</a>
+        </div>
+      </div>
+      <div class="tm-card">
+        <img class="tm-photo" src="/tugce-sahin.jpg" width="116" height="116"
+             alt="Tuğçe Şahin — co-founder of OpenElpis"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-ph" style="display:none" aria-hidden="true">TŞ</div>
+        <h3>Tuğçe Şahin</h3>
+        <div class="tm-role" data-i18n="role_cofounder">Сооснователь</div>
+        <p class="tm-bio" data-i18n="cofounder_bio">Помогает превратить OpenElpis в надёжный открытый дом для исследований рака молочной железы.</p>
+        <div class="tm-links">
+          <a class="tm-more" href="/cofounder/" data-i18n="cofounder_more">Читать историю Tuğçe →</a>
+          <a href="https://www.linkedin.com/in/tugcesahin0000/" target="_blank" rel="me noopener" aria-label="Tuğçe Şahin on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.24 8h4.52v14H.24V8zm7.2 0h4.33v1.92h.06c.6-1.14 2.07-2.34 4.27-2.34 4.57 0 5.41 3 5.41 6.9V22h-4.52v-6.62c0-1.58-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V22H7.44V8z"/></svg> LinkedIn</a>
+          <a href="https://github.com/tugcesahiint" target="_blank" rel="me noopener" aria-label="Tuğçe Şahin on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.32.47-2.39 1.24-3.23-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.23 0 4.62-2.81 5.65-5.49 5.95.43.37.82 1.1.82 2.22 0 1.61-.02 2.9-.02 3.29 0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5z"/></svg> GitHub</a>
         </div>
       </div>
     </div>
@@ -448,13 +615,13 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
         <h4 data-i18n="footer_explore">Обзор</h4>
         <a href="#vision" data-i18n="vision_eyebrow">Концепция</a>
         <a href="#future" data-i18n="roadmap_eyebrow">Что впереди</a>
-        <a href="/founder/" data-i18n="founder_eyebrow">Основатель</a>
+        <a href="/founder/" data-i18n="founder_eyebrow">Команда</a>
         <a href="#sponsors" data-i18n="nav_sponsors">Спонсоры</a>
       </div>
       <div class="fcol">
         <h4 data-i18n="footer_getinvolved">Присоединиться</h4>
         <a href="/ru/sponsor/" target="_blank" rel="noopener" data-i18n="nav_sponsor_btn">Стать спонсором</a>
-        <a href="/portal/" data-i18n="nav_portal">Для врачей</a>
+        <a href="/portal/" data-i18n="nav_portal">Доступ для участников</a>
         <a href="mailto:hello@openelpis.com" data-i18n="footer_contact">Контакты</a>
         <a href="https://openelpis.com">openelpis.com</a>
         <a href="https://openelpis.life">openelpis.life</a>
@@ -487,6 +654,30 @@ if(c==='en'&&s&&L[s]&&s!=='en')location.replace(L[s]);}catch(e){}})();</script>
       if(dest) window.location.href = dest;
     });
   }
+
+  // ---- live library stats bar (public counts; hidden until it loads, so the page never shows zeros) ----
+  (function(){
+    var bar = document.getElementById('libstats'); if(!bar) return;
+    var KINDS = ['pmc','article','preprint','clinical_trial','book','dataset'];
+    fetch('/api/public/library/kinds').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+      if(!d || !d.total) return;
+      var loc = (document.documentElement.lang||'en');
+      var fmt = function(n){ try{ return Number(n).toLocaleString(loc); }catch(e){ return String(n); } };
+      var set = function(k,v){ var el=bar.querySelector('[data-ls="'+k+'"]'); if(el) el.textContent=fmt(v); };
+      set('total', d.total);
+      var c = d.counts||{};
+      KINDS.forEach(function(k){
+        var tile = bar.querySelector('[data-ls-tile="'+k+'"]');
+        if(c[k]){ set(k, c[k]); } else if(tile){ tile.style.display = 'none'; }   // hide kinds with no items
+      });
+      var live = bar.querySelector('[data-ls-live]');
+      if(live && d.recent > 0){
+        set('recent', d.recent); live.style.setProperty('display','inline-flex','important');
+        var lbl = bar.querySelector('.ls-reclbl'); if(lbl) live.title = '+'+fmt(d.recent)+' '+lbl.textContent;
+      }
+      bar.hidden = false;
+    }).catch(function(){ /* leave the bar hidden on any error */ });
+  })();
 </script>
 </body>
 </html>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clinician portal — log in or request access | OpenElpis</title>
-<meta name="description" content="Invitation-only portal for verified clinicians, hospitals and labs contributing validated breast-cancer materials to OpenElpis.">
+<title>Member portal — log in or request access | OpenElpis</title>
+<meta name="description" content="Invitation-only portal for verified clinicians, researchers, universities, hospitals and labs contributing validated breast-cancer materials to OpenElpis.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://openelpis.com/portal/">
 <meta name="theme-color" content="#0a5b5a">
@@ -23,6 +23,8 @@
      radial-gradient(820px 520px at 2% 4%,rgba(14,124,123,.12),transparent 55%),
      linear-gradient(180deg,#fff,var(--mint-2));min-height:100vh;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
   a{color:var(--teal-deep);text-decoration:none}
+  .linklike{display:block;width:100%;background:none;border:0;color:var(--teal-deep);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;margin-top:12px;text-align:center}
+  .linklike:hover{text-decoration:underline}
   .nav{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;padding:18px 20px;gap:12px}
   .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces';font-size:20px;font-weight:600;color:var(--ink)}
   .brand img{width:34px;height:34px}
@@ -53,6 +55,10 @@
   .msg.ok{display:block;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
   .hide{display:none}
   .fine{margin-top:18px;font-size:12.5px;color:var(--muted);line-height:1.5}
+  .whybox{background:var(--mint-2);border:1px solid #cfe6e2;border-radius:13px;padding:14px 16px;margin-bottom:18px}
+  .whybox b{display:block;font-family:'Sora',sans-serif;font-weight:700;color:var(--teal-deep);font-size:14.5px;margin-bottom:5px}
+  .whybox p{font-size:13px;color:var(--ink-soft);line-height:1.55}
+  .whybox .wf{display:block;margin-top:7px;font-weight:600;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -69,7 +75,7 @@
 <div class="wrap">
   <div class="card">
     <h1 data-i18n="p_title">Clinician portal</h1>
-    <p class="sub" data-i18n="p_sub2">Invitation-only — for verified clinicians, hospitals &amp; labs contributing validated breast-cancer materials.</p>
+    <p class="sub" data-i18n="p_sub2">By invitation or request — for verified clinicians, researchers, universities, hospitals &amp; labs contributing validated breast-cancer materials. We review every request.</p>
     <div class="tabs">
       <button id="tabLogin" class="on" onclick="show('login')" data-i18n="p_login">Log in</button>
       <button id="tabJoin" onclick="show('join')" data-i18n="p_request">Request access</button>
@@ -82,6 +88,24 @@
       <label data-i18n="p_email">Email</label><input type="email" id="l_email" required autocomplete="email">
       <label data-i18n="p_password">Password</label><input type="password" id="l_pass" required autocomplete="current-password">
       <button class="btn" type="submit" data-i18n="p_login">Log in</button>
+      <button type="button" class="linklike" onclick="showForgot()" data-i18n="p_forgot">Forgot password?</button>
+    </form>
+
+    <!-- FORGOT PASSWORD -->
+    <form id="forgotForm" class="hide" onsubmit="return doForgot(event)">
+      <p class="sub" data-i18n="pr_intro">Enter your account email and we'll send you a reset link.</p>
+      <label data-i18n="p_email">Email</label><input type="email" id="f_email" required autocomplete="email">
+      <button class="btn" type="submit" data-i18n="pr_send">Send reset link</button>
+      <button type="button" class="linklike" onclick="show('login')" data-i18n="pr_back">Back to log in</button>
+    </form>
+
+    <!-- RESET PASSWORD (opened from the email link, ?reset=TOKEN) -->
+    <form id="resetForm" class="hide" onsubmit="return doReset(event)">
+      <p class="sub" data-i18n="pr_title">Reset password</p>
+      <label data-i18n="pr_new">New password</label>
+      <input type="password" id="rs_pass" minlength="10" required autocomplete="new-password">
+      <button class="btn" type="submit" data-i18n="pr_set">Set new password</button>
+      <button type="button" class="linklike" onclick="location.href='/portal/'" data-i18n="pr_back">Back to log in</button>
     </form>
 
     <!-- SIGNUP (only shown with a valid invite) -->
@@ -110,6 +134,11 @@
 
     <!-- REQUEST ACCESS (no/invalid invite) -->
     <form id="requestForm" class="hide" onsubmit="return doRequest(event)">
+      <div class="whybox">
+        <b data-i18n="why_heading">Why not just use ChatGPT or Gemini?</b>
+        <p data-i18n="why_body">General chatbots are built to sound convincing — and they will confidently invent studies, numbers and citations that don't exist. OpenElpis is the opposite: it answers only from validated, expert-reviewed articles, and every claim shows a real source you can open. If the evidence isn't there, it says so — it never guesses.</p>
+        <span class="wf" data-i18n="why_foot">It puts the evidence in front of you, so you stay in control.</span>
+      </div>
       <label data-i18n="p_name">Full name</label><input id="r_name" autocomplete="name">
       <label data-i18n="p_workemail">Work email</label><input type="email" id="r_email" autocomplete="email">
       <div class="row">
@@ -136,6 +165,8 @@
 <script>
   const $ = s => document.querySelector(s);
   const inviteToken = new URLSearchParams(location.search).get('invite');
+  const resetToken  = new URLSearchParams(location.search).get('reset');
+  const wantRequest = new URLSearchParams(location.search).has('request');
   let joinMode = 'request';   // 'signup' once an invite validates
 
   function msg(text, ok){
@@ -154,6 +185,8 @@
 
   function show(tab){
     const login = tab === 'login';
+    document.querySelector('.tabs').classList.remove('hide');
+    $('#forgotForm').classList.add('hide'); $('#resetForm').classList.add('hide');
     $('#loginForm').classList.toggle('hide', !login);
     $('#signupForm').classList.toggle('hide', login || joinMode !== 'signup');
     $('#requestForm').classList.toggle('hide', login || joinMode !== 'request');
@@ -210,7 +243,37 @@
     return false;
   }
 
+  function _onlyForm(id){
+    document.querySelector('.tabs').classList.add('hide');
+    ['loginForm','signupForm','requestForm','forgotForm','resetForm'].forEach(f=>$('#'+f).classList.toggle('hide', f!==id));
+    $('#notice').classList.add('hide'); msg('');
+  }
+  function showForgot(){ _onlyForm('forgotForm'); }
+  function showReset(){ _onlyForm('resetForm'); }
+  async function doForgot(e){
+    e.preventDefault(); msg(''); const b=$('#forgotForm button[type=submit]'); b.disabled=true;
+    try{
+      await api('/api/auth/forgot', { email:$('#f_email').value.trim(), lang:(window.OE_LANG||'en') });
+      msg(T('pr_sent'), true);
+    }catch(err){ msg(err.message); }
+    b.disabled=false; return false;
+  }
+  async function doReset(e){
+    e.preventDefault(); msg(''); const b=$('#resetForm button[type=submit]'); b.disabled=true;
+    try{
+      if($('#rs_pass').value.length < 10) throw new Error(T('p_pwmin'));
+      await api('/api/auth/reset', { token:resetToken, password:$('#rs_pass').value });
+      msg(T('pr_done'), true);
+      setTimeout(()=>{ location.href='/portal/'; }, 1800);
+    }catch(err){
+      b.disabled=false;
+      msg(/invalid or expired/i.test(err.message) ? T('pr_invalid') : err.message);
+    }
+    return false;
+  }
+
   async function init(){
+    if(resetToken){ showReset(); return; }
     try{ const r = await fetch('/api/me',{credentials:'same-origin'}); if(r.ok){ location.href='/portal/dashboard.html'; return; } }catch(e){}
     if(inviteToken){
       try{
@@ -221,7 +284,7 @@
       }catch(e){ joinMode='request'; }
     }
     renderJoin();
-    show(joinMode === 'signup' ? 'join' : 'login');
+    show((joinMode === 'signup' || wantRequest) ? 'join' : 'login');
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>

@@ -78,9 +78,15 @@
   .btn-mini:hover{background:#d6ebe7}
   .btn-x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600}
   .msg{margin-top:13px;font-size:13.5px;padding:10px 13px;border-radius:10px;display:none}
+  .pwmsg{margin-top:12px;font-size:13px;border-radius:8px;padding:8px 11px;display:none}
+  .pwmsg.err{display:block;background:var(--rose-soft);color:var(--rose-dark)}
+  .pwmsg.ok{display:block;background:var(--mint);color:var(--teal-deep)}
   .msg.err{display:block;background:var(--rose-soft);color:var(--rose-dark);border:1px solid #f3c6d6}
   .msg.ok{display:block;background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2}
   .empty{color:var(--muted);font-size:14px;padding:16px 0}
+  .loader{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 0;color:var(--muted);font-size:13.5px}
+  .spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--teal-deep);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
   .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
   .pill.pending_review,.pill.pending,.pill.active{background:var(--amber-soft);color:var(--amber)}
   .pill.approved,.pill.used{background:var(--mint);color:var(--teal-deep)}
@@ -97,6 +103,13 @@
   .bub.bot{align-self:flex-start;background:var(--mint-2);border:1px solid var(--line);border-bottom-left-radius:5px}
   .bub.bot :is(p,ul,ol){margin:0 0 8px}.bub.bot :is(p,ul,ol):last-child{margin-bottom:0}
   .bub.bot blockquote{border-left:3px solid var(--teal);margin:8px 0;padding:2px 12px;color:var(--ink-soft)}
+  .bub.bot.thinking{opacity:.7;font-style:italic}
+  .cosrc{margin-top:11px;border-top:1px solid var(--line);padding-top:9px}
+  .cosrc-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .cosrc-i{font-size:13px;margin:4px 0;display:flex;gap:7px;align-items:baseline;line-height:1.4}
+  .cosrc-i .cn{background:var(--mint);color:var(--teal-deep);border-radius:5px;padding:0 6px;font-weight:700;font-size:11px;flex:none}
+  .cosrc-i a{cursor:pointer;color:var(--teal-deep)}.cosrc-i a:hover{text-decoration:underline}
+  .cosrc-i .cy{color:var(--muted)}
   .bub .save{margin-top:8px}
   .askbar{display:flex;gap:9px;margin-top:8px}
   .askbar input{flex:1}
@@ -122,6 +135,26 @@
   .lr-main .nm{color:var(--ink);font-weight:600}
   .lr-main .sub{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lr-act{display:flex;gap:7px;flex:none}
+  .pclick{cursor:pointer}
+  .nm.pclick:hover{color:var(--teal-deep)}
+  /* avatar images fill the circle (initials sit behind, shown if image errors) */
+  .avatar,.avatar-sm{position:relative;overflow:hidden}
+  .avatar img,.avatar-sm img,.pf-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:inherit}
+  .hasimg .ini{display:none}   /* image loaded → hide the initials fallback (no overlap) */
+  /* profile modal */
+  .modal-card.profile{max-width:480px}
+  .pf-head{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+  .pf-av{width:76px;height:76px;border-radius:50%;background:var(--mint);color:var(--teal-deep);display:grid;place-items:center;font-weight:800;font-size:26px;flex:none;position:relative;overflow:hidden;font-family:'Sora',sans-serif}
+  .pf-name{font-family:'Fraunces',serif;font-size:21px;font-weight:600;color:var(--ink);line-height:1.25}
+  .pf-sub{color:var(--ink-soft);font-size:14px;margin-top:3px}
+  .pf-tags{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+  .pf-meta{border-top:1px solid var(--line);padding-top:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+  .pf-row{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-soft)}
+  .pf-ic{width:18px;text-align:center;flex:none}
+  .pf-bio{font-size:14.5px;line-height:1.6;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px;margin-bottom:14px}
+  .pf-bio p{margin:0 0 .6em}.pf-bio p:last-child{margin:0}
+  .pf-act{display:flex;gap:9px}
+  .pf-edit-av{display:flex;gap:14px;align-items:center;margin-bottom:6px}
   .unread{background:var(--rose-dark);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px}
   .sech{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:18px 0 4px}
   /* thread */
@@ -160,6 +193,10 @@
   .greet{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-.02em;font-size:24px}
   .greet-sub{color:var(--muted);font-size:14px;margin:2px 0 20px}
   .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;margin-bottom:22px}
+  .whybox{background:var(--mint-2);border:1px solid #cfe6e2;border-radius:14px;padding:16px 18px;margin-bottom:24px}
+  .whybox b{display:block;font-family:'Sora',sans-serif;font-weight:800;color:var(--teal-deep);font-size:16px;margin-bottom:6px}
+  .whybox p{font-size:14px;color:var(--ink-soft);line-height:1.6}
+  .whybox .wf{display:block;margin-top:8px;font-weight:600;color:var(--ink)}
   .stat-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:.12s}
   .stat-card:hover{border-color:var(--teal);transform:translateY(-1px)}
   .stat-card .n{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--teal-deep);line-height:1}
@@ -177,6 +214,9 @@
   .libask input:focus{outline:none}
   .libask .btn-ghost{flex:none}
   .asknote{background:var(--mint);color:var(--teal-deep);border:1px solid #cfe6e2;border-radius:10px;padding:8px 12px;font-size:13px;margin:-6px 0 12px}
+  .libcopilot{border:1.5px solid var(--teal);border-radius:14px;padding:12px 14px;margin:4px 0 14px;background:linear-gradient(180deg,#fff,var(--mint-2))}
+  .libcopilot .chat{min-height:150px;max-height:42vh}
+  .libcopilot .disc{margin-bottom:0}
   .libfilters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
   .libfilters input,.libfilters select{flex:1 1 130px;min-width:0;width:auto}
   .favtoggle{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin:0;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
@@ -197,9 +237,61 @@
   .ar{font-style:normal;font-size:11px;line-height:1}
   .ar.up{color:#1a8f4c} .ar.down{color:var(--rose-deep)}
   .libactions{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-  #libTotal{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(180deg,var(--mint),#dcefe9);color:var(--teal-deep);border:1px solid #b9e2da;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;margin:2px 0 12px;box-shadow:0 1px 2px rgba(7,63,62,.06)}
+  /* saved tab */
+  .subtabs{display:flex;gap:8px;margin:4px 0 16px;flex-wrap:wrap}
+  .subtab{background:#f3f6f5;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;font-size:13.5px;cursor:pointer}
+  .subtab.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
+  .subtab:not(.on):hover{border-color:var(--teal)}
+  .savedrow{display:flex;align-items:flex-start;gap:8px}
+  .savedrow .libitem{flex:1;min-width:0}
+  .b-rem{flex:none;align-self:center;background:var(--rose-soft);color:var(--rose-dark);border:0;border-radius:999px;padding:5px 11px;font:inherit;font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap}
+  .b-rem:hover{background:#f8d9e4}
+  .ansrow{border-top:1px solid var(--line)}
+  .ansq{display:flex;align-items:baseline;gap:10px;padding:13px 2px;cursor:pointer}
+  .ansq:hover .qq{color:var(--teal-deep)}
+  .ansq .qq{font-weight:600;color:var(--ink);flex:1;min-width:0}
+  .ansq .ad{color:var(--muted);font-size:12px;white-space:nowrap;flex:none}
+  .ansd{padding:0 2px 14px}
+  .ansbody{background:var(--mint-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.6}
+  .ansd .b-rem{margin-top:10px}
+  .libtopbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
+  #libTotal{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(180deg,var(--mint),#dcefe9);color:var(--teal-deep);border:1px solid #b9e2da;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;box-shadow:0 1px 2px rgba(7,63,62,.06)}
   #libTotal b{font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:var(--teal-deep)}
+  .lt-left{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
+  #libKinds{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .kcount{font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap;cursor:pointer;border:1px solid transparent;transition:.13s}
+  .kcount:hover{filter:brightness(.96);transform:translateY(-1px)}
+  .kcount.on{outline:2px solid var(--teal-deep);outline-offset:1px;box-shadow:0 2px 8px -2px rgba(7,63,62,.35)}
+  .kcount b{font-weight:800}
+  .pp{display:flex;align-items:center;gap:7px;margin:0;font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+  .pp select{width:auto;flex:none;padding:6px 8px;font-size:13px}
+  .pagerwrap{margin-top:16px}
+  .pager{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap}
+  .pager .pg{min-width:34px;height:34px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:9px;font:inherit;font-weight:600;font-size:13.5px;cursor:pointer}
+  .pager .pg:hover{border-color:var(--teal);color:var(--teal-deep)}
+  .pager .pg.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
+  .pager .pg.dis{color:var(--muted);opacity:.45;cursor:not-allowed}
+  .pager .pg.ell{border:0;background:none;cursor:default;min-width:18px;padding:0}
   .rh-actions{display:flex;gap:8px;flex-wrap:wrap;flex:none}
+  /* provenance / kind badges */
+  .kbadge{display:inline-block;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 8px;white-space:nowrap;vertical-align:middle}
+  .kb-ok{background:var(--mint);color:var(--teal-deep);border:1px solid #b9e2da}
+  .kb-ext{background:#eef1f0;color:var(--ink-soft);border:1px solid var(--line)}
+  .kb-warn{background:var(--amber-soft);color:var(--amber);border:1px solid #eedcae}
+  .kb-trial{background:#e6eefb;color:#2f5aa0;border:1px solid #cdddf6}
+  .kb-book{background:#efe6fb;color:#6b3fa0;border:1px solid #ddccf3}
+  .kb-data{background:#f0f5f3;color:var(--ink-soft);border:1px solid var(--line)}
+  .art-note{margin:8px 0 0;font-size:13px;color:var(--amber);background:var(--amber-soft);border:1px solid #eedcae;border-radius:9px;padding:8px 12px}
+  /* copilot chat history */
+  .histrow{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:11px 2px}
+  .histrow:first-child{border-top:0}
+  .histrow.active{background:var(--mint-2);border-radius:10px;border-top-color:transparent;padding-left:10px;padding-right:10px}
+  .hr-main{flex:1;min-width:0;cursor:pointer}
+  .hr-title{font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hr-main:hover .hr-title{color:var(--teal-deep)}
+  .hr-sub{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:2px}
+  .hr-badge{display:inline-flex;align-items:center;background:var(--mint);color:var(--teal-deep);border:1px solid #b9e2da;border-radius:999px;padding:1px 8px;font-weight:600;font-size:11px}
+  .histrow .b-rem{padding:5px 9px}
   /* article reading modal */
   .modal-card.art{max-width:820px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
   #artBody{display:flex;flex-direction:column;min-height:0;overflow:auto;flex:1}
@@ -224,7 +316,15 @@
   .reading p{margin:0 0 1em}
   .reading.tr{background:var(--mint-2);border-radius:10px;padding:14px 16px}
   .trnote{font-size:12px;color:var(--muted);margin:8px 0 0;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .trnote.err{color:var(--amber)}
   .trnote .lnk{color:var(--teal-deep);cursor:pointer;font-weight:600}
+  .btn-mini:disabled{opacity:.55;cursor:default}
+  .trwait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:54px 0;color:var(--muted);font-size:14px;text-align:center;font-family:'Inter',sans-serif}
+  .spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:oe-spin .7s linear infinite}
+  .spin.sm{width:15px;height:15px;border-width:2px}
+  @keyframes oe-spin{to{transform:rotate(360deg)}}
+  .trchunk{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin:16px 0 4px;font-family:'Inter',sans-serif}
+  .art-tl #art_toggle{margin-left:4px;font-size:12.5px}
   .cmts{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
   .cmt{border-top:1px solid var(--line);padding:11px 0}
   .cmt:first-child{border-top:0}
@@ -263,6 +363,8 @@
           <div class="umtags" id="umTags"></div>
         </div>
         <div class="umsep"></div>
+        <button class="umitem" onclick="editProfile()"><span>👤</span> <span data-i18n="pf_edit">Edit profile</span></button>
+        <button class="umitem" onclick="openChangePw()"><span>🔑</span> <span data-i18n="cp_title">Change password</span></button>
         <button class="umitem danger" onclick="logout()"><span>⎋</span> <span data-i18n="d_logout">Log out</span></button>
       </div>
     </div>
@@ -274,6 +376,7 @@
     <button class="navitem" data-tab="home" onclick="go('home')"><span class="ic">🏠</span><span class="lbl" data-i18n="nav_home">Home</span></button>
     <button class="navitem" data-tab="copilot" onclick="go('copilot')"><span class="ic">🔬</span><span class="lbl" data-i18n="nav_copilot">Copilot</span></button>
     <button class="navitem" data-tab="library" onclick="go('library')"><span class="ic">📚</span><span class="lbl" data-i18n="nav_library">Library</span></button>
+    <button class="navitem" data-tab="saved" onclick="go('saved')"><span class="ic">🔖</span><span class="lbl" data-i18n="nav_saved">Saved</span></button>
     <button class="navitem" data-tab="contribute" onclick="go('contribute')"><span class="ic">📤</span><span class="lbl" data-i18n="nav_contribute">Contribute</span></button>
     <button class="navitem" data-tab="forum" onclick="go('forum')"><span class="ic">💬</span><span class="lbl" data-i18n="nav_forum">Forum</span></button>
     <button class="navitem" data-tab="community" onclick="go('community')"><span class="ic">👥</span><span class="lbl" data-i18n="nav_community">Community</span><span id="bdg_comm" class="badge"></span></button>
@@ -288,6 +391,11 @@
     <section class="panel" data-panel="home">
       <div id="greet"></div>
       <div class="statgrid" id="homeStats"></div>
+      <div class="whybox">
+        <b data-i18n="why_heading">Why not just use ChatGPT or Gemini?</b>
+        <p data-i18n="why_body">General chatbots are built to sound convincing — and they will confidently invent studies, numbers and citations that don't exist. OpenElpis is the opposite: it answers only from validated, expert-reviewed articles, and every claim shows a real source you can open. If the evidence isn't there, it says so — it never guesses.</p>
+        <span class="wf" data-i18n="why_foot">It puts the evidence in front of you, so you stay in control.</span>
+      </div>
       <h2 style="margin-bottom:13px" data-i18n="home_quick">Quick actions</h2>
       <div class="qa">
         <button class="qa-btn" onclick="go('copilot')"><span class="ic">🔬</span><span data-i18n="nav_copilot">Copilot</span></button>
@@ -301,8 +409,14 @@
     <!-- COPILOT -->
     <section class="panel hide" data-panel="copilot">
       <div class="card">
-        <h2 data-i18n="co_title">Research copilot</h2>
-        <p class="hint" data-i18n="co_preview">Preview mode — the citation-grounded engine isn't connected to the corpus yet, so answers are test responses. Save an answer to share it in the forum or a message.</p>
+        <div class="rowhead">
+          <h2 data-i18n="co_title">Research copilot</h2>
+          <div class="rh-actions">
+            <button type="button" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:7px 12px!important;font:inherit!important;font-weight:700!important;font-size:13px!important;cursor:pointer!important" onclick="newChat('copilot')">✚ <span data-i18n="co_new">New chat</span></button>
+            <button type="button" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:7px 12px!important;font:inherit!important;font-weight:700!important;font-size:13px!important;cursor:pointer!important" onclick="openHistory('copilot')">🕘 <span data-i18n="co_history">History</span></button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="co_preview">Answers are grounded in the approved library and cite their sources. Ask in any language — the copilot replies in the language of your question.</p>
         <div id="chat" class="chat"></div>
         <form id="askForm" class="askbar" onsubmit="return doAsk(event)">
           <input id="co_input" data-i18n-ph="co_ph" placeholder="Ask a research question…" autocomplete="off">
@@ -352,13 +466,29 @@
             <button class="btn btn-sm" onclick="go('contribute')" data-i18n="lib_upload">＋ Upload your article</button>
           </div>
         </div>
-        <span id="libTotal" class="sub"></span>
-        <form id="libAskBar" class="libask hide" onsubmit="return libAsk(event)">
-          <span class="ic">🔬</span>
-          <input id="lib_ask" data-i18n-ph="lib_ask_ph" placeholder="Ask the copilot to find articles…" autocomplete="off">
-          <button class="btn-ghost btn-sm" type="submit" style="border:1.5px solid var(--teal)!important;background:var(--teal-deep)!important;color:#fff!important;border-radius:999px!important;padding:8px 16px!important;font:inherit;font-weight:700!important;font-size:13.5px!important;cursor:pointer!important;flex:none" data-i18n="lib_ask_btn">Ask</button>
-        </form>
-        <div id="lib_asknote" class="asknote hide"></div>
+        <div class="libtopbar">
+          <span class="lt-left"><span id="libTotal" class="sub"></span><span id="libKinds"></span></span>
+          <label class="pp"><span data-i18n="lib_perpage">Per page</span>
+            <select id="lib_pp" onchange="changePerPage()">
+              <option>12</option><option selected>24</option><option>48</option><option>96</option>
+            </select>
+          </label>
+        </div>
+        <div id="libCopilot" class="libcopilot hide">
+          <div class="rowhead" style="margin-bottom:8px">
+            <p class="hint" style="margin:0;flex:1" data-i18n="co_preview">Answers are grounded in the approved library and cite their sources. Ask in any language — the copilot replies in the language of your question.</p>
+            <div class="rh-actions">
+              <button type="button" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:7px 12px!important;font:inherit!important;font-weight:700!important;font-size:13px!important;cursor:pointer!important" onclick="newChat('library')">✚ <span data-i18n="co_new">New chat</span></button>
+              <button type="button" style="border:1.5px solid var(--teal)!important;background:#fff!important;color:var(--teal-deep)!important;border-radius:999px!important;padding:7px 12px!important;font:inherit!important;font-weight:700!important;font-size:13px!important;cursor:pointer!important" onclick="openHistory('library')">🕘 <span data-i18n="co_history">History</span></button>
+            </div>
+          </div>
+          <div id="libChat" class="chat"></div>
+          <form class="askbar" onsubmit="return doAskLib(event)">
+            <input id="lib_co_input" data-i18n-ph="co_ph" placeholder="Ask a research question…" autocomplete="off">
+            <button class="btn btn-sm" type="submit" data-i18n="co_send">Ask</button>
+          </form>
+          <p class="disc" data-i18n="d_disc">OpenElpis produces research hypotheses for qualified professionals and does not provide medical diagnosis or treatment advice.</p>
+        </div>
         <input id="lib_q" data-i18n-ph="lib_search_ph" placeholder="Search title, authors, abstract…" oninput="libSearch()">
         <div class="libfilters">
           <select id="lib_yf" onchange="libSearch()"><option value="" data-i18n="lib_year_from">Year from</option></select>
@@ -382,7 +512,20 @@
           <label class="favtoggle"><input type="checkbox" id="lib_fav" onchange="libSearch()"> <span data-i18n="lib_favorites">★ Favorites</span></label>
         </div>
         <div id="libResults"><div class="empty" data-i18n="d_loading">Loading…</div></div>
-        <div id="libMore" style="text-align:center;margin-top:14px"></div>
+        <div id="libPager" class="pagerwrap"></div>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section class="panel hide" data-panel="saved">
+      <div class="card">
+        <div class="rowhead"><h2 data-i18n="nav_saved">Saved</h2></div>
+        <div class="subtabs">
+          <button class="subtab on" id="svtab_arts" onclick="svShow('arts')" data-i18n="sv_articles">Saved articles</button>
+          <button class="subtab" id="svtab_ans" onclick="svShow('ans')" data-i18n="sv_answers">Saved copilot answers</button>
+        </div>
+        <div id="savedArts" class="savedlist"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+        <div id="savedAns" class="anslist hide"><div class="empty" data-i18n="d_loading">Loading…</div></div>
       </div>
     </section>
 
@@ -482,11 +625,41 @@
     <div id="pickerList"><div class="empty" data-i18n="d_loading">Loading…</div></div>
   </div>
 </div>
+<!-- change password -->
+<div id="pwModal" class="modal hide" onclick="if(event.target===this)closePw()">
+  <div class="modal-card" style="max-width:420px">
+    <div class="modal-head"><b data-i18n="cp_title">Change password</b><button class="btn-x" onclick="closePw()">✕</button></div>
+    <form onsubmit="return saveChangePw(event)">
+      <label data-i18n="cp_current">Current password</label>
+      <input type="password" id="pw_cur" autocomplete="current-password" required>
+      <label data-i18n="cp_new">New password</label>
+      <input type="password" id="pw_new" minlength="10" autocomplete="new-password" required>
+      <label data-i18n="cp_confirm">Confirm new password</label>
+      <input type="password" id="pw_conf" minlength="10" autocomplete="new-password" required>
+      <div id="pwMsg" class="pwmsg"></div>
+      <button class="btn" type="submit" style="margin-top:14px" data-i18n="cp_save">Update password</button>
+    </form>
+  </div>
+</div>
+<!-- member profile -->
+<div id="profileModal" class="modal hide" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-card profile">
+    <div class="modal-head"><b data-i18n="pf_title">Profile</b><button class="btn-x" onclick="closeProfile()">✕</button></div>
+    <div id="profileBody"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+  </div>
+</div>
 <!-- article reading view -->
 <div id="artModal" class="modal hide" onclick="if(event.target===this)closeArt()">
   <div class="modal-card art">
     <div class="modal-head"><b data-i18n="lib_preview">Preview</b><button class="btn-x" onclick="closeArt()">✕</button></div>
     <div id="artBody"><div class="empty" data-i18n="d_loading">Loading…</div></div>
+  </div>
+</div>
+<!-- copilot chat history -->
+<div id="histModal" class="modal hide" onclick="if(event.target===this)closeHistory()">
+  <div class="modal-card">
+    <div class="modal-head"><b data-i18n="co_hist_title">Chat history</b><button class="btn-x" onclick="closeHistory()">✕</button></div>
+    <div id="histList"><div class="empty" data-i18n="d_loading">Loading…</div></div>
   </div>
 </div>
 <div id="toast" class="toast"></div>
@@ -499,12 +672,38 @@ const $ = s => document.querySelector(s);
 const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function md(s){ try{ return DOMPurify.sanitize(marked.parse(s||'')); }catch(e){ return esc(s); } }
 function initials(n){ return (n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase(); }
+// avatar inner: initials shown by default; the image hides them once it loads, and if the
+// image fails (onerror) it removes itself so the initials remain — never both at once.
+function avInner(id,name,has){
+  const ini='<span class="ini">'+esc(initials(name))+'</span>';
+  return has ? ini+'<img src="/api/users/'+id+'/avatar" alt="" onload="this.parentNode.classList.add(\'hasimg\')" onerror="this.remove()">' : ini;
+}
 function fdate(s){ return new Date(s).toLocaleDateString(window.OE_LANG||'en'); }
 function ftime(s){ return new Date(s).toLocaleTimeString(window.OE_LANG||'en',{hour:'2-digit',minute:'2-digit'}); }
+// provenance/kind badge — so a researcher sees what each item IS (peer-reviewed PMC vs a
+// non-PMC article vs a preprint vs a clinical-trial record vs a book/dataset).
+const KIND_META = { pmc:['k_pmc','kb-ok'], article:['k_article','kb-ext'], preprint:['k_preprint','kb-warn'],
+  clinical_trial:['k_trial','kb-trial'], book:['k_book','kb-book'], dataset:['k_dataset','kb-data'] };
+function kindBadge(kind){ const m=KIND_META[kind]; return m ? '<span class="kbadge '+m[1]+'">'+esc(T(m[0]))+'</span>' : ''; }
+async function loadLibKinds(){   // corpus-wide composition counters shown beside the Library total — clickable to filter
+  try{
+    const d=await get('/api/library/kinds'); const c=d.counts||{};
+    const order=['pmc','article','preprint','clinical_trial','book','dataset'];
+    const fmt=n=>Number(n).toLocaleString(window.OE_LANG||'en');
+    const chips=order.filter(k=>c[k]).map(k=>{ const m=KIND_META[k];
+      return '<span class="kcount '+m[1]+(libKind===k?' on':'')+'" data-kind="'+k+'" role="button" tabindex="0" title="'+esc(T('lib_filter_kind'))+'">'+
+        esc(T(m[0]))+' <b>'+fmt(c[k])+'</b></span>'; }).join('');
+    $('#libKinds').innerHTML = chips;
+    $('#libKinds').querySelectorAll('.kcount').forEach(el=>{
+      el.onclick=()=>setLibKind(el.dataset.kind);
+      el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setLibKind(el.dataset.kind); } };
+    });
+  }catch(e){}
+}
 let toastT;
 function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('on'),2400); }
 
-const state = { me:null, tab:'home', forumCat:'', thread:null, copilotReady:false };
+const state = { me:null, tab:'home', forumCat:'', thread:null, copilot:{convId:null} };
 const attach = { topic:null, reply:null, dm:null };
 let pickerCb=null, pickerKind='material';
 
@@ -529,8 +728,9 @@ function go(tab){
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hide', p.dataset.panel!==tab));
   document.querySelectorAll('.navitem[data-tab]').forEach(n=>n.classList.toggle('on', n.dataset.tab===tab));
   if(tab==='home') loadHome();
-  if(tab==='library') loadLibrary();
-  if(tab==='copilot' && !state.copilotReady){ state.copilotReady=true; appendChat('assistant', T('co_hello'), T('co_hello_q')); }
+  if(tab==='library'){ loadLibrary(); if(!$('#libCopilot').classList.contains('hide')) initCopilot('library'); }
+  if(tab==='saved') loadSaved();
+  if(tab==='copilot') initCopilot('copilot');
   if(tab==='contribute') loadMaterials();
   if(tab==='forum') loadForum();
   if(tab==='community') loadCommunity();
@@ -547,7 +747,7 @@ function renderUser(){
   if(!state.me) return;
   const me=state.me, v=me.verification_status;
   const first=(me.full_name||'').split(/\s+/)[0]||me.full_name;
-  $('#umAvatar').textContent = initials(me.full_name);
+  $('#umAvatar').innerHTML = avInner(me.id, me.full_name, me.avatar);
   $('#umName').textContent = first;
   $('#umFull').textContent = me.full_name;
   $('#umOrg').textContent = [me.specialty, me.org].filter(Boolean).join(' · ') || me.email || '';
@@ -561,13 +761,33 @@ function renderUser(){
 function toggleUserMenu(e){ e.stopPropagation(); $('#ummenu').classList.toggle('hide'); }
 function closeUserMenu(){ const m=$('#ummenu'); if(m) m.classList.add('hide'); }
 document.addEventListener('click', function(e){ const m=$('#ummenu'); if(m && !m.classList.contains('hide') && !e.target.closest('.usermenu')) m.classList.add('hide'); });
+/* ── change password ── */
+function openChangePw(){ closeUserMenu(); const m=$('#pwMsg'); m.textContent=''; m.className='pwmsg'; $('#pw_cur').value=''; $('#pw_new').value=''; $('#pw_conf').value=''; $('#pwModal').classList.remove('hide'); setTimeout(()=>$('#pw_cur').focus(),50); }
+function closePw(){ $('#pwModal').classList.add('hide'); }
+async function saveChangePw(e){
+  e.preventDefault();
+  const cur=$('#pw_cur').value, nw=$('#pw_new').value, cf=$('#pw_conf').value, m=$('#pwMsg');
+  if(nw.length<10){ m.className='pwmsg err'; m.textContent=T('cp_short'); return false; }
+  if(nw!==cf){ m.className='pwmsg err'; m.textContent=T('cp_mismatch'); return false; }
+  const b=e.target.querySelector('button[type=submit]'); b.disabled=true;
+  try{
+    await post('/api/password',{current_password:cur, new_password:nw});
+    m.className='pwmsg ok'; m.textContent=T('cp_saved'); setTimeout(closePw,1200);
+  }catch(err){
+    b.disabled=false;
+    if(err.message==='auth') return false;
+    m.className='pwmsg err';
+    m.textContent = /current password/i.test(err.message) ? T('cp_wrong') : err.message;
+  }
+  return false;
+}
 
 window.onPortalLang = function(){ renderUser(); renderCats(); reloadCurrent(); };
 function reloadCurrent(){
   if(!state.me) return;
   const t=state.tab;
   if(t==='home') loadHome();
-  else if(t==='library') loadLibrary();
+  else if(t==='library') loadLibrary(libPage);
   else if(t==='contribute') loadMaterials();
   else if(t==='forum'){ if($('#forumDetail').classList.contains('hide')) loadTopics(); }
   else if(t==='community') loadCommunity();
@@ -606,7 +826,7 @@ async function loadReview(){
 async function reviewAct(id,status){ try{ await post('/api/review/materials/'+id,{status}); toast(status==='approved'?T('review_approve'):T('review_reject')); loadReview(); refreshBadges(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
 
 /* ── library (browse/search the corpus) ──────────────────────── */
-let libNext=null, libT;
+let libPage=1, libT, libKind="";   // libKind = active kind filter ("" = all kinds)
 function trunc(s,n){ return s.length>n? s.slice(0,n)+'…':s; }
 function fillYears(){
   const yf=$('#lib_yf'), yt=$('#lib_yt'); if(yf.options.length>1) return;
@@ -621,30 +841,36 @@ function libParams(){
   add('year_from','#lib_yf'); add('year_to','#lib_yt');
   const lic=$('#lib_license').value; if(lic) p.set('license',lic);
   if($('#lib_fav').checked) p.set('favorites','1');
+  if(libKind) p.set('kind', libKind);
   p.set('sort', $('#lib_sort').value);
   return p;
 }
-function libSearch(){ clearTimeout(libT); libT=setTimeout(()=>loadLibrary(true),300); }
-function libMore(){ loadLibrary(false); }
-function toggleAsk(){ const b=$('#libAskBar'); b.classList.toggle('hide'); if(!b.classList.contains('hide')) $('#lib_ask').focus(); }
+function setLibKind(k){            // click a count chip → filter to that kind (click again = clear)
+  libKind = (libKind===k ? "" : k);
+  $('#libKinds').querySelectorAll('.kcount').forEach(el=>el.classList.toggle('on', el.dataset.kind===libKind));
+  loadLibrary(1);
+}
+function libSearch(){ clearTimeout(libT); libT=setTimeout(()=>loadLibrary(1),300); }   // filter change → page 1
+function gotoPage(p){ if(p<1) return; loadLibrary(p); const el=document.querySelector('[data-panel="library"]'); if(el) el.scrollIntoView({block:'start'}); }
+function changePerPage(){ loadLibrary(1); }
+function pager(total, page, pages){
+  if(!pages || pages<=1) return '';
+  const b=(p,label,o)=>{ o=o||{}; return o.dis ? '<span class="pg dis">'+label+'</span>'
+    : '<button class="pg'+(o.cur?' on':'')+'" onclick="gotoPage('+p+')">'+label+'</button>'; };
+  const want=new Set([1,pages,page]);
+  for(let i=1;i<=2;i++){ if(page-i>=1) want.add(page-i); if(page+i<=pages) want.add(page+i); }
+  const list=[...want].sort((a,b)=>a-b);
+  let mid='', prev=0;
+  for(const p of list){ if(p-prev>1) mid+='<span class="pg ell">…</span>'; mid+=b(p,p,{cur:p===page}); prev=p; }
+  return '<div class="pager">'+b(page-1,'‹',{dis:page<=1})+mid+b(page+1,'›',{dis:page>=pages})+'</div>';
+}
+function toggleAsk(){
+  const b=$('#libCopilot'); b.classList.toggle('hide');
+  if(!b.classList.contains('hide')){ initCopilot('library'); const i=$('#lib_co_input'); if(i) i.focus(); }
+}
 function toggleFilters(){
   const a=$('#libAdv'); a.classList.toggle('hide');
   $('#lib_morebtn').textContent = a.classList.contains('hide') ? T('lib_more_filters') : T('lib_less_filters');
-}
-async function libAsk(e){
-  e.preventDefault();
-  const q=$('#lib_ask').value.trim(); if(!q) return false;
-  const note=$('#lib_asknote'); note.classList.remove('hide'); note.className='asknote'; note.textContent=T('lib_asking');
-  try{
-    const d=await post('/api/library/ask',{question:q});
-    const p=d.params||{};
-    $('#lib_q').value=p.q||''; $('#lib_author').value=p.author||''; $('#lib_journal').value=p.journal||'';
-    $('#lib_yf').value=p.year_from||''; $('#lib_yt').value=p.year_to||'';
-    $('#lib_sort').value = p.q ? 'relevance' : 'new';
-    note.textContent = d.interpreted ? T('lib_ask_done') : T('lib_ask_kw');
-    loadLibrary(true);
-  }catch(err){ if(err.message!=='auth'){ note.className='asknote err'; note.textContent=err.message; } }
-  return false;
 }
 function libCard(it){
   const meta=[it.journal,it.year].filter(Boolean).map(esc).join(' · ');
@@ -657,26 +883,27 @@ function libCard(it){
               (it.favorited?'<span class="vc fav on">★</span>':'');
   return '<div class="libitem">'+
     '<div class="t" onclick="openArt(\''+it.id+'\')">'+esc(it.title)+'</div>'+au+
-    '<div class="me">'+(meta?'<span>'+meta+'</span>':'')+lic+doi+
+    '<div class="me">'+kindBadge(it.kind)+(meta?'<span>'+meta+'</span>':'')+lic+doi+
       '<span class="libactions">'+stats+
         '<button class="lib-prev" onclick="openArt(\''+it.id+'\')">'+esc(T('lib_preview'))+'</button>'+
       '</span></div></div>';
 }
 function refreshLibCard(id,n){ const e=$('#cmc_'+id); if(e) e.innerHTML='💬 '+(n!=null?n:''); }
-async function loadLibrary(reset=true){
+async function loadLibrary(page){
+  page = page || 1; libPage = page;
   fillYears();
-  if(reset){ libNext=null; $('#libResults').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>'; }
-  const p=libParams(); if(!reset && libNext) p.set('cursor', libNext);
+  $('#libResults').innerHTML='<div class="loader"><div class="spinner"></div><span>'+esc(T('d_loading'))+'</span></div>';
+  $('#libPager').innerHTML='';
+  const p=libParams(); p.set('page', libPage); p.set('limit', $('#lib_pp').value); p.set('lang', window.OE_LANG||'en');
   try{
     const d=await get('/api/library?'+p.toString());
-    libNext=d.next;
+    libPage = d.page || libPage;
     const lt=$('#libTotal');
     if(d.total!=null){ lt.style.display='inline-flex'; lt.innerHTML='📚 <b>'+Number(d.total).toLocaleString(window.OE_LANG||'en')+'</b> '+esc(T('lib_count')); }
     else lt.style.display='none';
-    const html=d.items.map(libCard).join('');
-    if(reset) $('#libResults').innerHTML = d.items.length?html:'<div class="empty">'+esc(T('lib_none'))+'</div>';
-    else $('#libResults').insertAdjacentHTML('beforeend', html);
-    $('#libMore').innerHTML = libNext?'<button class="btn-ghost btn-sm" onclick="libMore()">'+esc(T('lib_loadmore'))+'</button>':'';
+    loadLibKinds();
+    $('#libResults').innerHTML = d.items.length ? d.items.map(libCard).join('') : '<div class="empty">'+esc(T('lib_none'))+'</div>';
+    $('#libPager').innerHTML = pager(d.total, d.page, d.pages);
   }catch(e){ if(e.message!=='auth') $('#libResults').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
 }
 
@@ -793,14 +1020,16 @@ function renderArt(){
   const opts=langs.map(l=>'<option value="'+l[0]+'"'+(l[0]===def?' selected':'')+'>'+l[1]+'</option>').join('');
   $('#artBody').innerHTML=
     '<div class="art-h">'+esc(d.title)+'</div>'+
-    '<div class="art-meta">'+meta.map(m=>'<span>'+esc(m)+'</span>').join('')+lic+'</div>'+
+    '<div class="art-meta">'+kindBadge(d.kind)+meta.map(m=>'<span>'+esc(m)+'</span>').join('')+lic+'</div>'+
+    (d.kind==='preprint'?'<div class="art-note">'+esc(T('k_preprint_note'))+'</div>':'')+
     '<div class="art-bar">'+
       '<button class="vbtn up'+(d.my_vote===1?' on':'')+'" id="av_up" onclick="artVote(1)"><i class="ar up">▲</i> <span id="av_upn">'+(d.up||0)+'</span></button>'+
       '<button class="vbtn down'+(d.my_vote===-1?' on':'')+'" id="av_down" onclick="artVote(-1)"><i class="ar down">▼</i> <span id="av_downn">'+(d.down||0)+'</span></button>'+
       '<button class="vbtn fav'+(d.favorited?' on':'')+'" id="av_fav" onclick="artFav()">★ <span>'+esc(T(d.favorited?'lib_faved':'lib_fav'))+'</span></button>'+
       '<span class="spacer"></span>'+
       '<span class="art-tl"><select id="art_lang">'+opts+'</select>'+
-        '<button class="btn-mini" onclick="artTranslate()">'+esc(T('lib_translate'))+'</button></span>'+
+        '<button class="btn-mini" id="art_tr_btn" onclick="artTranslate()">'+esc(T('lib_translate'))+'</button>'+
+        '<span class="lnk" id="art_toggle" style="display:none" onclick="artToggleOrig()"></span></span>'+
     '</div>'+
     '<div class="reading" id="art_read">'+renderContent(d.content, d.title, d.clean)+'</div>'+
     '<div id="art_trnote"></div>'+
@@ -828,20 +1057,77 @@ async function artFav(){
     toast(T(r.favorited?'lib_faved':'lib_unfaved'));
   }catch(e){ if(e.message!=='auth') toast(e.message); }
 }
-async function artTranslate(){
-  const d=art.data; if(!d) return;
-  const lang=$('#art_lang').value, read=$('#art_read'), note=$('#art_trnote');
-  if(lang===(d.language||'en')){ read.classList.remove('tr'); read.innerHTML=renderContent(d.content, d.title, d.clean); note.innerHTML=''; return; }
-  note.innerHTML='<div class="trnote">'+esc(T('lib_translating'))+'</div>';
-  try{
-    const r=await post('/api/library/'+d.id+'/translate',{lang});
-    if(!r.available){ note.innerHTML='<div class="trnote">'+esc(T('lib_tr_soon'))+'</div>'; return; }
-    read.classList.add('tr'); read.innerHTML=renderContent(r.content, r.title||d.title, d.clean);
-    let n=T('lib_tr_note')+(r.truncated?' · '+T('lib_tr_trunc'):'');
-    note.innerHTML='<div class="trnote">'+esc(n)+' <span class="lnk" onclick="artShowOrig()">'+esc(T('lib_tr_orig'))+'</span></div>';
-  }catch(e){ if(e.message!=='auth') note.innerHTML='<div class="trnote">'+esc(e.message)+'</div>'; }
+let _translating=false;
+const _sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function _artTitle(){ return document.querySelector('#artBody .art-h'); }
+function _trNote(truncated){ return '<div class="trnote">'+esc(T('lib_tr_note')+(truncated?' · '+T('lib_tr_trunc'):''))+'</div>'; }
+function setToggle(showOrig){ const tg=$('#art_toggle'); if(!tg) return; tg.style.display='inline'; tg.textContent = showOrig ? T('lib_tr_orig') : T('lib_tr_showtr'); }
+// Render translated chunks as they stream in, KEEPING the reader's scroll position (content
+// only ever grows at the bottom, so restoring scrollTop keeps the section being read in place).
+function renderTrProgress(chunks, total, titleTr){
+  const read=$('#art_read'); if(!read) return;
+  const sc=$('#artBody'); const top=sc?sc.scrollTop:0;
+  read.classList.add('tr');
+  let html=renderContent(chunks.join('\n\n'), '', true);
+  if(chunks.length<total) html+='<div class="trchunk"><span class="spin sm"></span> '+esc(T('lib_tr_long'))+' '+chunks.length+'/'+total+'</div>';
+  read.innerHTML=html;
+  if(sc) sc.scrollTop=top;
+  const h=_artTitle(); if(h && titleTr) h.textContent=titleTr;
 }
-function artShowOrig(){ const d=art.data; $('#art_read').classList.remove('tr'); $('#art_read').innerHTML=renderContent(d.content, d.title, d.clean); $('#art_trnote').innerHTML=''; }
+function finalizeTr(content, title, truncated){
+  const d=art.data; art.tr={content, title:title||d.title, truncated}; art.showingOrig=false;
+  $('#art_read').classList.add('tr'); $('#art_read').innerHTML=renderContent(content, '', true);
+  const h=_artTitle(); if(h) h.textContent=art.tr.title;
+  $('#art_trnote').innerHTML=_trNote(truncated);
+  setToggle(true);
+}
+// Toggle between the translation and the original (the link sits next to the language dropdown).
+function artToggleOrig(){
+  const d=art.data; if(!d || !art.tr) return; const h=_artTitle();
+  if(art.showingOrig){            // → show translation
+    $('#art_read').classList.add('tr'); $('#art_read').innerHTML=renderContent(art.tr.content,'',true);
+    if(h) h.textContent=art.tr.title; $('#art_trnote').innerHTML=_trNote(art.tr.truncated);
+    art.showingOrig=false; setToggle(true);
+  } else {                        // → show original
+    $('#art_read').classList.remove('tr'); $('#art_read').innerHTML=renderContent(d.content, d.title, d.clean);
+    if(h) h.textContent=d.title; $('#art_trnote').innerHTML='';
+    art.showingOrig=true; setToggle(false);
+  }
+}
+async function artTranslate(){
+  const d=art.data; if(!d || _translating) return;          // single-flight: ignore extra clicks
+  const lang=$('#art_lang').value, read=$('#art_read'), note=$('#art_trnote');
+  const btn=$('#art_tr_btn'), sel=$('#art_lang'), tg=$('#art_toggle'), h=_artTitle();
+  if(lang===(d.language||'en')){ read.classList.remove('tr'); read.innerHTML=renderContent(d.content, d.title, d.clean); if(h) h.textContent=d.title; note.innerHTML=''; art.tr=null; if(tg) tg.style.display='none'; return; }
+  _translating=true; if(btn) btn.disabled=true; if(sel) sel.disabled=true; if(tg) tg.style.display='none';
+  note.innerHTML='';
+  const wait=(msg)=>{ read.innerHTML='<div class="trwait"><span class="spin"></span><div>'+esc(msg)+'</div></div>'; };
+  const restore=()=>{ read.classList.remove('tr'); read.innerHTML=renderContent(d.content, d.title, d.clean); if(h) h.textContent=d.title; };
+  const fail=(msg)=>{ restore(); note.innerHTML='<div class="trnote err">'+esc(msg)+'</div>'; };
+  wait(T('lib_translating'));
+  const t0=Date.now();
+  try{
+    while(true){
+      if(!art.data || art.data.id!==d.id) break;   // user navigated away → stop polling (bg still caches it)
+      let r;
+      try{ r=await post('/api/library/'+d.id+'/translate',{lang}); }
+      catch(e){
+        if(e.message==='auth'){ restore(); break; }
+        if(e.message==='rate_limited'){ await _sleep(5000); continue; }
+        fail(e.message==='ai_unavailable'?T('lib_tr_soon'):T('lib_tr_failed')); break;
+      }
+      if(r.status==='done'){ finalizeTr(r.content, r.title, r.truncated); break; }
+      if(r.status==='unavailable' || r.available===false){ restore(); note.innerHTML='<div class="trnote">'+esc(T('lib_tr_soon'))+'</div>'; break; }
+      if(r.status==='error'){ fail(T('lib_tr_failed')); break; }
+      if(r.status==='translating'){
+        if(r.chunks && r.chunks.length) renderTrProgress(r.chunks, r.total, r.title);
+        else wait(T('lib_translating'));
+      }
+      if(Date.now()-t0 > 360000){ note.innerHTML='<div class="trnote">'+esc(T('lib_tr_long'))+'</div>'; break; }  // ~6 min; bg keeps going + caches → reopen shows the rest
+      await _sleep(2500);
+    }
+  } finally { _translating=false; if(btn) btn.disabled=false; if(sel) sel.disabled=false; }
+}
 async function loadComments(id){
   const box=$('#artCmts'); if(!box) return;
   let comments=[];
@@ -873,28 +1159,181 @@ async function delComment(id){
   catch(e){ if(e.message!=='auth') toast(e.message); }
 }
 
-/* ── copilot ─────────────────────────────────────────────────── */
-function appendChat(role, text, q){
-  const c=$('#chat'); const d=document.createElement('div');
+/* ── copilot ─────────────────────────────────────────────────────
+   ONE copilot, two surfaces: the Copilot tab and the Library "Ask copilot".
+   Both render into a "host" element, call the same /api/copilot/ask, and share
+   ONE active conversation (state.copilot.convId) + the same history.        */
+const CO = {
+  copilot: { chat:'#chat',    input:'#co_input' },
+  library: { chat:'#libChat', input:'#lib_co_input' },
+};
+function coSourcesHTML(sources){
+  if(!sources || !sources.length) return '';
+  return '<div class="cosrc"><div class="cosrc-h">'+esc(T('co_sources'))+'</div>'+
+    sources.map(s=>'<div class="cosrc-i"><span class="cn">'+esc(s.n)+'</span>'+
+      '<a onclick="openArt(\''+s.id+'\')">'+esc(s.title)+'</a>'+
+      (s.year?' <span class="cy">'+esc(s.year)+'</span>':'')+' '+kindBadge(s.kind)+'</div>').join('')+'</div>';
+}
+function coAppend(where, role, text, q, sources, noSave){
+  const c=$(CO[where].chat); if(!c) return null;
+  const d=document.createElement('div');
   d.className='bub '+(role==='user'?'user':'bot');
   if(role==='user'){ d.textContent=text; }
   else{
-    d.innerHTML = md(text) + '<button class="btn-mini save" data-i18n="co_save">'+esc(T('co_save'))+'</button>';
-    d.querySelector('.save').onclick = ev => saveAnswer(q, text, ev.target);
+    let html = md(text) + coSourcesHTML(sources);
+    if(!noSave) html += '<button class="btn-mini save">'+esc(T('co_save'))+'</button>';
+    d.innerHTML = html;
+    const sv=d.querySelector('.save'); if(sv) sv.onclick = ev => saveAnswer(q, text, sources||[], ev.target);
   }
-  c.appendChild(d); c.scrollTop=c.scrollHeight;
+  c.appendChild(d); c.scrollTop=c.scrollHeight; return d;
 }
-async function doAsk(e){
-  e.preventDefault(); const q=$('#co_input').value.trim(); if(!q) return false;
-  appendChat('user', q); $('#co_input').value=''; $('#co_input').focus();
-  try{ const d=await post('/api/copilot/ask',{question:q}); appendChat('assistant', d.answer, q); }
-  catch(err){ if(err.message!=='auth') appendChat('assistant', '⚠️ '+err.message, q); }
-  return false;
+function coThinking(where){
+  const c=$(CO[where].chat); if(!c) return null;
+  const d=document.createElement('div'); d.className='bub bot thinking';
+  d.textContent=T('co_searching'); c.appendChild(d); c.scrollTop=c.scrollHeight; return d;
 }
-async function saveAnswer(q,a,btn){
+async function coAsk(where, q){
+  if(!q) return;
+  coAppend(where,'user',q);
+  const inp=$(CO[where].input); if(inp){ inp.value=''; inp.focus(); }
+  const tb=coThinking(where);
+  try{
+    const d=await post('/api/copilot/ask',{question:q, lang: window.OE_LANG||'en', conversation_id: state.copilot.convId});
+    if(tb) tb.remove(); coAppend(where,'assistant', d.answer||'', q, d.sources||[]);
+    if(d.conversation_id) saveConvId(d.conversation_id);
+  }catch(err){
+    if(tb) tb.remove();
+    if(err.message==='auth') return;
+    const msg = err.message==='rate_limited' ? T('co_busy')
+              : err.message==='ai_unavailable' ? T('co_unavailable') : '⚠️ '+err.message;
+    coAppend(where,'assistant', msg, q, [], true);
+  }
+}
+function doAsk(e){ e.preventDefault(); coAsk('copilot', $('#co_input').value.trim()); return false; }
+function doAskLib(e){ e.preventDefault(); coAsk('library', $('#lib_co_input').value.trim()); return false; }
+async function saveAnswer(q,a,sources,btn){
   btn.disabled=true;
-  try{ await post('/api/answers',{question:q, answer:a}); btn.textContent=T('co_saved'); }
+  try{ await post('/api/answers',{question:q, answer:a, sources:sources||[]}); btn.textContent=T('co_saved'); }
   catch(e){ btn.disabled=false; }
+}
+
+/* ── copilot chat history (persistent, survives refresh / tab switches) ── */
+const COPILOT_KEY='elpis_copilot_conv';
+let histWhere='copilot';
+function saveConvId(id){ state.copilot.convId=id||null; try{ id?localStorage.setItem(COPILOT_KEY,id):localStorage.removeItem(COPILOT_KEY); }catch(e){} }
+function loadConvId(){ try{ return localStorage.getItem(COPILOT_KEY)||null; }catch(e){ return null; } }
+function coRender(where, messages){
+  const c=$(CO[where].chat); if(!c) return;
+  c.innerHTML='';
+  if(!messages || !messages.length){ coAppend(where,'assistant', T('co_hello'), null, [], true); return; }
+  let lastQ=null;
+  messages.forEach(m=>{ if(m.role==='user'){ lastQ=m.content; coAppend(where,'user',m.content); }
+                        else coAppend(where,'assistant', m.content, lastQ, m.sources||[]); });
+}
+async function initCopilot(where){
+  const id=loadConvId();
+  if(id && await loadConversation(where, id, true)) return;   // restore active chat into this host
+  coRender(where, []);                                        // else: fresh greeting
+}
+function freshChat(where){ saveConvId(null); coRender(where, []); }
+function newChat(where){ freshChat(where); const i=$(CO[where].input); if(i) i.focus(); }
+async function loadConversation(where, id, silent){
+  try{
+    const c=await get('/api/chats/'+id);
+    saveConvId(id); coRender(where, c.messages);
+    return true;
+  }catch(e){
+    if(e.message==='auth') return true;       // redirecting to login anyway
+    saveConvId(null);                          // stale / deleted conversation
+    if(!silent) toast(e.message);
+    return false;
+  }
+}
+async function openHistory(where){
+  histWhere = where || 'copilot';
+  const box=$('#histList'); box.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  $('#histModal').classList.remove('hide');
+  try{
+    const {chats}=await get('/api/chats');
+    if(!chats.length){ box.innerHTML='<div class="empty">'+esc(T('co_hist_empty'))+'</div>'; return; }
+    box.innerHTML=chats.map(c=>{
+      const badge=c.source==='library' ? '📚 '+esc(T('co_src_library')) : '🔬 '+esc(T('co_src_copilot'));
+      const active=c.id===state.copilot.convId ? ' active' : '';
+      return '<div class="histrow'+active+'" id="hist_'+c.id+'">'+
+        '<div class="hr-main" onclick="pickChat(\''+c.id+'\')">'+
+          '<div class="hr-title">'+esc(c.title||T('co_new'))+'</div>'+
+          '<div class="hr-sub"><span class="hr-badge">'+badge+'</span> '+esc(fdate(c.last_message_at))+'</div>'+
+        '</div>'+
+        '<button class="b-rem" title="'+esc(T('sv_delete'))+'" onclick="delChat(\''+c.id+'\',event)">🗑</button>'+
+      '</div>';
+    }).join('');
+  }catch(e){ if(e.message!=='auth') box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function closeHistory(){ $('#histModal').classList.add('hide'); }
+async function pickChat(id){ if(await loadConversation(histWhere, id, false)) closeHistory(); }
+async function delChat(id,e){
+  if(e) e.stopPropagation();
+  if(!confirm(T('co_hist_del_confirm'))) return;
+  try{
+    await post('/api/chats/'+id+'/delete'); toast(T('co_deleted'));
+    const r=$('#hist_'+id); if(r) r.remove();
+    if(id===state.copilot.convId) freshChat(histWhere);
+    if(!$('#histList').querySelector('.histrow')) $('#histList').innerHTML='<div class="empty">'+esc(T('co_hist_empty'))+'</div>';
+  }catch(err){ if(err.message!=='auth') toast(err.message); }
+}
+
+/* ── saved (favorited articles + saved copilot answers) ───────── */
+function loadSaved(){ svShow(state.svTab||'arts'); }
+function svShow(which){
+  state.svTab=which;
+  $('#svtab_arts').classList.toggle('on', which==='arts');
+  $('#svtab_ans').classList.toggle('on', which==='ans');
+  $('#savedArts').classList.toggle('hide', which!=='arts');
+  $('#savedAns').classList.toggle('hide', which!=='ans');
+  if(which==='arts') loadSavedArticles(); else loadSavedAnswers();
+}
+async function loadSavedArticles(){
+  const box=$('#savedArts'); box.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  try{
+    const d=await get('/api/library?favorites=1&limit=50&sort=new&lang='+(window.OE_LANG||'en'));
+    if(!d.items.length){ box.innerHTML='<div class="empty">'+esc(T('sv_no_articles'))+'</div>'; return; }
+    box.innerHTML=d.items.map(it=>'<div class="savedrow">'+libCard(it)+
+      '<button class="b-rem" title="'+esc(T('sv_remove'))+'" onclick="unsaveArticle(\''+it.id+'\')">✕ '+esc(T('sv_remove'))+'</button></div>').join('');
+  }catch(e){ if(e.message!=='auth') box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function unsaveArticle(id){
+  try{ await post('/api/library/'+id+'/favorite',{}); toast(T('lib_unfaved')); loadSavedArticles(); }
+  catch(e){ if(e.message!=='auth') toast(e.message); }
+}
+async function loadSavedAnswers(){
+  const box=$('#savedAns'); box.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  try{
+    const {answers}=await get('/api/answers');
+    if(!answers.length){ box.innerHTML='<div class="empty">'+esc(T('sv_no_answers'))+'</div>'; return; }
+    box.innerHTML=answers.map(a=>'<div class="ansrow" id="ans_'+a.id+'">'+
+      '<div class="ansq" onclick="toggleAnswer(\''+a.id+'\')"><span class="qq">'+esc(a.question)+'</span>'+
+      '<span class="ad">'+esc(fdate(a.created_at))+'</span></div>'+
+      '<div class="ansd hide" id="ansd_'+a.id+'"></div></div>').join('');
+  }catch(e){ if(e.message!=='auth') box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function toggleAnswer(id){
+  const d=$('#ansd_'+id); if(!d) return;
+  if(!d.classList.contains('hide')){ d.classList.add('hide'); return; }
+  d.classList.remove('hide');
+  if(d.dataset.loaded) return;
+  d.innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  try{
+    const a=await get('/api/answers/'+id);
+    d.innerHTML='<div class="ansbody">'+md(a.answer||'')+coSourcesHTML(a.sources)+'</div>'+
+      '<button class="b-rem" onclick="deleteAnswer(\''+id+'\')">🗑 '+esc(T('sv_delete'))+'</button>';
+    d.dataset.loaded='1';
+  }catch(e){ d.innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function deleteAnswer(id){
+  if(!confirm(T('sv_confirm_del'))) return;
+  try{ await post('/api/answers/'+id+'/delete'); toast(T('sv_deleted')); const r=$('#ans_'+id); if(r) r.remove();
+    if(!$('#savedAns').querySelector('.ansrow')) loadSavedAnswers(); }
+  catch(e){ if(e.message!=='auth') toast(e.message); }
 }
 
 /* ── contribute ──────────────────────────────────────────────── */
@@ -1047,7 +1486,7 @@ async function doSearchMembers(){
   }catch(e){}
 }
 function personRow(p,ctx){
-  const sub = [p.specialty,p.org].filter(Boolean).map(esc).join(' · ');
+  const sub = [p.title||p.specialty, p.workplace||p.org].filter(Boolean).map(esc).join(' · ');
   let act='';
   if(ctx==='member'){
     if(p.relation==='friends') act='<button class="btn-mini" onclick="dmOpen(\''+p.id+'\')">'+esc(T('cm_message'))+'</button>';
@@ -1058,10 +1497,113 @@ function personRow(p,ctx){
     act='<button class="btn-mini" onclick="friend(\'accept\',\''+p.id+'\')">'+esc(T('cm_accept'))+'</button> <button class="btn-x" onclick="friend(\'decline\',\''+p.id+'\')">'+esc(T('cm_decline'))+'</button>';
   } else if(ctx==='out'){ act='<span class="pill pending">'+esc(T('cm_pending'))+'</span>'; }
   else if(ctx==='friend'){ act='<button class="btn-mini" onclick="dmOpen(\''+p.id+'\')">'+esc(T('cm_message'))+'</button>'; }
-  return '<div class="listrow"><div class="avatar">'+esc(initials(p.full_name))+'</div><div class="lr-main"><div class="nm">'+esc(p.full_name)+(p.verified?' <span class="vchk">✓</span>':'')+'</div><div class="sub">'+sub+'</div></div><div class="lr-act">'+act+'</div></div>';
+  return '<div class="listrow">'+
+    '<div class="avatar pclick" onclick="openProfile(\''+p.id+'\')">'+avInner(p.id,p.full_name,p.avatar)+'</div>'+
+    '<div class="lr-main"><div class="nm pclick" onclick="openProfile(\''+p.id+'\')">'+esc(p.full_name)+(p.verified?' <span class="vchk">✓</span>':'')+'</div><div class="sub">'+sub+'</div></div>'+
+    '<div class="lr-act">'+act+'</div></div>';
 }
 async function friend(action,id){ try{ await post('/api/friends/'+action,{user_id:id}); loadCommunity(); refreshBadges(); }catch(e){ if(e.message!=='auth') toast(e.message); } }
 function dmOpen(id){ go('messages'); openThread(id); document.querySelectorAll('.navitem[data-tab]').forEach(n=>n.classList.toggle('on',n.dataset.tab==='messages')); }
+
+/* ── member profiles ─────────────────────────────────────────── */
+let prof=null;
+function closeProfile(){ $('#profileModal').classList.add('hide'); prof=null; }
+async function openProfile(id){
+  closeUserMenu();
+  $('#profileBody').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  $('#profileModal').classList.remove('hide');
+  try{ prof=await get('/api/users/'+id); renderProfileView(); }
+  catch(e){ if(e.message!=='auth') $('#profileBody').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+function profMeta(d){
+  const line=(ic,val,link)=> val ? '<div class="pf-row"><span class="pf-ic">'+ic+'</span>'+(link?'<a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(val)+'</a>':esc(val))+'</div>' : '';
+  return [
+    line('🏥', d.workplace||d.org),
+    line('🌍', d.country),
+    line('🔗', d.website? d.website.replace(/^https?:\/\//,'') : '', d.website),
+    d.created_at? line('🗓️', T('pf_since')+' '+fdate(d.created_at)) : '',
+    d.uploads? line('📄', d.uploads+' '+T('pf_uploads')) : '',
+  ].filter(Boolean).join('');
+}
+function profActions(d){
+  if(d.is_self) return '<button class="btn btn-sm" onclick="editProfile()">'+esc(T('pf_edit'))+'</button>';
+  if(d.relation==='friends') return '<button class="btn btn-sm" onclick="closeProfile();dmOpen(\''+d.id+'\')">'+esc(T('cm_message'))+'</button>';
+  if(d.relation==='pending_out') return '<span class="pill pending">'+esc(T('cm_pending'))+'</span>';
+  if(d.relation==='pending_in') return '<button class="btn btn-sm" onclick="profFriend(\'accept\',\''+d.id+'\')">'+esc(T('cm_accept'))+'</button>';
+  return '<button class="btn btn-sm" onclick="profFriend(\'request\',\''+d.id+'\')">'+esc(T('cm_connect'))+'</button>';
+}
+async function profFriend(a,id){
+  try{ await post('/api/friends/'+a,{user_id:id}); refreshBadges(); }
+  catch(e){ if(e.message!=='auth'){ toast(e.message); return; } }
+  openProfile(id); if(state.tab==='community') loadCommunity();
+}
+function renderProfileView(){
+  const d=prof; if(!d) return;
+  const role='<span class="umrole '+esc(d.role)+'">'+esc(T('role_'+d.role)||d.role)+'</span>';
+  const ver=d.verified?'<span class="pillv verified">'+esc(T('d_verified'))+'</span>':'';
+  const subtitle=[d.title, d.specialty].filter(Boolean).map(esc).join(' · ');
+  $('#profileBody').innerHTML=
+    '<div class="pf-head"><div class="pf-av">'+avInner(d.id,d.full_name,d.avatar)+'</div>'+
+      '<div class="pf-id"><div class="pf-name">'+esc(d.full_name)+(d.verified?' <span class="vchk">✓</span>':'')+'</div>'+
+      (subtitle?'<div class="pf-sub">'+subtitle+'</div>':'')+
+      '<div class="pf-tags">'+role+ver+'</div></div></div>'+
+    (profMeta(d)?'<div class="pf-meta">'+profMeta(d)+'</div>':'')+
+    (d.bio?'<div class="pf-bio">'+md(d.bio)+'</div>':'')+
+    '<div class="pf-act">'+profActions(d)+'</div>';
+}
+function editProfile(){
+  closeUserMenu();
+  $('#profileModal').classList.remove('hide');
+  $('#profileBody').innerHTML='<div class="empty">'+esc(T('d_loading'))+'</div>';
+  get('/api/users/'+state.me.id).then(d=>{ prof=d; renderProfileEdit(); })
+    .catch(e=>{ if(e.message!=='auth') $('#profileBody').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; });
+}
+function pickAvatar(){ $('#pf_file').click(); }
+function renderProfileEdit(){
+  const d=prof||state.me;
+  const f=(id,label,val,ph)=> '<label>'+esc(label)+'</label><input id="'+id+'" maxlength="200" value="'+esc(val||'')+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>';
+  $('#profileBody').innerHTML=
+    '<div class="pf-edit-av"><div class="pf-av">'+avInner(d.id,d.full_name,d.avatar)+'</div>'+
+      '<div><input type="file" id="pf_file" accept="image/*" style="display:none" onchange="uploadAvatar()">'+
+      '<button class="btn-mini" onclick="pickAvatar()">'+esc(T('pf_change_photo'))+'</button> '+
+      (d.avatar?'<button class="btn-x" onclick="removeAvatar()">'+esc(T('pf_remove_photo'))+'</button>':'')+
+      '<div class="hint" style="margin:6px 0 0">'+esc(T('pf_photo_hint'))+'</div></div></div>'+
+    f('pf_name', T('p_name'), d.full_name)+
+    f('pf_title', T('pf_jobtitle'), d.title, T('pf_title_ph'))+
+    f('pf_specialty', T('p_specialty'), d.specialty, T('p_specialty_ph'))+
+    f('pf_workplace', T('pf_workplace'), d.workplace, T('pf_workplace_ph'))+
+    f('pf_country', T('p_country'), d.country, T('p_country_ph'))+
+    f('pf_website', T('pf_website'), d.website, 'example.com')+
+    '<label>'+esc(T('pf_bio'))+' <span class="lhint">'+esc(T('d_optional'))+'</span></label>'+
+    '<textarea id="pf_bio" maxlength="4000" placeholder="'+esc(T('pf_bio_ph'))+'">'+esc(d.bio||'')+'</textarea>'+
+    '<div style="display:flex;gap:9px;margin-top:14px"><button class="btn" onclick="saveProfile()">'+esc(T('pf_save'))+'</button>'+
+    '<button class="btn-x" onclick="openProfile(state.me.id)">'+esc(T('act_cancel'))+'</button></div>'+
+    '<div id="pfmsg" class="msg"></div>';
+}
+async function saveProfile(){
+  const body={ full_name:$('#pf_name').value, title:$('#pf_title').value, specialty:$('#pf_specialty').value,
+    workplace:$('#pf_workplace').value, country:$('#pf_country').value, website:$('#pf_website').value, bio:$('#pf_bio').value };
+  try{
+    await post('/api/profile', body);
+    state.me=await get('/api/me'); renderUser();
+    toast(T('pf_saved')); openProfile(state.me.id);
+    if(state.tab==='community') loadCommunity();
+  }catch(e){ if(e.message!=='auth') setMsg('#pfmsg', e.message); }
+}
+async function uploadAvatar(){
+  const inp=$('#pf_file'); if(!inp.files||!inp.files[0]) return;
+  const fd=new FormData(); fd.append('file', inp.files[0]);
+  try{
+    await api('/api/profile/avatar',{method:'POST',body:fd});
+    state.me=await get('/api/me'); renderUser(); editProfile(); toast(T('pf_saved'));
+    if(state.tab==='community') loadCommunity();
+  }catch(e){ if(e.message!=='auth') toast(e.message); }
+}
+async function removeAvatar(){
+  try{ await del('/api/profile/avatar'); state.me=await get('/api/me'); renderUser(); editProfile();
+    if(state.tab==='community') loadCommunity(); }
+  catch(e){ if(e.message!=='auth') toast(e.message); }
+}
 
 /* ── messages ────────────────────────────────────────────────── */
 let msgTimer;
@@ -1070,7 +1612,7 @@ async function loadConversations(){
   $('#convList').classList.remove('hide'); $('#thread').classList.add('hide'); state.thread=null; manageMsgPoll();
   try{
     const {conversations}=await get('/api/messages');
-    $('#convos').innerHTML = conversations.length ? conversations.map(c=>'<div class="listrow" onclick="openThread(\''+c.user_id+'\')" style="cursor:pointer"><div class="avatar">'+esc(initials(c.full_name))+'</div><div class="lr-main"><div class="nm">'+esc(c.full_name)+'</div><div class="sub">'+esc(c.last)+'</div></div>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div>').join('') : '<div class="empty">'+esc(T('ms_empty'))+'</div>';
+    $('#convos').innerHTML = conversations.length ? conversations.map(c=>'<div class="listrow" onclick="openThread(\''+c.user_id+'\')" style="cursor:pointer"><div class="avatar">'+avInner(c.user_id,c.full_name,c.avatar)+'</div><div class="lr-main"><div class="nm">'+esc(c.full_name)+'</div><div class="sub">'+esc(c.last)+'</div></div>'+(c.unread?'<span class="unread">'+c.unread+'</span>':'')+'</div>').join('') : '<div class="empty">'+esc(T('ms_empty'))+'</div>';
   }catch(e){}
 }
 async function openThread(id){
@@ -1139,7 +1681,7 @@ async function logout(){ try{ await post('/api/logout'); }catch(e){} location.hr
 async function boot(){
   try{ state.me=await get('/api/me'); }catch(e){ location.href='/portal/'; return; }
   renderUser(); refreshBadges(); setInterval(refreshBadges,20000);
-  const valid=['home','copilot','library','contribute','forum','community','messages','review','invite'];
+  const valid=['home','copilot','library','saved','contribute','forum','community','messages','review','invite'];
   let start=(location.hash||'').replace('#','');
   if(!valid.includes(start)) start='home';
   if(start==='review' && !(state.me.role==='reviewer'||state.me.role==='admin')) start='home';

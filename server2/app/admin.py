@@ -5,16 +5,40 @@ management, access-request review (approve -> issues an invite), invite
 management, materials (the trust gate, filterable by uploader), forum moderation,
 and the audit log.
 """
-import secrets, hashlib, datetime as dt
+import secrets, hashlib, shutil, datetime as dt
 from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException, Depends
 from pydantic import BaseModel, EmailStr, constr
 
 from core import db, audit, client_ip, require_admin, is_admin_email, SITE_ORIGIN
+from library import _is_degenerate, _FTS, kind_counts   # quality detector + title FTS + corpus kind counts
 import mailer
 
 router = APIRouter()
+
+_TR_LANGS = {"en", "tr", "es", "de", "fr", "it", "ru", "nl"}
+
+
+@router.get("/api/admin/system")
+def system(user=Depends(require_admin)):
+    """Server (openelpis-db) disk + memory + swap, for the admin panel."""
+    du = shutil.disk_usage("/")
+    mem = {}
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                k, _, v = line.partition(":")
+                parts = v.split()
+                if parts and parts[0].isdigit():
+                    mem[k.strip()] = int(parts[0]) * 1024   # kB → bytes
+    except Exception:
+        pass
+    return {
+        "disk": {"total": du.total, "used": du.used, "free": du.free},
+        "mem":  {"total": mem.get("MemTotal"), "available": mem.get("MemAvailable")},
+        "swap": {"total": mem.get("SwapTotal"), "free": mem.get("SwapFree")},
+    }
 
 
 @router.get("/api/admin/overview")
@@ -33,7 +57,7 @@ def overview(user=Depends(require_admin)):
           (SELECT count(*) FROM forum_topics WHERE status='open')                                   AS topics,
           (SELECT count(*) FROM direct_messages)                                                    AS dms""")
         s = cur.fetchone()
-    return {k: s[k] for k in s}
+    return {**{k: s[k] for k in s}, "kinds": kind_counts()["counts"]}
 
 
 # ── members ─────────────────────────────────────────────────────────────────────
@@ -246,6 +270,121 @@ def remove_topic(topic_id: str, user=Depends(require_admin)):
         if not cur.fetchone():
             raise HTTPException(404, "not found")
     return {"ok": True}
+
+
+# ── cached translations (management) ─────────────────────────────────────────────
+@router.get("/api/admin/translations")
+def admin_translations(lang: Optional[str] = None, flagged: int = 0, user=Depends(require_admin)):
+    """List cached machine translations with a health flag (degenerate = looks like an LLM
+    repetition loop). `flagged=1` shows only the broken ones; `lang` filters by language."""
+    sql = ("SELECT t.material_id, t.lang, t.engine, t.truncated, t.created_at, t.title AS tr_title, "
+           "t.content, m.title AS src_title "
+           "FROM article_translations t JOIN materials m ON m.id=t.material_id WHERE 1=1")
+    params = []
+    if lang in _TR_LANGS:
+        sql += " AND t.lang=%s"; params.append(lang)
+    sql += " ORDER BY t.created_at DESC LIMIT 300"
+    with db() as cur:
+        cur.execute(sql, params); rows = cur.fetchall()
+    items, flagged_count = [], 0
+    for r in rows:
+        content = r["content"] or ""
+        degen = _is_degenerate(content, None)
+        if degen:
+            flagged_count += 1
+        if flagged and not degen:
+            continue
+        items.append({
+            "material_id": str(r["material_id"]), "lang": r["lang"], "engine": r["engine"],
+            "truncated": r["truncated"], "chars": len(content), "degenerate": degen,
+            "tr_title": r["tr_title"], "src_title": r["src_title"],
+            "preview": content[:200], "created_at": r["created_at"].isoformat()})
+    return {"translations": items, "flagged_count": flagged_count, "scanned": len(rows)}
+
+
+@router.get("/api/admin/translations/{material_id}/{lang}")
+def admin_translation_view(material_id: str, lang: str, user=Depends(require_admin)):
+    with db() as cur:
+        cur.execute("SELECT t.title, t.content, t.engine, t.truncated, t.created_at, m.title AS src_title "
+                    "FROM article_translations t JOIN materials m ON m.id=t.material_id "
+                    "WHERE t.material_id=%s AND t.lang=%s", (material_id, lang))
+        r = cur.fetchone()
+    if not r:
+        raise HTTPException(404, "translation not found")
+    content = r["content"] or ""
+    return {"material_id": material_id, "lang": lang, "title": r["title"], "src_title": r["src_title"],
+            "content": content, "engine": r["engine"], "truncated": r["truncated"],
+            "degenerate": _is_degenerate(content, None), "created_at": r["created_at"].isoformat()}
+
+
+@router.post("/api/admin/translations/{material_id}/{lang}/delete")
+def admin_translation_delete(material_id: str, lang: str, request: Request, user=Depends(require_admin)):
+    with db() as cur:
+        cur.execute("DELETE FROM article_translations WHERE material_id=%s AND lang=%s RETURNING material_id",
+                    (material_id, lang))
+        if not cur.fetchone():
+            raise HTTPException(404, "translation not found")
+        audit(cur, user["id"], "translation_delete", "material", material_id, {"lang": lang}, client_ip(request))
+    return {"ok": True}     # re-translated automatically next time a member opens it
+
+
+@router.post("/api/admin/translations/purge-flagged")
+def admin_translations_purge(request: Request, user=Depends(require_admin)):
+    """Delete every cached translation that looks degenerate (repetition loop). Each is
+    re-translated cleanly the next time a member requests it."""
+    deleted = 0
+    with db() as cur:
+        cur.execute("SELECT material_id, lang, content FROM article_translations")
+        bad = [(r["material_id"], r["lang"]) for r in cur.fetchall() if _is_degenerate(r["content"] or "", None)]
+        for mid, lg in bad:
+            cur.execute("DELETE FROM article_translations WHERE material_id=%s AND lang=%s", (mid, lg))
+            deleted += 1
+        if deleted:
+            audit(cur, user["id"], "translation_purge_flagged", "translation", None, {"deleted": deleted}, client_ip(request))
+    return {"ok": True, "deleted": deleted}
+
+
+# ── article TITLE translation coverage (matrix view) ──────────────────────────────
+_TITLE_TARGETS = ["tr", "es", "de", "fr", "it", "ru", "nl"]   # English stays canonical
+
+
+@router.get("/api/admin/title-translations")
+def admin_title_translations(q: Optional[str] = None, page: int = 1, limit: int = 50,
+                             user=Depends(require_admin)):
+    """A coverage matrix: one row per approved article (title + which target languages
+    have a stored title translation), for the admin Title-status tab. Paginated."""
+    limit = max(1, min(limit, 200))
+    page = max(1, page)
+    where = ["m.status='approved'"]
+    params = {}
+    if q and q.strip():
+        where.append(f"{_FTS} @@ websearch_to_tsquery('english', %(q)s)")   # uses the partial GIN index
+        params["q"] = q.strip()
+    where_sql = " AND ".join(where)
+    offset = min((page - 1) * limit, 1000000)
+    with db() as cur:
+        cur.execute(f"SELECT count(*) AS n FROM materials m WHERE {where_sql}", params)
+        total = cur.fetchone()["n"]
+        cur.execute(f"SELECT m.id, m.title FROM materials m WHERE {where_sql} "
+                    f"ORDER BY m.id LIMIT {limit} OFFSET {offset}", params)
+        rows = cur.fetchall()
+        ids = [str(r["id"]) for r in rows]
+        cov = {i: set() for i in ids}
+        if ids:
+            cur.execute("SELECT material_id, lang FROM material_title_translations "
+                        "WHERE material_id = ANY(%s::uuid[])", (ids,))
+            for r in cur.fetchall():
+                cov[str(r["material_id"])].add(r["lang"])
+        cur.execute("SELECT lang, count(*) AS n FROM material_title_translations GROUP BY lang")
+        totals = {r["lang"]: r["n"] for r in cur.fetchall()}
+        cur.execute("SELECT count(*) AS n FROM materials WHERE status='approved'")
+        approved_total = cur.fetchone()["n"]
+    pages = max(1, -(-total // limit))
+    items = [{"id": str(r["id"]), "title": r["title"] or "",
+              "langs": sorted(cov[str(r["id"])] & set(_TITLE_TARGETS))} for r in rows]
+    return {"items": items, "page": page, "pages": pages, "total": total,
+            "langs": _TITLE_TARGETS, "approved_total": approved_total,
+            "totals": {l: totals.get(l, 0) for l in _TITLE_TARGETS}}
 
 
 @router.get("/api/admin/audit")

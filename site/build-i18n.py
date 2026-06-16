@@ -913,9 +913,11 @@ urls = []
 home_pairs = [(l, f"{BASE}{URL[l]}") for l in ALL]
 for l in ALL:
     urls.append(url_entry(f"{BASE}{URL[l]}", home_pairs, "1.0" if l == "en" else "0.8", "weekly", with_img=(l == "en")))
-# founder page (single-language)
+# founder + co-founder pages (single-language)
 urls.append(f'  <url>\n    <loc>{BASE}/founder/</loc>\n    <lastmod>{LASTMOD}</lastmod>\n'
             f'    <changefreq>monthly</changefreq>\n    <priority>0.9</priority>\n{img}\n  </url>')
+urls.append(f'  <url>\n    <loc>{BASE}/cofounder/</loc>\n    <lastmod>{LASTMOD}</lastmod>\n'
+            f'    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>')
 # name profiles (en + tr)
 for p in PROFILES:
     pairs = [(l, f"{BASE}{prof_url(p['slug'], l)}") for l in PROF_LANGS]
@@ -925,6 +927,9 @@ for p in PROFILES:
 sponsor_pairs = [(l, f"{BASE}{sponsor_url(l)}") for l in SPONSOR_LANGS]
 for l in SPONSOR_LANGS:
     urls.append(url_entry(f"{BASE}{sponsor_url(l)}", sponsor_pairs, "0.9", "monthly"))
+# public, read-only research library (single URL; UI is translated client-side)
+urls.append(f'  <url>\n    <loc>{BASE}/library/</loc>\n    <lastmod>{LASTMOD}</lastmod>\n'
+            f'    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>')
 
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'

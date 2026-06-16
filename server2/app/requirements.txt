@@ -5,3 +5,9 @@ argon2-cffi>=21
 PyJWT>=2.8
 python-multipart>=0.0.9
 pydantic[email]>=2.6
+# Local multilingual sentence embeddings (ONNX/CPU) for semantic RAG — see embed.py.
+# Optional: if absent, the copilot degrades to keyword-only (full-body) retrieval.
+fastembed>=0.8
+# PDF text extraction for the OpenAlex importer (deploy/import-openalex.py only — the app
+# never imports it; listed so a venv rebuild keeps it available for the importer).
+pymupdf>=1.24

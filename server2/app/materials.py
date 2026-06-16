@@ -37,14 +37,20 @@ def _visible(cur, m, user) -> bool:
 
 
 def material_text(m) -> Optional[str]:
-    """Decoded UTF-8 text of a material's stored file (gunzips bulk-imported .gz).
-    Returns None if the file is missing. Used by the Library reading view + translator."""
+    """Decoded UTF-8 text of a material's stored file (gunzips compressed content).
+    Returns None if the file is missing. Used by the Library reading view + translator.
+    Detects gzip by MAGIC BYTES, not the filename — some legacy keys are gzip content
+    misnamed `.txt` (re-extractor wrote .gz over a pre-`.txt.gz` key), and member uploads
+    are raw; magic-byte detection serves both correctly."""
     path = UPLOAD_DIR / m["storage_key"]
     if not path.exists():
         return None
     raw = path.read_bytes()
-    if m["storage_key"].endswith(".gz"):
-        raw = gzip.decompress(raw)
+    if raw[:2] == b"\x1f\x8b":
+        try:
+            raw = gzip.decompress(raw)
+        except OSError:
+            pass
     return raw.decode("utf-8", "replace")
 
 
@@ -114,7 +120,9 @@ def material_file(material_id: str, user=Depends(current_user)):
     if not path.exists():
         raise HTTPException(410, "file missing")
     fname = m["original_filename"] or "material"
-    if m["storage_key"].endswith(".gz"):     # bulk-imported text is stored gzipped — serve decompressed
+    with open(path, "rb") as f:
+        magic = f.read(2)
+    if magic == b"\x1f\x8b":                  # gzip magic — bulk-imported text; serve decompressed
         data = gzip.decompress(path.read_bytes())
         return Response(content=data, media_type=m["mime_type"] or "text/plain",
                         headers={"Content-Disposition": f'inline; filename="{fname}"'})

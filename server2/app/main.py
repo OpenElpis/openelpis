@@ -7,6 +7,8 @@ Runs on server2 (localhost:8000), behind server1's Caddy at openelpis.com/api/*.
   shares.py    attach/preview a material or saved answer
   invites.py   invitations + public invite validation + access requests
   materials.py upload / list-mine / visibility-checked file download
+  library.py   member Library: browse/search + reading view (translate, votes, comments)
+  public.py    PUBLIC read-only library (no auth) — browse/search + full text, no member features
   forum.py     question topics + replies (+ shares)
   social.py    member directory + friend requests + direct messages
   copilot.py   PLACEHOLDER ask + saved (shareable) answers
@@ -16,7 +18,7 @@ Security: argon2 hashing, JWT in an httpOnly+Secure cookie, parameterized SQL,
 INVITE-ONLY signup (founder bootstrap via ADMIN_EMAILS), per-file content hashing.
 Secrets (DATABASE_URL, JWT_SECRET, ADMIN_EMAILS) come from /etc/openelpis.env.
 """
-import datetime as dt, hashlib
+import datetime as dt, hashlib, secrets
 from typing import Optional
 
 from argon2.exceptions import VerifyMismatchError
@@ -25,11 +27,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, constr
 
 from core import (db, ph, audit, client_ip, make_token, set_cookie, current_user,
-                  is_admin_email, COOKIE_NAME)
-import invites, materials, library, forum, social, copilot, admin
+                  is_admin_email, COOKIE_NAME, SITE_ORIGIN)
+import invites, materials, library, public, forum, social, copilot, chat, admin, mailer
+
+RESET_TTL = dt.timedelta(hours=2)   # password-reset link lifetime
 
 app = FastAPI(title="OpenElpis portal API", docs_url=None, redoc_url=None)
-for module in (invites, materials, library, forum, social, copilot, admin):
+for module in (invites, materials, library, public, forum, social, copilot, chat, admin):
     app.include_router(module.router)
 
 ORG_TYPES = {"clinic", "hospital", "lab", "university", "individual", "other"}
@@ -146,6 +150,74 @@ def logout():
     return resp
 
 
+# ── change password (logged in) ──────────────────────────────────────────────────
+class PasswordChangeIn(BaseModel):
+    current_password: str
+    new_password:     constr(min_length=10, max_length=200)
+
+
+@app.post("/api/password")
+def change_password(body: PasswordChangeIn, request: Request, user=Depends(current_user)):
+    with db() as cur:
+        cur.execute("SELECT password_hash FROM users WHERE id=%s", (user["id"],))
+        cur_hash = cur.fetchone()["password_hash"]
+    try:
+        ph.verify(cur_hash, body.current_password)
+    except VerifyMismatchError:
+        raise HTTPException(400, "current password is incorrect")
+    with db() as cur:
+        cur.execute("UPDATE users SET password_hash=%s, reset_token_hash=NULL, reset_expires_at=NULL WHERE id=%s",
+                    (ph.hash(body.new_password), user["id"]))
+        audit(cur, user["id"], "password_change", "user", user["id"], None, client_ip(request))
+    return {"ok": True}
+
+
+# ── forgot / reset password (logged out) ─────────────────────────────────────────
+class ForgotIn(BaseModel):
+    email: EmailStr
+    lang:  Optional[str] = "en"
+
+
+@app.post("/api/auth/forgot")
+def forgot_password(body: ForgotIn, request: Request):
+    """Email a reset link if the account exists. Always returns ok (no account enumeration)."""
+    with db() as cur:
+        cur.execute("SELECT id,email,is_active FROM users WHERE email=%s", (body.email,))
+        u = cur.fetchone()
+    if u and u["is_active"]:
+        token   = secrets.token_urlsafe(32)
+        th      = hashlib.sha256(token.encode()).hexdigest()
+        expires = dt.datetime.now(dt.timezone.utc) + RESET_TTL
+        with db() as cur:
+            cur.execute("UPDATE users SET reset_token_hash=%s, reset_expires_at=%s WHERE id=%s",
+                        (th, expires, u["id"]))
+            audit(cur, u["id"], "password_reset_request", "user", u["id"], None, client_ip(request))
+        link = f"{SITE_ORIGIN}/portal/?reset={token}"
+        mailer.try_send_reset(u["email"], link, expires, lang=body.lang)
+    return {"ok": True}
+
+
+class ResetIn(BaseModel):
+    token:    constr(min_length=10, max_length=300)
+    password: constr(min_length=10, max_length=200)
+
+
+@app.post("/api/auth/reset")
+def reset_password(body: ResetIn, request: Request):
+    th  = hashlib.sha256(body.token.encode()).hexdigest()
+    now = dt.datetime.now(dt.timezone.utc)
+    with db() as cur:
+        cur.execute("SELECT id FROM users WHERE reset_token_hash=%s AND reset_expires_at>%s AND is_active=true",
+                    (th, now))
+        u = cur.fetchone()
+        if not u:
+            raise HTTPException(400, "invalid or expired reset link")
+        cur.execute("UPDATE users SET password_hash=%s, reset_token_hash=NULL, reset_expires_at=NULL WHERE id=%s",
+                    (ph.hash(body.password), u["id"]))
+        audit(cur, u["id"], "password_reset", "user", u["id"], None, client_ip(request))
+    return {"ok": True}
+
+
 @app.get("/api/me")
 def me(user=Depends(current_user)):
     org = None
@@ -157,6 +229,9 @@ def me(user=Depends(current_user)):
     return {"id": str(user["id"]), "email": user["email"], "full_name": user["full_name"],
             "role": user["role"], "verification_status": user["verification_status"],
             "specialty": user.get("specialty"), "bio": user.get("bio"), "org": org,
+            "title": user.get("title"), "workplace": user.get("workplace"),
+            "country": user.get("country"), "website": user.get("website"),
+            "avatar": bool(user.get("avatar_key")),
             "is_super_admin": is_admin_email(user["email"])}
 
 

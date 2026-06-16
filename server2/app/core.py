@@ -22,7 +22,10 @@ SITE_ORIGIN  = os.environ.get("SITE_ORIGIN", "https://openelpis.com")
 ADMIN_EMAILS = {e.strip().lower() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()}
 
 ph   = PasswordHasher()
-pool = ThreadedConnectionPool(1, 10, dsn=DATABASE_URL)
+# Pool sized for dashboard bursts (each page load fans out ~6 parallel calls) + concurrent
+# users, while staying well under Postgres max_connections=40 (importer/embed/psql need the
+# rest). 10 was too small → intermittent "connection pool exhausted" 500s under load.
+pool = ThreadedConnectionPool(1, 20, dsn=DATABASE_URL)
 
 
 # ── db ────────────────────────────────────────────────────────────────────────
@@ -80,8 +83,8 @@ def current_user(request: Request):
     except jwt.PyJWTError:
         raise HTTPException(401, "invalid session")
     with db() as cur:
-        cur.execute("SELECT id,email,full_name,role,verification_status,is_active,org_id,specialty,bio "
-                    "FROM users WHERE id=%s", (payload["sub"],))
+        cur.execute("SELECT id,email,full_name,role,verification_status,is_active,org_id,specialty,bio,"
+                    "avatar_key,title,workplace,country,website FROM users WHERE id=%s", (payload["sub"],))
         user = cur.fetchone()
     if not user or not user["is_active"]:
         raise HTTPException(401, "account not found or disabled")

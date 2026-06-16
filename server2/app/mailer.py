@@ -33,6 +33,9 @@ LOCALES = {
     "en": {
         "subj_inv": "{inviter} is inviting you to OpenElpis — a breast cancer research copilot",
         "subj_app": "Your OpenElpis access request was approved",
+        "subj_reset": "Reset your OpenElpis password", "head_reset": "Reset your password",
+        "intro_reset": "We received a request to reset the password for your <b>OpenElpis</b> account. Click below to choose a new one — if you didn't ask for this, you can ignore this email.",
+        "cta_reset": "Set a new password", "expiry_reset": "This link is valid for <b>2 hours</b> — until {expires}.",
         "head_inv": "You're invited", "head_app": "You're approved",
         "intro_inv": "<b>{inviter}</b> has invited you to join <b>OpenElpis</b>.",
         "intro_app": "Good news — your request to join <b>OpenElpis</b> has been approved.",
@@ -44,6 +47,9 @@ LOCALES = {
     "tr": {
         "subj_inv": "{inviter} sizi OpenElpis'e davet ediyor — meme kanseri araştırma asistanı",
         "subj_app": "OpenElpis erişim talebiniz onaylandı",
+        "subj_reset": "OpenElpis şifrenizi sıfırlayın", "head_reset": "Şifrenizi sıfırlayın",
+        "intro_reset": "<b>OpenElpis</b> hesabınızın şifresini sıfırlama talebi aldık. Yeni bir şifre belirlemek için aşağıya tıklayın — bunu siz istemediyseniz bu e-postayı yok sayabilirsiniz.",
+        "cta_reset": "Yeni şifre belirle", "expiry_reset": "Bu bağlantı <b>2 saat</b> geçerlidir — {expires} tarihine kadar.",
         "head_inv": "Davet edildiniz", "head_app": "Onaylandınız",
         "intro_inv": "<b>{inviter}</b> sizi <b>OpenElpis</b>'e katılmaya davet ediyor.",
         "intro_app": "Güzel haber — <b>OpenElpis</b>'e katılma talebiniz onaylandı.",
@@ -55,6 +61,9 @@ LOCALES = {
     "es": {
         "subj_inv": "{inviter} te invita a OpenElpis — un copiloto de investigación sobre el cáncer de mama",
         "subj_app": "Tu solicitud de acceso a OpenElpis fue aprobada",
+        "subj_reset": "Restablece tu contraseña de OpenElpis", "head_reset": "Restablece tu contraseña",
+        "intro_reset": "Recibimos una solicitud para restablecer la contraseña de tu cuenta de <b>OpenElpis</b>. Haz clic abajo para elegir una nueva — si no lo solicitaste, puedes ignorar este correo.",
+        "cta_reset": "Establecer nueva contraseña", "expiry_reset": "Este enlace es válido durante <b>2 horas</b>, hasta el {expires}.",
         "head_inv": "Estás invitado", "head_app": "Has sido aprobado",
         "intro_inv": "<b>{inviter}</b> te ha invitado a unirte a <b>OpenElpis</b>.",
         "intro_app": "Buenas noticias: tu solicitud para unirte a <b>OpenElpis</b> ha sido aprobada.",
@@ -66,6 +75,9 @@ LOCALES = {
     "de": {
         "subj_inv": "{inviter} lädt Sie zu OpenElpis ein — einem Forschungs-Copiloten für Brustkrebs",
         "subj_app": "Ihre OpenElpis-Zugangsanfrage wurde genehmigt",
+        "subj_reset": "Setzen Sie Ihr OpenElpis-Passwort zurück", "head_reset": "Passwort zurücksetzen",
+        "intro_reset": "Wir haben eine Anfrage erhalten, das Passwort für Ihr <b>OpenElpis</b>-Konto zurückzusetzen. Klicken Sie unten, um ein neues zu wählen — falls Sie das nicht angefordert haben, können Sie diese E-Mail ignorieren.",
+        "cta_reset": "Neues Passwort festlegen", "expiry_reset": "Dieser Link ist <b>2 Stunden</b> gültig — bis zum {expires}.",
         "head_inv": "Sie sind eingeladen", "head_app": "Sie sind freigeschaltet",
         "intro_inv": "<b>{inviter}</b> hat Sie eingeladen, <b>OpenElpis</b> beizutreten.",
         "intro_app": "Gute Nachrichten — Ihre Anfrage, <b>OpenElpis</b> beizutreten, wurde genehmigt.",
@@ -77,6 +89,9 @@ LOCALES = {
     "fr": {
         "subj_inv": "{inviter} vous invite sur OpenElpis — un copilote de recherche sur le cancer du sein",
         "subj_app": "Votre demande d'accès à OpenElpis a été approuvée",
+        "subj_reset": "Réinitialisez votre mot de passe OpenElpis", "head_reset": "Réinitialisez votre mot de passe",
+        "intro_reset": "Nous avons reçu une demande de réinitialisation du mot de passe de votre compte <b>OpenElpis</b>. Cliquez ci-dessous pour en choisir un nouveau — si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
+        "cta_reset": "Définir un nouveau mot de passe", "expiry_reset": "Ce lien est valable <b>2 heures</b> — jusqu'au {expires}.",
         "head_inv": "Vous êtes invité", "head_app": "Vous êtes approuvé",
         "intro_inv": "<b>{inviter}</b> vous a invité à rejoindre <b>OpenElpis</b>.",
         "intro_app": "Bonne nouvelle — votre demande pour rejoindre <b>OpenElpis</b> a été approuvée.",
@@ -88,6 +103,9 @@ LOCALES = {
     "it": {
         "subj_inv": "{inviter} ti invita su OpenElpis — un copilota di ricerca sul cancro al seno",
         "subj_app": "La tua richiesta di accesso a OpenElpis è stata approvata",
+        "subj_reset": "Reimposta la tua password OpenElpis", "head_reset": "Reimposta la password",
+        "intro_reset": "Abbiamo ricevuto una richiesta di reimpostazione della password del tuo account <b>OpenElpis</b>. Clicca qui sotto per sceglierne una nuova — se non l'hai richiesta, puoi ignorare questa email.",
+        "cta_reset": "Imposta una nuova password", "expiry_reset": "Questo link è valido per <b>2 ore</b> — fino al {expires}.",
         "head_inv": "Sei invitato", "head_app": "Sei approvato",
         "intro_inv": "<b>{inviter}</b> ti ha invitato a unirti a <b>OpenElpis</b>.",
         "intro_app": "Buone notizie — la tua richiesta di unirti a <b>OpenElpis</b> è stata approvata.",
@@ -99,6 +117,9 @@ LOCALES = {
     "ru": {
         "subj_inv": "{inviter} приглашает вас в OpenElpis — исследовательский ассистент по раку молочной железы",
         "subj_app": "Ваш запрос на доступ к OpenElpis одобрен",
+        "subj_reset": "Сброс пароля OpenElpis", "head_reset": "Сброс пароля",
+        "intro_reset": "Мы получили запрос на сброс пароля для вашего аккаунта <b>OpenElpis</b>. Нажмите ниже, чтобы выбрать новый — если это были не вы, проигнорируйте это письмо.",
+        "cta_reset": "Задать новый пароль", "expiry_reset": "Ссылка действительна <b>2 часа</b> — до {expires}.",
         "head_inv": "Вас пригласили", "head_app": "Вы одобрены",
         "intro_inv": "<b>{inviter}</b> приглашает вас присоединиться к <b>OpenElpis</b>.",
         "intro_app": "Хорошие новости — ваш запрос на присоединение к <b>OpenElpis</b> одобрен.",
@@ -110,6 +131,9 @@ LOCALES = {
     "nl": {
         "subj_inv": "{inviter} nodigt u uit voor OpenElpis — een borstkanker-onderzoekscopilot",
         "subj_app": "Uw toegangsverzoek voor OpenElpis is goedgekeurd",
+        "subj_reset": "Stel uw OpenElpis-wachtwoord opnieuw in", "head_reset": "Wachtwoord opnieuw instellen",
+        "intro_reset": "We hebben een verzoek ontvangen om het wachtwoord van uw <b>OpenElpis</b>-account opnieuw in te stellen. Klik hieronder om een nieuw wachtwoord te kiezen — als u dit niet hebt aangevraagd, kunt u deze e-mail negeren.",
+        "cta_reset": "Nieuw wachtwoord instellen", "expiry_reset": "Deze link is <b>2 uur</b> geldig — tot {expires}.",
         "head_inv": "U bent uitgenodigd", "head_app": "U bent goedgekeurd",
         "intro_inv": "<b>{inviter}</b> heeft u uitgenodigd om lid te worden van <b>OpenElpis</b>.",
         "intro_app": "Goed nieuws — uw verzoek om lid te worden van <b>OpenElpis</b> is goedgekeurd.",
@@ -196,4 +220,46 @@ def try_send_invite(to, link, expires_at, inviter=None, approved=False, lang="en
         return _send(to, subject, html, text)
     except Exception as e:  # noqa: BLE001 — email must never break invite creation
         log.warning("invite email to %s failed: %s", to, e)
+        return False
+
+
+def _render_reset(L, link, expires):
+    intro  = L["intro_reset"]
+    expiry = L["expiry_reset"].format(expires=expires)
+    html = f"""\
+<!doctype html><html><body style="margin:0;background:#f4faf8;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#13211e">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:30px 16px">
+<table role="presentation" width="540" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border:1px solid #dde7e4;border-radius:18px;overflow:hidden;box-shadow:0 12px 32px -16px rgba(7,63,62,.18)">
+<tr><td style="background:linear-gradient(180deg,#0a5b5a,#073f3e);padding:22px 34px">
+<div style="font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:600;color:#ffffff">🎗️ OpenElpis</div></td></tr>
+<tr><td style="padding:28px 34px 4px">
+<div style="font-family:Georgia,serif;font-size:22px;font-weight:600;color:#0a5b5a;margin-bottom:12px">{_esc(L["head_reset"])}</div>
+<p style="margin:0 0 24px;font-size:15.5px;line-height:1.6">{intro}</p>
+<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:#a82f5f">
+<a href="{link}" style="display:inline-block;padding:13px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px">{_esc(L["cta_reset"])} &rarr;</a>
+</td></tr></table>
+<p style="margin:18px 0 0;font-size:13.5px;color:#42524d">{expiry}</p>
+<p style="margin:14px 0 0;font-size:12.5px;color:#6c7d78">{_esc(L["fallback"])}<br><span style="word-break:break-all;color:#0a5b5a">{link}</span></p>
+</td></tr>
+<tr><td style="padding:22px 34px 26px">
+<hr style="border:0;border-top:1px solid #eef1f0;margin:0 0 14px">
+<p style="margin:0;font-size:11.5px;color:#9aa8a4;line-height:1.5">{_esc(L["disc"])}</p>
+</td></tr></table></td></tr></table></body></html>"""
+    plain_intro = intro.replace("<b>", "").replace("</b>", "")
+    plain_exp   = expiry.replace("<b>", "").replace("</b>", "")
+    text = f"{L['head_reset']}\n\n{plain_intro}\n\n{L['cta_reset']}: {link}\n\n{plain_exp}\n\n{L['disc']}"
+    return html, text
+
+
+def try_send_reset(to, link, expires_at, lang="en") -> bool:
+    """Best-effort password-reset email, localized to `lang`. Returns True if sent. Never raises."""
+    if not to:
+        return False
+    L = LOCALES.get((lang or "en").lower(), LOCALES["en"])
+    expires = expires_at.strftime("%d.%m.%Y %H:%M UTC") if expires_at else ""
+    html, text = _render_reset(L, link, expires)
+    try:
+        return _send(to, L["subj_reset"], html, text)
+    except Exception as e:  # noqa: BLE001 — email must never break the reset request
+        log.warning("reset email to %s failed: %s", to, e)
         return False

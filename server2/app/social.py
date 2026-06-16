@@ -3,16 +3,23 @@ Community layer: a member directory, friend requests (the `connections` graph),
 and 1:1 direct messages. DMs are limited to accepted connections. Real-time is
 done by client polling (no WebSockets) — light enough for the 1 GB box.
 """
+import re, uuid as uuidlib
 from typing import Optional
 
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends, UploadFile, File
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, constr
 from psycopg2.extras import Json
 
 from core import db, audit, client_ip, current_user
 from shares import validate_share, hydrate_share
+from materials import UPLOAD_DIR
 
 router = APIRouter()
+
+AVATAR_EXT = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif"}
+MAX_AVATAR = 3 * 1024 * 1024   # 3 MB
+_MIME = {"jpg": "image/jpeg", "png": "image/png", "webp": "image/webp", "gif": "image/gif"}
 
 
 # ── friend graph helpers ────────────────────────────────────────────────────────
@@ -46,22 +53,129 @@ def _are_friends(cur, a, b):
 # ── member directory ─────────────────────────────────────────────────────────────
 @router.get("/api/members")
 def members(q: Optional[str] = None, user=Depends(current_user)):
-    sql = ("SELECT u.id,u.full_name,u.specialty,u.role,u.verification_status,o.name AS org "
+    sql = ("SELECT u.id,u.full_name,u.specialty,u.title,u.workplace,u.role,u.verification_status,"
+           "u.avatar_key,o.name AS org "
            "FROM users u LEFT JOIN organizations o ON o.id=u.org_id "
            "WHERE u.is_active AND u.id<>%s")
     params = [str(user["id"])]
     if q:
-        sql += " AND (u.full_name ILIKE %s OR u.specialty ILIKE %s OR o.name ILIKE %s)"
-        like = f"%{q}%"; params += [like, like, like]
+        sql += (" AND (u.full_name ILIKE %s OR u.specialty ILIKE %s OR u.workplace ILIKE %s OR o.name ILIKE %s)")
+        like = f"%{q}%"; params += [like, like, like, like]
     sql += " ORDER BY u.full_name LIMIT 60"
     with db() as cur:
         cur.execute(sql, params)
         rows = cur.fetchall()
         cmap = _conn_map(cur, user["id"])
     return {"members": [
-        {"id": str(r["id"]), "full_name": r["full_name"], "specialty": r["specialty"], "org": r["org"],
-         "verified": r["verification_status"] == "verified",
+        {"id": str(r["id"]), "full_name": r["full_name"], "specialty": r["specialty"],
+         "title": r["title"], "workplace": r["workplace"], "org": r["org"],
+         "verified": r["verification_status"] == "verified", "avatar": bool(r["avatar_key"]),
          "relation": _rel(cmap.get(str(r["id"])))} for r in rows]}
+
+
+# ── member profiles ──────────────────────────────────────────────────────────────
+@router.get("/api/users/{user_id}/avatar")
+def get_avatar(user_id: str, user=Depends(current_user)):
+    with db() as cur:
+        cur.execute("SELECT avatar_key FROM users WHERE id=%s AND is_active", (user_id,))
+        r = cur.fetchone()
+    if not r or not r["avatar_key"]:
+        raise HTTPException(404, "no avatar")
+    path = UPLOAD_DIR / r["avatar_key"]
+    if not path.exists():
+        raise HTTPException(404, "no avatar")
+    mime = _MIME.get(path.suffix.lstrip(".").lower(), "application/octet-stream")
+    return FileResponse(path, media_type=mime, headers={"Cache-Control": "no-cache"})
+
+
+@router.get("/api/users/{user_id}")
+def user_profile(user_id: str, user=Depends(current_user)):
+    with db() as cur:
+        cur.execute("SELECT u.id,u.full_name,u.role,u.verification_status,u.specialty,u.bio,u.title,"
+                    "u.workplace,u.country,u.website,u.avatar_key,u.created_at,o.name AS org "
+                    "FROM users u LEFT JOIN organizations o ON o.id=u.org_id "
+                    "WHERE u.id=%s AND u.is_active", (user_id,))
+        r = cur.fetchone()
+        if not r:
+            raise HTTPException(404, "member not found")
+        rel = _rel(_conn_map(cur, user["id"]).get(str(r["id"])))
+        cur.execute("SELECT count(*) AS c FROM materials WHERE uploaded_by=%s AND status='approved'", (r["id"],))
+        uploads = cur.fetchone()["c"]
+    return {"id": str(r["id"]), "full_name": r["full_name"], "role": r["role"],
+            "verified": r["verification_status"] == "verified", "specialty": r["specialty"],
+            "bio": r["bio"], "title": r["title"], "workplace": r["workplace"], "country": r["country"],
+            "website": r["website"], "org": r["org"], "avatar": bool(r["avatar_key"]),
+            "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+            "relation": rel, "is_self": str(r["id"]) == str(user["id"]), "uploads": uploads}
+
+
+class ProfileIn(BaseModel):
+    full_name: Optional[constr(max_length=200)] = None
+    specialty: Optional[constr(max_length=120)] = None
+    title:     Optional[constr(max_length=120)] = None
+    workplace: Optional[constr(max_length=200)] = None
+    country:   Optional[constr(max_length=100)] = None
+    website:   Optional[constr(max_length=300)] = None
+    bio:       Optional[constr(max_length=4000)] = None
+
+
+@router.post("/api/profile")
+def update_profile(body: ProfileIn, user=Depends(current_user)):
+    fields = {}
+    for k in ("full_name", "specialty", "title", "workplace", "country", "website", "bio"):
+        v = getattr(body, k)
+        if v is not None:
+            fields[k] = v.strip() or None
+    if not fields.get("full_name"):           # never blank out the name
+        fields.pop("full_name", None)
+    if fields.get("website"):
+        w = fields["website"]
+        if not re.match(r"^https?://", w, re.I):
+            w = "https://" + w
+        fields["website"] = w[:300]
+    if not fields:
+        return {"ok": True}
+    sets = ", ".join(f"{k}=%({k})s" for k in fields)
+    fields["uid"] = str(user["id"])
+    with db() as cur:
+        cur.execute(f"UPDATE users SET {sets} WHERE id=%(uid)s", fields)
+    return {"ok": True}
+
+
+@router.post("/api/profile/avatar")
+async def upload_avatar(file: UploadFile = File(...), user=Depends(current_user)):
+    ext = AVATAR_EXT.get(file.content_type)
+    if not ext:
+        raise HTTPException(415, "image must be JPG, PNG, WEBP or GIF")
+    data = await file.read(MAX_AVATAR + 1)
+    if len(data) > MAX_AVATAR:
+        raise HTTPException(413, "image too large (max 3 MB)")
+    if not data:
+        raise HTTPException(400, "empty file")
+    key = f"avatars/{user['id']}-{uuidlib.uuid4().hex[:8]}.{ext}"
+    dest = UPLOAD_DIR / key
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(data)
+    with db() as cur:
+        cur.execute("SELECT avatar_key FROM users WHERE id=%s", (user["id"],))
+        old = cur.fetchone()["avatar_key"]
+        cur.execute("UPDATE users SET avatar_key=%s WHERE id=%s", (key, user["id"]))
+    if old and old != key:
+        try: (UPLOAD_DIR / old).unlink()
+        except Exception: pass
+    return {"ok": True}
+
+
+@router.delete("/api/profile/avatar")
+def delete_avatar(user=Depends(current_user)):
+    with db() as cur:
+        cur.execute("SELECT avatar_key FROM users WHERE id=%s", (user["id"],))
+        old = cur.fetchone()["avatar_key"]
+        cur.execute("UPDATE users SET avatar_key=NULL WHERE id=%s", (user["id"],))
+    if old:
+        try: (UPLOAD_DIR / old).unlink()
+        except Exception: pass
+    return {"ok": True}
 
 
 # ── friend requests ──────────────────────────────────────────────────────────────
@@ -138,7 +252,7 @@ def list_friends(user=Depends(current_user)):
         people = {}
         if ids:
             cur.execute("SELECT u.id,u.full_name,u.specialty,o.name AS org FROM users u "
-                        "LEFT JOIN organizations o ON o.id=u.org_id WHERE u.id = ANY(%s)", (ids,))
+                        "LEFT JOIN organizations o ON o.id=u.org_id WHERE u.id = ANY(%s::uuid[])", (ids,))
             for x in cur.fetchall():
                 people[str(x["id"])] = {"id": str(x["id"]), "full_name": x["full_name"],
                                         "specialty": x["specialty"], "org": x["org"]}
@@ -175,15 +289,17 @@ def conversations(user=Depends(current_user)):
         ids = [str(r["other_id"]) for r in last]
         names = {}
         if ids:
-            cur.execute("SELECT id,full_name,specialty FROM users WHERE id = ANY(%s)", (ids,))
+            cur.execute("SELECT id,full_name,specialty,avatar_key FROM users WHERE id = ANY(%s::uuid[])", (ids,))
             for x in cur.fetchall():
-                names[str(x["id"])] = {"full_name": x["full_name"], "specialty": x["specialty"]}
+                names[str(x["id"])] = {"full_name": x["full_name"], "specialty": x["specialty"],
+                                       "avatar": bool(x["avatar_key"])}
     convos = []
     for r in last:
-        oid = str(r["other_id"]); nm = names.get(oid, {"full_name": "—", "specialty": None})
+        oid = str(r["other_id"]); nm = names.get(oid, {"full_name": "—", "specialty": None, "avatar": False})
         body = r["body"]
         preview = (body[:60] + "…") if body and len(body) > 60 else (body or ("📎 shared a " + (r["share_kind"] or "item")))
         convos.append({"user_id": oid, "full_name": nm["full_name"], "specialty": nm["specialty"],
+                       "avatar": nm.get("avatar", False),
                        "last": preview, "last_at": r["last_at"].isoformat(), "unread": unread.get(oid, 0)})
     convos.sort(key=lambda c: c["last_at"], reverse=True)
     return {"conversations": convos}
@@ -192,7 +308,7 @@ def conversations(user=Depends(current_user)):
 @router.get("/api/messages/{other_id}")
 def thread(other_id: str, user=Depends(current_user)):
     with db() as cur:
-        cur.execute("SELECT id,full_name,specialty FROM users WHERE id=%s AND is_active", (other_id,))
+        cur.execute("SELECT id,full_name,specialty,avatar_key FROM users WHERE id=%s AND is_active", (other_id,))
         other = cur.fetchone()
         if not other:
             raise HTTPException(404, "member not found")
@@ -207,7 +323,8 @@ def thread(other_id: str, user=Depends(current_user)):
         cur.execute("UPDATE direct_messages SET read_at=now() "
                     "WHERE recipient_id=%s AND sender_id=%s AND read_at IS NULL", (user["id"], other_id))
         are_friends = _are_friends(cur, user["id"], other_id)
-    return {"other": {"id": other_id, "full_name": other["full_name"], "specialty": other["specialty"]},
+    return {"other": {"id": other_id, "full_name": other["full_name"], "specialty": other["specialty"],
+                      "avatar": bool(other["avatar_key"])},
             "are_friends": are_friends, "messages": msgs}
 
 

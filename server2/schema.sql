@@ -97,6 +97,10 @@ CREATE TABLE IF NOT EXISTS materials (
   created_at        timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS materials_status_idx     ON materials(status);
+-- selection index for the full-body chunk worker (deploy/embed-corpus.py): the few articles
+-- not yet at chunks_v=2. Shrinks to ~0 once the corpus is fully (re)chunked.
+CREATE INDEX IF NOT EXISTS materials_chunks_pending ON materials (id)
+  WHERE status='approved' AND (metadata->>'chunks_v') IS DISTINCT FROM '2';
 CREATE INDEX IF NOT EXISTS materials_uploader_idx   ON materials(uploaded_by);
 CREATE INDEX IF NOT EXISTS materials_metadata_idx   ON materials USING gin (metadata jsonb_path_ops);
 -- Member Library (browse/search the approved corpus). Partial indexes on approved
@@ -123,17 +127,20 @@ CREATE TABLE IF NOT EXISTS material_chunks (
   token_count   int,
   tsv           tsvector GENERATED ALWAYS AS (to_tsvector('english', content)) STORED,
   -- dim 384 = small CPU-friendly embedder (bge-small-en / all-MiniLM-L6-v2).
-  -- CHANGE this number to match whatever embedder you pick (768, 1024, ...).
+  -- 384 = multilingual-MiniLM-L12-v2 (fastembed/ONNX, CPU) — see app/embed.py.
+  -- CHANGE this number if you switch embedders (768, 1024, ...).
   embedding     vector(384),
   metadata      jsonb NOT NULL DEFAULT '{}',         -- page, section, heading
   created_at    timestamptz NOT NULL DEFAULT now(),
   UNIQUE (material_id, chunk_index)
 );
-CREATE INDEX IF NOT EXISTS chunks_tsv_idx   ON material_chunks USING gin (tsv);              -- keyword (v0)
-CREATE INDEX IF NOT EXISTS chunks_trgm_idx  ON material_chunks USING gin (content gin_trgm_ops);
--- Semantic index (v1): create AFTER you have data + a chosen embedder. HNSW build
--- needs RAM, so on the 1 GB box build it during a quiet moment (or use ivfflat):
---   CREATE INDEX chunks_embedding_idx ON material_chunks USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS chunks_tsv_idx   ON material_chunks USING gin (tsv);              -- full-body keyword
+-- (chunks_trgm_idx was dropped: unused by any query, and a 2.6 GB GIN that made full-body
+--  re-indexing slow. Keyword search uses chunks_tsv_idx; fuzzy matching lives in the FTS layer.)
+-- Semantic (v1, LIVE since 2026-06-14 on the 24 GB A1): cosine HNSW over chunk embeddings.
+-- Maintains incrementally on insert; needs maintenance_work_mem for the build. The copilot
+-- does hybrid keyword+vector retrieval (app/copilot.py); chunks are filled by deploy/embed-corpus.py.
+CREATE INDEX IF NOT EXISTS chunks_embedding_idx ON material_chunks USING hnsw (embedding vector_cosine_ops);
 
 -- ── Audit log: provenance / who did what (signup, login, upload, approve...) ──
 CREATE TABLE IF NOT EXISTS audit_log (
@@ -237,6 +244,33 @@ CREATE TABLE IF NOT EXISTS saved_answers (
 );
 CREATE INDEX IF NOT EXISTS saved_answers_user_idx ON saved_answers(user_id);
 
+-- ── Copilot chat history: persistent, per-member conversations so a clinician can
+--    revisit & continue past chats. Two surfaces write here: the Copilot tab
+--    (multi-turn Q&A, source='copilot') and the Library "ask the copilot" search
+--    (single-turn log, source='library'). Distinct from saved_answers, which is the
+--    explicit "save & share" bookmark unit. ──
+CREATE TABLE IF NOT EXISTS chat_conversations (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title           text,
+  source          text NOT NULL DEFAULT 'copilot' CHECK (source IN ('copilot','library')),
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  last_message_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS chat_conv_user_idx ON chat_conversations(user_id, last_message_at DESC);
+
+-- bigserial id = a reliable insertion order (two messages in one txn share now(),
+-- so we order by id, never created_at, to keep user→assistant in sequence).
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id              bigserial PRIMARY KEY,
+  conversation_id uuid NOT NULL REFERENCES chat_conversations(id) ON DELETE CASCADE,
+  role            text NOT NULL CHECK (role IN ('user','assistant')),
+  content         text NOT NULL,
+  sources         jsonb NOT NULL DEFAULT '[]',
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS chat_msg_conv_idx ON chat_messages(conversation_id, id);
+
 -- ── Forum: question topics + threaded replies. A topic/post can carry a share. ──
 CREATE TABLE IF NOT EXISTS forum_topics (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -275,6 +309,14 @@ CREATE INDEX IF NOT EXISTS forum_posts_topic_idx ON forum_posts(topic_id, create
 ALTER TABLE users ADD COLUMN IF NOT EXISTS invited_by uuid REFERENCES users(id) ON DELETE SET NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS specialty  text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS bio        text;
+-- ── member profile (all optional): avatar, professional title, workplace, etc. ──
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_key text;   -- uploaded profile pic (storage key under UPLOAD_DIR)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS title      text;   -- professional title / role
+ALTER TABLE users ADD COLUMN IF NOT EXISTS workplace  text;   -- where they work
+ALTER TABLE users ADD COLUMN IF NOT EXISTS country    text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS website    text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_hash text;       -- sha256 of a password-reset token (one active at a time)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires_at timestamptz;
 
 -- ============================================================================
 -- LIBRARY ENGAGEMENT (added June 2026): per-article reading view extras —
@@ -296,6 +338,30 @@ CREATE TABLE IF NOT EXISTS article_translations (
   created_at   timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (material_id, lang)
 );
+
+-- ── Article TITLE translations: just the title, per (article, language). Separate
+--    from article_translations (whole-body, on-demand) because titles are bulk
+--    pre-translated for EVERY approved article so the Library list and the copilot's
+--    cited sources can show in the member's language. PK (material_id, lang) → cheap
+--    lookups by material_id for the ids on a page / the ≤6 copilot sources. ──
+CREATE TABLE IF NOT EXISTS material_title_translations (
+  material_id  uuid NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+  lang         text NOT NULL,                 -- tr/es/de/fr/it/ru/nl (en stays canonical)
+  title        text NOT NULL,
+  engine       text,                          -- e.g. 'claude' / 'groq:…'
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (material_id, lang)
+);
+-- Fast guard for the title-translator's URGENT tier: "is there any approved article
+-- that is NOT the bulk import (a member upload)?" Indexes only those few rows.
+CREATE INDEX IF NOT EXISTS materials_nonbulk ON materials (created_at DESC)
+  WHERE status='approved' AND (metadata->>'source') IS DISTINCT FROM 'europepmc';
+-- per-kind counts of non-PMC items (clinical trials, non-PMC articles, preprints, books…)
+-- for the Library + admin composition counters: keyed on kind over only the few non-bulk
+-- rows → an index-only GROUP BY (the planner can't estimate the jsonb predicate, so without
+-- this it seq-scans the whole table ~seconds). PMC count = total approved − these.
+CREATE INDEX IF NOT EXISTS materials_kind_nonpmc ON materials ((coalesce(metadata->>'kind','article')))
+  WHERE status='approved' AND (metadata->>'source') IS DISTINCT FROM 'europepmc';
 
 -- ── Votes: one row per (article, member); value +1 (up) or -1 (down). ──
 CREATE TABLE IF NOT EXISTS material_votes (

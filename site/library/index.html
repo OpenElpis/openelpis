@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research library — OpenElpis</title>
+<meta name="description" content="Search and read the OpenElpis open research library — validated, open-access breast-cancer articles, preprints, clinical trials and books. Free for researchers, no account needed.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://openelpis.com/library/">
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#13211e; --ink-soft:#42524d; --muted:#6c7d78;
+    --teal:#0e7c7b; --teal-deep:#0a5b5a; --teal-dark:#073f3e;
+    --mint:#e7f3f1; --mint-2:#f4faf8;
+    --rose:#e35d8a; --rose-deep:#c43a6e; --rose-dark:#a82f5f; --rose-soft:#fdeef3; --ribbon:#ffc2d6;
+    --line:#dde7e4; --card:#ffffff; --bg:#fbfdfc;
+    --shadow:0 1px 2px rgba(7,63,62,.04),0 12px 32px -12px rgba(7,63,62,.16);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.12;letter-spacing:-.01em;color:var(--ink)}
+  a{color:var(--teal-deep);text-decoration:none}
+  .eyebrow{font-family:'Inter';font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--rose-deep)}
+  .muted{color:var(--muted)}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(251,253,252,.85);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;height:66px;gap:16px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:'Fraunces';font-size:20px;font-weight:600;color:var(--ink)}
+  .brand .mark{width:38px;height:38px;flex:none;display:block}
+  .navactions{display:flex;align-items:center;gap:12px;margin-left:auto}
+  .lang{font-family:inherit;font-size:16px;line-height:1;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 25px 6px 11px;cursor:pointer;
+    appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7d78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+  .lang:hover{border-color:var(--teal)}
+  .btn{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:14.5px;padding:9px 17px;border-radius:999px;transition:.18s;cursor:pointer;border:1px solid transparent;white-space:nowrap;font-family:inherit}
+  .btn-portal{background:#fff;color:var(--teal-deep);border:1.5px solid var(--teal);font-weight:700}
+  .btn-portal:hover{background:var(--teal-deep);color:#fff !important;border-color:var(--teal-deep)}
+  .btn-primary{background:var(--rose-dark);color:#fff !important;box-shadow:0 8px 20px -8px rgba(168,47,95,.5);font-weight:700}
+  .btn-primary:hover{background:#8a2750}
+  .navlink{color:var(--ink-soft);font-size:14.5px;font-weight:500}
+  .navlink:hover{color:var(--teal-deep)}
+  @media(max-width:680px){.navlink{display:none}.brand{font-size:18px}}
+
+  /* intro */
+  .intro{background:
+     radial-gradient(800px 380px at 82% -20%,rgba(227,93,138,.13),transparent 60%),
+     radial-gradient(700px 420px at 2% 0%,rgba(14,124,123,.12),transparent 55%),
+     linear-gradient(180deg,#fff,var(--mint-2));border-bottom:1px solid var(--line)}
+  .intro .wrap{padding:46px 24px 40px}
+  .intro h1{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-.025em;font-size:clamp(30px,4.6vw,46px);margin:14px 0 0;max-width:20ch}
+  .intro h1 .accent{font-family:'Fraunces',Georgia,serif;font-weight:500;font-style:italic;color:var(--rose-deep)}
+  .intro p.lead{font-size:18px;color:var(--ink-soft);max-width:62ch;margin:16px 0 0}
+  .lockednote{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;font-size:14.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+  .lockednote b{color:var(--ink)}
+  .lockednote a{font-weight:700}
+
+  /* live stats bar (under the hero) — compact; tiles fill the width & filter by kind */
+  .statbar{background:#fff;border-bottom:1px solid var(--line)}
+  .statbar .wrap{display:flex;padding:11px 24px}
+  .stat-tiles{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+  .tile{flex:1 1 0;min-width:112px;display:flex;flex-direction:column;justify-content:center;gap:1px;background:var(--mint-2);border:1px solid var(--line);border-radius:11px;padding:7px 13px;cursor:pointer;font-family:inherit;transition:.14s}
+  .tile:hover{border-color:var(--teal);transform:translateY(-1px)}
+  .tile.on{border-color:var(--teal-deep);box-shadow:0 4px 12px -4px rgba(7,63,62,.4);background:#fff}
+  .tile .n{font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--ink);line-height:1.12}
+  .tile .lbl{font-size:11.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .tile.total{background:var(--teal-deep);border-color:var(--teal-deep)}
+  .tile.total .n{color:#fff} .tile.total .lbl{color:#cdeae6}
+  .tile.total.on{outline:2px solid var(--rose);outline-offset:2px}
+  .tile .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .stat-new{display:inline-flex;align-items:center;gap:4px;margin-left:5px;font-size:10.5px;font-weight:800;color:#bbf7d0;background:rgba(255,255,255,.13);border-radius:999px;padding:1px 7px 1px 6px}
+  .stat-new .pulse{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.7s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.6)}70%{box-shadow:0 0 0 6px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+  @media(max-width:680px){.tile{min-width:0;flex:1 1 30%;padding:7px 9px}.tile .n{font-size:16px}.statbar .wrap{padding:10px 16px}}
+  /* loading spinner (shown while results/filter load) */
+  .loader{display:flex;flex-direction:column;align-items:center;gap:13px;padding:54px 0;color:var(--muted);font-size:14px}
+  .spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--teal-deep);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* search */
+  .searchbox{margin:22px 0 0}
+  .searchrow{display:flex;gap:10px}
+  .searchrow input.q{flex:1;border:1px solid var(--line);border-radius:999px;padding:13px 18px;font-size:15.5px;font-family:inherit;color:var(--ink);background:#fff;box-shadow:var(--shadow)}
+  .searchrow input.q:focus{outline:none;border-color:var(--teal)}
+  .filters{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:12px}
+  .filters input,.filters select{border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:13.5px;font-family:inherit;color:var(--ink);background:#fff}
+  .filters input{width:140px}
+  .filters input.yr{width:104px}
+  .filters input:focus,.filters select:focus{outline:none;border-color:var(--teal)}
+
+  .resmeta{margin:22px 0 12px;font-size:14px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:9px;transition:.16s}
+  .card:hover{border-color:var(--teal);transform:translateY(-2px)}
+  .badge-kind{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:11.5px;font-weight:700;letter-spacing:.02em;padding:3px 10px;border-radius:999px}
+  .card h3{font-family:'Fraunces';font-size:17px;font-weight:600;line-height:1.25;cursor:pointer}
+  .card h3:hover{color:var(--teal-deep)}
+  .card .meta{font-size:13px;color:var(--muted);line-height:1.5}
+  .card .auth{color:var(--ink-soft)}
+  .card .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:6px}
+  .lic{font-size:11.5px;color:var(--muted);background:var(--mint);border-radius:6px;padding:2px 8px}
+  .read{font-size:13.5px;font-weight:700;color:var(--teal-deep);cursor:pointer;background:none;border:none;font-family:inherit}
+  .read:hover{text-decoration:underline}
+
+  .pager{display:flex;align-items:center;justify-content:center;gap:14px;margin:30px 0 50px}
+  .pager button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;font-family:inherit;color:var(--ink-soft);cursor:pointer}
+  .pager button:disabled{opacity:.4;cursor:default}
+  .pager button:not(:disabled):hover{border-color:var(--teal);color:var(--teal-deep)}
+
+  /* modal / article view */
+  .modal{position:fixed;inset:0;z-index:100;background:rgba(13,33,30,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+  .modal.open{display:flex}
+  .sheet{background:#fff;border-radius:20px;max-width:840px;width:100%;margin:auto;box-shadow:0 30px 80px -20px rgba(7,63,62,.5);overflow:hidden}
+  .sheet .top{display:flex;align-items:flex-start;gap:12px;padding:22px 26px 0}
+  .sheet .top h2{font-size:23px;line-height:1.2;flex:1}
+  .close{background:none;border:none;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+  .sheet .body{padding:14px 26px 26px}
+  .detailcard{background:var(--mint-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:13.5px;color:var(--ink-soft);margin:12px 0 6px}
+  .detailcard div{margin:3px 0}
+  .detailcard b{color:var(--ink);font-weight:600}
+  .preprint{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:9px 13px;font-size:13.5px;font-weight:600;margin:10px 0}
+  .articletext{white-space:pre-wrap;font-size:15.5px;line-height:1.7;color:var(--ink);margin-top:14px;max-height:none;word-wrap:break-word}
+  .lockbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 4px;padding:13px 15px;background:var(--rose-soft);border:1px solid #f6d3e0;border-radius:12px;font-size:13.5px;color:var(--rose-dark);font-weight:600}
+  .lockchips{display:flex;gap:8px;flex-wrap:wrap}
+  .lockchip{position:relative;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+  .lockchip:hover{border-color:var(--rose);color:var(--rose-dark)}
+  .lockchip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:500;white-space:nowrap;padding:6px 10px;border-radius:8px;opacity:0;pointer-events:none;transition:.15s;box-shadow:0 8px 20px -8px rgba(0,0,0,.4)}
+  .lockchip:hover::after{opacity:1}
+
+  footer{border-top:1px solid var(--line);background:#fff}
+  footer .wrap{padding:26px 24px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between}
+  .disc{max-width:78ch;line-height:1.55}
+  .center{text-align:center;padding:40px 0;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img class="mark" src="/logo.svg" alt="OpenElpis" onerror="this.style.display='none'">
+      <span>OpenElpis</span>
+    </a>
+    <div class="navactions">
+      <a class="navlink" href="/" data-i18n="nav_home">Home</a>
+      <select id="portalLang" class="lang" aria-label="Language" title="Language">
+        <option value="en">🇬🇧 EN</option><option value="tr">🇹🇷 TR</option>
+        <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option>
+        <option value="fr">🇫🇷 FR</option><option value="it">🇮🇹 IT</option>
+        <option value="ru">🇷🇺 RU</option><option value="nl">🇳🇱 NL</option>
+      </select>
+      <a class="btn btn-portal" href="/portal/" data-i18n="nav_member">Member access</a>
+    </div>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="wrap">
+    <span class="eyebrow" data-i18n="hero_eyebrow">Open to everyone · no account needed</span>
+    <h1 data-i18n-html="hero_h">The open <span class="accent">research</span> library</h1>
+    <p class="lead" data-i18n="hero_p">Search and read validated, open-access breast-cancer literature — peer-reviewed articles, preprints, clinical trials and books. Free and open for researchers; no account required.</p>
+    <div class="lockednote">
+      <span>🔒 <span data-i18n="hero_locked">The citation-grounded AI copilot, on-demand translation, voting, comments and favorites are member features.</span></span>
+      <a href="/portal/?request=1" data-i18n="hero_cta">Request access →</a>
+    </div>
+  </div>
+</section>
+
+<section class="statbar" aria-label="Library composition">
+  <div class="wrap">
+    <div class="stat-tiles" id="statTiles"></div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="searchbox">
+    <div class="searchrow">
+      <input class="q" id="q" type="search" data-i18n-ph="search_ph" placeholder="Search titles, authors, journals — or article content…" autocomplete="off">
+      <button class="btn btn-primary" id="searchBtn" data-i18n="btn_search">Search</button>
+    </div>
+    <div class="filters">
+      <input id="f_author" type="text" data-i18n-ph="f_author" placeholder="Author">
+      <input id="f_journal" type="text" data-i18n-ph="f_journal" placeholder="Journal">
+      <input id="f_yf" class="yr" type="number" min="1900" max="2100" data-i18n-ph="f_yf" placeholder="Year from">
+      <input id="f_yt" class="yr" type="number" min="1900" max="2100" data-i18n-ph="f_yt" placeholder="Year to">
+      <select id="f_sort">
+        <option value="new" data-i18n="sort_new">Newest</option>
+        <option value="old" data-i18n="sort_old">Oldest</option>
+        <option value="relevance" data-i18n="sort_rel">Relevance</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="resmeta" id="resmeta"></div>
+  <div class="grid" id="results"></div>
+  <div class="pager" id="pager"></div>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="top">
+      <h2 id="av_title"></h2>
+      <button class="close" id="av_close" aria-label="Close">×</button>
+    </div>
+    <div class="body" id="av_body"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="disc" data-i18n="disc">OpenElpis produces research hypotheses for qualified professionals and never provides diagnosis or treatment advice. Library content is open-access (CC-licensed) and remains the property of its original authors and publishers.</span>
+    <span data-i18n="foot">OpenElpis · non-profit · open-source · breast cancer</span>
+  </div>
+</footer>
+
+<script>
+/* ── self-contained i18n (8 languages), shares the site-wide elpis_lang choice ── */
+var I18N = {
+  en:{ _title:"Research library — OpenElpis", nav_home:"Home", nav_member:"Member access",
+    hero_eyebrow:"Open to everyone · no account needed", hero_h:'The open <span class="accent">research</span> library',
+    hero_p:"Search and read validated, open-access breast-cancer literature — peer-reviewed articles, preprints, clinical trials and books. Free and open for researchers; no account required.",
+    hero_locked:"The citation-grounded AI copilot, on-demand translation, voting, comments and favorites are member features.",
+    hero_cta:"Request access →",
+    search_ph:"Search titles, authors, journals — or article content…", btn_search:"Search",
+    f_author:"Author", f_journal:"Journal", f_yf:"Year from", f_yt:"Year to",
+    sort_new:"Newest", sort_old:"Oldest", sort_rel:"Relevance",
+    res_results:"results", res_searching:"Searching…", empty:"No articles match your search — try fewer or broader terms.",
+    loading:"Loading…", err:"Something went wrong — please try again.", read:"Read",
+    pg_prev:"← Previous", pg_next:"Next →", pg_page:"Page", pg_of:"of", tot_total:"Total", stat_recent:"added in the last 24h",
+    k_pmc:"Peer-reviewed", k_article:"Non-PMC article", k_preprint:"Preprint", k_trial:"Clinical trial", k_book:"Book", k_dataset:"Dataset",
+    k_preprint_note:"⚠️ Preprint — not yet peer-reviewed; interpret with caution.",
+    av_authors:"Authors", av_journal:"Journal", av_year:"Year", av_license:"License", av_doi:"DOI",
+    av_source:"View original source →", av_nocontent:"Full text isn't available for this item — see the original source.",
+    lock_bar:"🔒 Vote, comment and save articles as a member.", lock_cta:"Request access →",
+    lk_vote:"Vote", lk_comment:"Comment", lk_save:"Save", lk_tip:"Member feature — click to request access",
+    disc:"OpenElpis produces research hypotheses for qualified professionals and never provides diagnosis or treatment advice. Library content is open-access (CC-licensed) and remains the property of its original authors and publishers.",
+    foot:"OpenElpis · non-profit · open-source · breast cancer" },
+
+  tr:{ _title:"Araştırma kütüphanesi — OpenElpis", nav_home:"Ana sayfa", nav_member:"Üye erişimi",
+    hero_eyebrow:"Herkese açık · hesap gerekmez", hero_h:'Açık <span class="accent">araştırma</span> kütüphanesi',
+    hero_p:"Doğrulanmış, açık erişimli meme kanseri literatürünü arayın ve okuyun — hakemli makaleler, ön baskılar, klinik araştırmalar ve kitaplar. Araştırmacılar için ücretsiz ve açık; hesap gerekmez.",
+    hero_locked:"Kaynak gösteren yapay zekâ asistanı, anlık çeviri, oylama, yorumlar ve favoriler üyelere özel özelliklerdir.",
+    hero_cta:"Erişim iste →",
+    search_ph:"Başlık, yazar, dergi — veya makale içeriğinde arayın…", btn_search:"Ara",
+    f_author:"Yazar", f_journal:"Dergi", f_yf:"Başlangıç yılı", f_yt:"Bitiş yılı",
+    sort_new:"En yeni", sort_old:"En eski", sort_rel:"İlgi düzeyi",
+    res_results:"sonuç", res_searching:"Aranıyor…", empty:"Aramanızla eşleşen makale yok — daha az veya daha genel terim deneyin.",
+    loading:"Yükleniyor…", err:"Bir sorun oluştu — lütfen tekrar deneyin.", read:"Oku",
+    pg_prev:"← Önceki", pg_next:"Sonraki →", pg_page:"Sayfa", pg_of:"/", tot_total:"Toplam", stat_recent:"son 24 saatte eklendi",
+    k_pmc:"Hakemli", k_article:"PMC dışı makale", k_preprint:"Ön baskı", k_trial:"Klinik araştırma", k_book:"Kitap", k_dataset:"Veri kümesi",
+    k_preprint_note:"⚠️ Ön baskı — henüz hakem değerlendirmesinden geçmedi; dikkatle yorumlayın.",
+    av_authors:"Yazarlar", av_journal:"Dergi", av_year:"Yıl", av_license:"Lisans", av_doi:"DOI",
+    av_source:"Orijinal kaynağı görüntüle →", av_nocontent:"Bu öğe için tam metin mevcut değil — orijinal kaynağa bakın.",
+    lock_bar:"🔒 Üye olarak makaleleri oylayın, yorumlayın ve kaydedin.", lock_cta:"Erişim iste →",
+    lk_vote:"Oyla", lk_comment:"Yorum", lk_save:"Kaydet", lk_tip:"Üyelere özel — erişim istemek için tıklayın",
+    disc:"OpenElpis, nitelikli profesyoneller için araştırma hipotezleri üretir ve asla teşhis veya tedavi önerisi sunmaz. Kütüphane içeriği açık erişimlidir (CC lisanslı) ve orijinal yazarlarının ve yayıncılarının mülkiyetinde kalır.",
+    foot:"OpenElpis · kâr amacı gütmez · açık kaynak · meme kanseri" },
+
+  es:{ _title:"Biblioteca de investigación — OpenElpis", nav_home:"Inicio", nav_member:"Acceso de miembros",
+    hero_eyebrow:"Abierta para todos · sin cuenta", hero_h:'La biblioteca de <span class="accent">investigación</span> abierta',
+    hero_p:"Busca y lee literatura validada y de acceso abierto sobre cáncer de mama: artículos revisados por pares, preprints, ensayos clínicos y libros. Gratis y abierta para investigadores; sin cuenta.",
+    hero_locked:"El copiloto de IA con citas, la traducción instantánea, los votos, los comentarios y los favoritos son funciones para miembros.",
+    hero_cta:"Solicitar acceso →",
+    search_ph:"Busca por título, autores, revista — o en el contenido…", btn_search:"Buscar",
+    f_author:"Autor", f_journal:"Revista", f_yf:"Año desde", f_yt:"Año hasta",
+    sort_new:"Más recientes", sort_old:"Más antiguos", sort_rel:"Relevancia",
+    res_results:"resultados", res_searching:"Buscando…", empty:"Ningún artículo coincide — prueba términos más amplios.",
+    loading:"Cargando…", err:"Algo salió mal — inténtalo de nuevo.", read:"Leer",
+    pg_prev:"← Anterior", pg_next:"Siguiente →", pg_page:"Página", pg_of:"de", tot_total:"Total", stat_recent:"añadidos en las últimas 24 h",
+    k_pmc:"Revisado por pares", k_article:"Artículo no PMC", k_preprint:"Preprint", k_trial:"Ensayo clínico", k_book:"Libro", k_dataset:"Conjunto de datos",
+    k_preprint_note:"⚠️ Preprint — aún no revisado por pares; interpreta con cautela.",
+    av_authors:"Autores", av_journal:"Revista", av_year:"Año", av_license:"Licencia", av_doi:"DOI",
+    av_source:"Ver fuente original →", av_nocontent:"No hay texto completo para este elemento — consulta la fuente original.",
+    lock_bar:"🔒 Vota, comenta y guarda artículos como miembro.", lock_cta:"Solicitar acceso →",
+    lk_vote:"Votar", lk_comment:"Comentar", lk_save:"Guardar", lk_tip:"Función para miembros — pulsa para solicitar acceso",
+    disc:"OpenElpis produce hipótesis de investigación para profesionales cualificados y nunca ofrece diagnóstico ni tratamiento. El contenido es de acceso abierto (con licencia CC) y sigue siendo propiedad de sus autores y editores originales.",
+    foot:"OpenElpis · sin ánimo de lucro · código abierto · cáncer de mama" },
+
+  de:{ _title:"Forschungsbibliothek — OpenElpis", nav_home:"Start", nav_member:"Mitglieder-Zugang",
+    hero_eyebrow:"Für alle offen · kein Konto nötig", hero_h:'Die offene <span class="accent">Forschungs</span>bibliothek',
+    hero_p:"Durchsuchen und lesen Sie validierte, frei zugängliche Brustkrebs-Literatur — begutachtete Artikel, Preprints, klinische Studien und Bücher. Kostenlos und offen für Forschende; kein Konto erforderlich.",
+    hero_locked:"Der quellenbasierte KI-Copilot, die Sofortübersetzung, Bewertungen, Kommentare und Favoriten sind Mitglieder-Funktionen.",
+    hero_cta:"Zugang anfragen →",
+    search_ph:"Titel, Autoren, Zeitschrift — oder im Volltext suchen…", btn_search:"Suchen",
+    f_author:"Autor", f_journal:"Zeitschrift", f_yf:"Jahr von", f_yt:"Jahr bis",
+    sort_new:"Neueste", sort_old:"Älteste", sort_rel:"Relevanz",
+    res_results:"Ergebnisse", res_searching:"Suche läuft…", empty:"Keine Artikel gefunden — versuchen Sie breitere Begriffe.",
+    loading:"Wird geladen…", err:"Etwas ist schiefgelaufen — bitte erneut versuchen.", read:"Lesen",
+    pg_prev:"← Zurück", pg_next:"Weiter →", pg_page:"Seite", pg_of:"von", tot_total:"Gesamt", stat_recent:"in den letzten 24 Std. hinzugefügt",
+    k_pmc:"Begutachtet", k_article:"Nicht-PMC-Artikel", k_preprint:"Preprint", k_trial:"Klinische Studie", k_book:"Buch", k_dataset:"Datensatz",
+    k_preprint_note:"⚠️ Preprint — noch nicht begutachtet; mit Vorsicht interpretieren.",
+    av_authors:"Autoren", av_journal:"Zeitschrift", av_year:"Jahr", av_license:"Lizenz", av_doi:"DOI",
+    av_source:"Originalquelle ansehen →", av_nocontent:"Für dieses Element ist kein Volltext verfügbar — siehe Originalquelle.",
+    lock_bar:"🔒 Als Mitglied Artikel bewerten, kommentieren und speichern.", lock_cta:"Zugang anfragen →",
+    lk_vote:"Bewerten", lk_comment:"Kommentieren", lk_save:"Speichern", lk_tip:"Mitglieder-Funktion — zum Anfragen klicken",
+    disc:"OpenElpis erzeugt Forschungshypothesen für qualifizierte Fachleute und gibt niemals Diagnose- oder Behandlungsempfehlungen. Bibliotheksinhalte sind frei zugänglich (CC-lizenziert) und bleiben Eigentum ihrer ursprünglichen Autoren und Verlage.",
+    foot:"OpenElpis · gemeinnützig · Open Source · Brustkrebs" },
+
+  fr:{ _title:"Bibliothèque de recherche — OpenElpis", nav_home:"Accueil", nav_member:"Accès membre",
+    hero_eyebrow:"Ouverte à tous · sans compte", hero_h:'La bibliothèque de <span class="accent">recherche</span> ouverte',
+    hero_p:"Recherchez et lisez une littérature validée et en libre accès sur le cancer du sein — articles évalués par les pairs, prépublications, essais cliniques et livres. Gratuite et ouverte aux chercheurs ; aucun compte requis.",
+    hero_locked:"Le copilote IA avec citations, la traduction instantanée, les votes, les commentaires et les favoris sont des fonctions réservées aux membres.",
+    hero_cta:"Demander l'accès →",
+    search_ph:"Titre, auteurs, revue — ou dans le contenu…", btn_search:"Rechercher",
+    f_author:"Auteur", f_journal:"Revue", f_yf:"Année de", f_yt:"Année à",
+    sort_new:"Plus récents", sort_old:"Plus anciens", sort_rel:"Pertinence",
+    res_results:"résultats", res_searching:"Recherche…", empty:"Aucun article ne correspond — essayez des termes plus larges.",
+    loading:"Chargement…", err:"Une erreur est survenue — réessayez.", read:"Lire",
+    pg_prev:"← Précédent", pg_next:"Suivant →", pg_page:"Page", pg_of:"sur", tot_total:"Total", stat_recent:"ajoutés ces dernières 24 h",
+    k_pmc:"Évalué par les pairs", k_article:"Article hors PMC", k_preprint:"Prépublication", k_trial:"Essai clinique", k_book:"Livre", k_dataset:"Jeu de données",
+    k_preprint_note:"⚠️ Prépublication — pas encore évaluée par les pairs ; à interpréter avec prudence.",
+    av_authors:"Auteurs", av_journal:"Revue", av_year:"Année", av_license:"Licence", av_doi:"DOI",
+    av_source:"Voir la source originale →", av_nocontent:"Texte intégral indisponible pour cet élément — voir la source originale.",
+    lock_bar:"🔒 Votez, commentez et enregistrez des articles en tant que membre.", lock_cta:"Demander l'accès →",
+    lk_vote:"Voter", lk_comment:"Commenter", lk_save:"Enregistrer", lk_tip:"Fonction membre — cliquez pour demander l'accès",
+    disc:"OpenElpis produit des hypothèses de recherche pour des professionnels qualifiés et ne fournit jamais de diagnostic ni de conseil thérapeutique. Le contenu est en libre accès (sous licence CC) et reste la propriété de ses auteurs et éditeurs d'origine.",
+    foot:"OpenElpis · à but non lucratif · open source · cancer du sein" },
+
+  it:{ _title:"Biblioteca di ricerca — OpenElpis", nav_home:"Home", nav_member:"Accesso membri",
+    hero_eyebrow:"Aperta a tutti · nessun account", hero_h:'La biblioteca di <span class="accent">ricerca</span> aperta',
+    hero_p:"Cerca e leggi letteratura validata e ad accesso aperto sul cancro al seno — articoli sottoposti a revisione paritaria, preprint, studi clinici e libri. Gratuita e aperta ai ricercatori; nessun account richiesto.",
+    hero_locked:"Il copilota IA con citazioni, la traduzione istantanea, i voti, i commenti e i preferiti sono funzioni per i membri.",
+    hero_cta:"Richiedi accesso →",
+    search_ph:"Titolo, autori, rivista — o nel contenuto…", btn_search:"Cerca",
+    f_author:"Autore", f_journal:"Rivista", f_yf:"Anno da", f_yt:"Anno a",
+    sort_new:"Più recenti", sort_old:"Più vecchi", sort_rel:"Pertinenza",
+    res_results:"risultati", res_searching:"Ricerca…", empty:"Nessun articolo corrisponde — prova termini più ampi.",
+    loading:"Caricamento…", err:"Qualcosa è andato storto — riprova.", read:"Leggi",
+    pg_prev:"← Precedente", pg_next:"Successivo →", pg_page:"Pagina", pg_of:"di", tot_total:"Totale", stat_recent:"aggiunti nelle ultime 24 h",
+    k_pmc:"Revisione paritaria", k_article:"Articolo non PMC", k_preprint:"Preprint", k_trial:"Studio clinico", k_book:"Libro", k_dataset:"Set di dati",
+    k_preprint_note:"⚠️ Preprint — non ancora sottoposto a revisione paritaria; interpreta con cautela.",
+    av_authors:"Autori", av_journal:"Rivista", av_year:"Anno", av_license:"Licenza", av_doi:"DOI",
+    av_source:"Vedi fonte originale →", av_nocontent:"Testo completo non disponibile per questo elemento — vedi la fonte originale.",
+    lock_bar:"🔒 Vota, commenta e salva gli articoli come membro.", lock_cta:"Richiedi accesso →",
+    lk_vote:"Vota", lk_comment:"Commenta", lk_save:"Salva", lk_tip:"Funzione per membri — clicca per richiedere l'accesso",
+    disc:"OpenElpis produce ipotesi di ricerca per professionisti qualificati e non fornisce mai diagnosi o indicazioni terapeutiche. I contenuti sono ad accesso aperto (con licenza CC) e restano proprietà dei rispettivi autori ed editori originali.",
+    foot:"OpenElpis · senza scopo di lucro · open source · cancro al seno" },
+
+  ru:{ _title:"Исследовательская библиотека — OpenElpis", nav_home:"Главная", nav_member:"Доступ для членов",
+    hero_eyebrow:"Открыта для всех · без аккаунта", hero_h:'Открытая <span class="accent">исследовательская</span> библиотека',
+    hero_p:"Ищите и читайте проверенную литературу о раке молочной железы в открытом доступе — рецензируемые статьи, препринты, клинические исследования и книги. Бесплатно и открыто для исследователей; аккаунт не нужен.",
+    hero_locked:"ИИ-помощник со ссылками на источники, мгновенный перевод, голосование, комментарии и избранное — функции для членов сообщества.",
+    hero_cta:"Запросить доступ →",
+    search_ph:"Поиск по названию, авторам, журналу — или по тексту…", btn_search:"Поиск",
+    f_author:"Автор", f_journal:"Журнал", f_yf:"Год с", f_yt:"Год по",
+    sort_new:"Новые", sort_old:"Старые", sort_rel:"Релевантность",
+    res_results:"результатов", res_searching:"Поиск…", empty:"Ничего не найдено — попробуйте более общие запросы.",
+    loading:"Загрузка…", err:"Что-то пошло не так — попробуйте снова.", read:"Читать",
+    pg_prev:"← Назад", pg_next:"Вперёд →", pg_page:"Страница", pg_of:"из", tot_total:"Всего", stat_recent:"добавлено за последние 24 ч",
+    k_pmc:"Рецензируемая", k_article:"Статья (не PMC)", k_preprint:"Препринт", k_trial:"Клиническое исследование", k_book:"Книга", k_dataset:"Набор данных",
+    k_preprint_note:"⚠️ Препринт — ещё не прошёл рецензирование; интерпретируйте с осторожностью.",
+    av_authors:"Авторы", av_journal:"Журнал", av_year:"Год", av_license:"Лицензия", av_doi:"DOI",
+    av_source:"Открыть оригинал →", av_nocontent:"Полный текст недоступен — см. оригинальный источник.",
+    lock_bar:"🔒 Голосуйте, комментируйте и сохраняйте статьи как член сообщества.", lock_cta:"Запросить доступ →",
+    lk_vote:"Голос", lk_comment:"Комментарий", lk_save:"Сохранить", lk_tip:"Функция для членов — нажмите, чтобы запросить доступ",
+    disc:"OpenElpis формирует исследовательские гипотезы для квалифицированных специалистов и никогда не даёт диагноз или назначения. Содержимое библиотеки находится в открытом доступе (лицензия CC) и остаётся собственностью авторов и издателей.",
+    foot:"OpenElpis · некоммерческий · открытый код · рак молочной железы" },
+
+  nl:{ _title:"Onderzoeksbibliotheek — OpenElpis", nav_home:"Home", nav_member:"Ledentoegang",
+    hero_eyebrow:"Voor iedereen · geen account nodig", hero_h:'De open <span class="accent">onderzoeks</span>bibliotheek',
+    hero_p:"Doorzoek en lees gevalideerde, opentoegankelijke borstkankerliteratuur — peer-reviewed artikelen, preprints, klinische studies en boeken. Gratis en open voor onderzoekers; geen account nodig.",
+    hero_locked:"De bronvermeldende AI-copiloot, directe vertaling, stemmen, reacties en favorieten zijn ledenfuncties.",
+    hero_cta:"Toegang aanvragen →",
+    search_ph:"Zoek op titel, auteurs, tijdschrift — of in de inhoud…", btn_search:"Zoeken",
+    f_author:"Auteur", f_journal:"Tijdschrift", f_yf:"Jaar vanaf", f_yt:"Jaar tot",
+    sort_new:"Nieuwste", sort_old:"Oudste", sort_rel:"Relevantie",
+    res_results:"resultaten", res_searching:"Zoeken…", empty:"Geen artikelen gevonden — probeer bredere termen.",
+    loading:"Laden…", err:"Er ging iets mis — probeer het opnieuw.", read:"Lezen",
+    pg_prev:"← Vorige", pg_next:"Volgende →", pg_page:"Pagina", pg_of:"van", tot_total:"Totaal", stat_recent:"toegevoegd in de laatste 24 uur",
+    k_pmc:"Peer-reviewed", k_article:"Niet-PMC-artikel", k_preprint:"Preprint", k_trial:"Klinische studie", k_book:"Boek", k_dataset:"Dataset",
+    k_preprint_note:"⚠️ Preprint — nog niet peer-reviewed; met voorzichtigheid interpreteren.",
+    av_authors:"Auteurs", av_journal:"Tijdschrift", av_year:"Jaar", av_license:"Licentie", av_doi:"DOI",
+    av_source:"Originele bron bekijken →", av_nocontent:"Volledige tekst niet beschikbaar — zie de originele bron.",
+    lock_bar:"🔒 Stem, reageer en bewaar artikelen als lid.", lock_cta:"Toegang aanvragen →",
+    lk_vote:"Stemmen", lk_comment:"Reageren", lk_save:"Bewaren", lk_tip:"Ledenfunctie — klik om toegang aan te vragen",
+    disc:"OpenElpis levert onderzoekshypothesen voor gekwalificeerde professionals en geeft nooit diagnose- of behandeladvies. Bibliotheekinhoud is opentoegankelijk (CC-licentie) en blijft eigendom van de oorspronkelijke auteurs en uitgevers.",
+    foot:"OpenElpis · non-profit · open source · borstkanker" }
+};
+
+var LANG = "en";
+function T(k){ return (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k; }
+function detect(){
+  try{ var s=localStorage.getItem("elpis_lang"); if(s && I18N[s]) return s; }catch(e){}
+  var n=(navigator.languages&&navigator.languages[0])||navigator.language||"en";
+  var c=n.toLowerCase().split("-")[0]; return I18N[c]?c:"en";
+}
+function applyLang(lang, persist){
+  LANG = I18N[lang] ? lang : "en";
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){ var v=I18N[LANG][el.getAttribute("data-i18n")]; if(v!=null) el.textContent=v; });
+  document.querySelectorAll("[data-i18n-html]").forEach(function(el){ var v=I18N[LANG][el.getAttribute("data-i18n-html")]; if(v!=null) el.innerHTML=v; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var v=I18N[LANG][el.getAttribute("data-i18n-ph")]; if(v!=null) el.setAttribute("placeholder",v); });
+  document.title = I18N[LANG]._title || document.title;
+  if(persist){ try{ localStorage.setItem("elpis_lang", LANG); }catch(e){} }
+  var sw=document.getElementById("portalLang"); if(sw) sw.value=LANG;
+  renderKinds(); if(window._lastTotal!=null) renderResMeta(window._lastTotal);
+}
+
+/* ── kind metadata (badge colours mirror the member library) ── */
+var KIND = {
+  pmc:{k:"k_pmc",c:"#0a5b5a",bg:"#e7f3f1"}, article:{k:"k_article",c:"#5b21b6",bg:"#ede9fe"},
+  preprint:{k:"k_preprint",c:"#9a3412",bg:"#ffedd5"}, clinical_trial:{k:"k_trial",c:"#9d174d",bg:"#fce7f3"},
+  book:{k:"k_book",c:"#1e40af",bg:"#dbeafe"}, dataset:{k:"k_dataset",c:"#3f6212",bg:"#ecfccb"}
+};
+function kindMeta(k){ return KIND[k] || KIND.article; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function clean(s){ return String(s==null?"":s).replace(/<[^>]*>/g,""); }   // strip journal markup (<i>,<sub>…) from titles
+
+/* ── live stats bar (clickable tiles filter by kind) ── */
+function nfmt(n){ return Number(n||0).toLocaleString(LANG==="en"?undefined:LANG); }
+function renderKinds(){
+  var t=document.getElementById("statTiles");
+  if(!t) return;
+  if(!window._kinds){ t.innerHTML=""; return; }
+  var d=window._kinds, c=d.counts||{};
+  var order=["pmc","article","preprint","clinical_trial","book","dataset"];
+  // the live "+N added in the last 24h" delta lives INSIDE the Total tile as a small badge
+  var nb = (d.recent>0) ? '<span class="stat-new" title="+'+nfmt(d.recent)+' '+esc(T("stat_recent"))+'"><span class="pulse"></span>+'+nfmt(d.recent)+'</span>' : '';
+  var html='<button type="button" class="tile total'+(state.kind===""?" on":"")+'" data-kind=""><span class="n">'+nfmt(d.total)+'</span><span class="lbl">'+T("tot_total")+nb+'</span></button>';
+  order.forEach(function(k){ if(!c[k]) return; var m=kindMeta(k);
+    html+='<button type="button" class="tile'+(state.kind===k?" on":"")+'" data-kind="'+k+'"><span class="n">'+nfmt(c[k])+'</span><span class="lbl"><span class="dot" style="background:'+m.c+'"></span>'+T(m.k)+'</span></button>';
+  });
+  t.innerHTML=html;
+  t.querySelectorAll(".tile").forEach(function(el){ el.onclick=function(){ setKind(el.dataset.kind); }; });
+}
+function setKind(k){ state.kind = (state.kind===k ? "" : k); state.page=1; renderKinds(); load(); window.scrollTo(0,0); }
+function loadKinds(){
+  fetch("/api/public/library/kinds").then(function(r){return r.json();}).then(function(d){ window._kinds=d; renderKinds(); }).catch(function(){});
+}
+
+/* ── search + results ── */
+var state={ q:"", author:"", journal:"", sort:"new", page:1, pages:1, kind:"" };
+function renderResMeta(total){
+  window._lastTotal=total;
+  document.getElementById("resmeta").textContent = (total||0).toLocaleString()+" "+T("res_results");
+}
+function card(it){
+  var m=kindMeta(it.kind);
+  var bits=[]; if(it.authors) bits.push('<span class="auth">'+esc(it.authors)+'</span>');
+  var jy=[]; if(it.journal) jy.push(esc(it.journal)); if(it.year) jy.push(esc(it.year));
+  var d=document.createElement("div"); d.className="card";
+  d.innerHTML=
+    '<span class="badge-kind" style="color:'+m.c+';background:'+m.bg+'">'+T(m.k)+'</span>'+
+    '<h3>'+(esc(clean(it.title))||"Untitled")+'</h3>'+
+    (bits.length?'<div class="meta">'+bits.join("")+'</div>':'')+
+    (jy.length?'<div class="meta">'+jy.join(" · ")+'</div>':'')+
+    '<div class="foot">'+(it.license?'<span class="lic">'+esc(it.license)+'</span>':'<span></span>')+
+      '<button class="read">'+T("read")+'</button></div>';
+  d.querySelector("h3").addEventListener("click",function(){ openArticle(it.id); });
+  d.querySelector(".read").addEventListener("click",function(){ openArticle(it.id); });
+  return d;
+}
+function load(){
+  var res=document.getElementById("results");
+  res.innerHTML='<div class="loader"><div class="spinner"></div><span>'+T("res_searching")+'</span></div>';
+  document.getElementById("pager").innerHTML="";
+  var u=new URLSearchParams();
+  if(state.q) u.set("q",state.q);
+  if(state.author) u.set("author",state.author);
+  if(state.journal) u.set("journal",state.journal);
+  if(state.yf) u.set("year_from",state.yf);
+  if(state.yt) u.set("year_to",state.yt);
+  if(state.kind) u.set("kind",state.kind);
+  u.set("sort",state.sort); u.set("page",state.page); u.set("limit","24");
+  fetch("/api/public/library?"+u.toString()).then(function(r){return r.json();}).then(function(d){
+    state.pages=d.pages||1; renderResMeta(d.total||0);
+    res.innerHTML="";
+    if(!d.items||!d.items.length){ res.innerHTML='<div class="center">'+T("empty")+'</div>'; return; }
+    d.items.forEach(function(it){ res.appendChild(card(it)); });
+    renderPager(d.page||1, d.pages||1);
+  }).catch(function(){ res.innerHTML='<div class="center">'+T("err")+'</div>'; });
+}
+function renderPager(page,pages){
+  var p=document.getElementById("pager"); p.innerHTML="";
+  if(pages<=1) return;
+  var prev=document.createElement("button"); prev.textContent=T("pg_prev"); prev.disabled=page<=1;
+  prev.onclick=function(){ if(state.page>1){state.page--; load(); window.scrollTo(0,0);} };
+  var info=document.createElement("span"); info.className="muted";
+  info.textContent=T("pg_page")+" "+page+" "+T("pg_of")+" "+pages;
+  var next=document.createElement("button"); next.textContent=T("pg_next"); next.disabled=page>=pages;
+  next.onclick=function(){ if(state.page<state.pages){state.page++; load(); window.scrollTo(0,0);} };
+  p.appendChild(prev); p.appendChild(info); p.appendChild(next);
+}
+function runSearch(){
+  state.q=document.getElementById("q").value.trim();
+  state.author=document.getElementById("f_author").value.trim();
+  state.journal=document.getElementById("f_journal").value.trim();
+  state.yf=document.getElementById("f_yf").value.trim();
+  state.yt=document.getElementById("f_yt").value.trim();
+  state.sort=document.getElementById("f_sort").value;
+  state.page=1; load();
+}
+
+/* ── article reading view ── */
+var REQ="/portal/?request=1";
+function lockChip(labelKey){
+  return '<a class="lockchip" href="'+REQ+'" data-tip="'+esc(T("lk_tip"))+'">🔒 '+T(labelKey)+'</a>';
+}
+function openArticle(id){
+  var modal=document.getElementById("modal"), body=document.getElementById("av_body");
+  document.getElementById("av_title").textContent="…"; body.innerHTML='<div class="center">'+T("loading")+'</div>';
+  modal.classList.add("open"); document.body.style.overflow="hidden";
+  fetch("/api/public/library/"+encodeURIComponent(id)).then(function(r){
+    if(!r.ok) throw 0; return r.json();
+  }).then(function(a){
+    document.getElementById("av_title").textContent=clean(a.title)||"Untitled";
+    var m=kindMeta(a.kind);
+    var det=[];
+    if(a.authors) det.push('<div><b>'+T("av_authors")+':</b> '+esc(a.authors)+'</div>');
+    if(a.journal) det.push('<div><b>'+T("av_journal")+':</b> '+esc(a.journal)+'</div>');
+    if(a.year) det.push('<div><b>'+T("av_year")+':</b> '+esc(a.year)+'</div>');
+    if(a.license) det.push('<div><b>'+T("av_license")+':</b> '+esc(a.license)+'</div>');
+    if(a.doi) det.push('<div><b>'+T("av_doi")+':</b> '+esc(a.doi)+'</div>');
+    var link=a.url || (a.doi?("https://doi.org/"+a.doi):(a.pmcid?("https://www.ncbi.nlm.nih.gov/pmc/articles/"+a.pmcid+"/"):null));
+    if(link) det.push('<div><a href="'+esc(link)+'" target="_blank" rel="noopener">'+T("av_source")+'</a></div>');
+    var txt=a.content||"";
+    var hm=/\n={5,}\s*\n/.exec(txt);                // drop our provenance header → show clean body
+    if(hm){ txt=txt.slice(hm.index+hm[0].length).trim(); }
+    var html=
+      '<span class="badge-kind" style="color:'+m.c+';background:'+m.bg+'">'+T(m.k)+'</span>'+
+      (a.kind==="preprint"?'<div class="preprint">'+T("k_preprint_note")+'</div>':'')+
+      '<div class="detailcard">'+det.join("")+'</div>'+
+      '<div class="lockbar"><span>'+T("lock_bar")+'</span><span class="lockchips">'+
+        lockChip("lk_vote")+lockChip("lk_comment")+lockChip("lk_save")+'</span>'+
+        '<a class="btn btn-primary" href="'+REQ+'" style="margin-left:auto">'+T("lock_cta")+'</a></div>'+
+      (txt? '<div class="articletext">'+esc(txt)+'</div>'
+          : '<div class="center">'+T("av_nocontent")+(link?' <a href="'+esc(link)+'" target="_blank" rel="noopener">'+T("av_source")+'</a>':'')+'</div>');
+    body.innerHTML=html;
+    body.scrollTop=0;
+  }).catch(function(){ body.innerHTML='<div class="center">'+T("err")+'</div>'; });
+}
+function closeArticle(){ document.getElementById("modal").classList.remove("open"); document.body.style.overflow=""; }
+
+/* ── init ── */
+(function(){
+  applyLang(detect(), false);
+  var sw=document.getElementById("portalLang");
+  if(sw) sw.addEventListener("change",function(e){ applyLang(e.target.value,true); });
+  document.getElementById("searchBtn").addEventListener("click",runSearch);
+  document.getElementById("q").addEventListener("keydown",function(e){ if(e.key==="Enter") runSearch(); });
+  ["f_author","f_journal","f_yf","f_yt"].forEach(function(id){
+    document.getElementById(id).addEventListener("keydown",function(e){ if(e.key==="Enter") runSearch(); });
+  });
+  document.getElementById("f_sort").addEventListener("change",runSearch);
+  document.getElementById("av_close").addEventListener("click",closeArticle);
+  document.getElementById("modal").addEventListener("click",function(e){ if(e.target===this) closeArticle(); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeArticle(); });
+  try{ var k=new URLSearchParams(location.search).get("kind");   // deep-link from the homepage tiles, e.g. /library/?kind=book
+       if(k && ["pmc","article","preprint","clinical_trial","book","dataset"].indexOf(k)>=0) state.kind=k; }catch(e){}
+  loadKinds(); load();
+})();
+</script>
+</body>
+</html>

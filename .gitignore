@@ -11,20 +11,32 @@ __pycache__/
 
 # Agent / working files
 .claude/
-CLAUDE.md
 
-# Operational runbooks & infra (contain server IPs, Oracle OCIDs, emails) — keep private
-server1-README.md
-server2-README.md
-seeding.md
+# Markdown is private by default (runbooks, design notes, strategy, outreach).
+# Only the public README and the architecture blueprint are committed — any NEW .md
+# is ignored automatically; add a "!" exception below if it should be public.
+*.md
+!README.md
+!architecture.md
+
+# Operational scripts & infra (server IPs, Oracle OCIDs, emails, deploy) — keep private
 deploy/
 server2/setup-db.sh
+server2/provision-a1-db.sh
 server2/app/deploy-app.sh
 server2/app/openelpis-app.service
 server2/app/openelpis-tunnel.service
 
 # Internal strategy / outreach — keep private
-funding-and-credits.md
-email-templates.md
-partnership-proposal.md
 proposal/
+
+# Personal founder & name-SEO pages — generated for the live site, not relevant to the
+# open-source repo (GitHub visitors don't need them).
+site/founder/
+site/cofounder/
+site/ali-tajbakhsh/
+site/alan-tajbakhsh/
+site/mohammadali-tajbakhsh/
+site/tr/ali-tajbakhsh/
+site/tr/alan-tajbakhsh/
+site/tr/mohammadali-tajbakhsh/
