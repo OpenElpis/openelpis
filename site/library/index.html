@@ -193,6 +193,7 @@
         <option value="old" data-i18n="sort_old">Oldest</option>
         <option value="relevance" data-i18n="sort_rel">Relevance</option>
       </select>
+      <select id="f_lang"><option value="" data-i18n="f_lang_all">All languages</option></select>
     </div>
   </div>
 
@@ -228,7 +229,7 @@ var I18N = {
     hero_cta:"Request access →",
     search_ph:"Search titles, authors, journals — or article content…", btn_search:"Search",
     f_author:"Author", f_journal:"Journal", f_yf:"Year from", f_yt:"Year to",
-    sort_new:"Newest", sort_old:"Oldest", sort_rel:"Relevance",
+    sort_new:"Newest", sort_old:"Oldest", sort_rel:"Relevance", f_lang_all:"All languages",
     res_results:"results", res_searching:"Searching…", empty:"No articles match your search — try fewer or broader terms.",
     loading:"Loading…", err:"Something went wrong — please try again.", read:"Read",
     pg_prev:"← Previous", pg_next:"Next →", pg_page:"Page", pg_of:"of", tot_total:"Total", stat_recent:"added in the last 24h",
@@ -248,7 +249,7 @@ var I18N = {
     hero_cta:"Erişim iste →",
     search_ph:"Başlık, yazar, dergi — veya makale içeriğinde arayın…", btn_search:"Ara",
     f_author:"Yazar", f_journal:"Dergi", f_yf:"Başlangıç yılı", f_yt:"Bitiş yılı",
-    sort_new:"En yeni", sort_old:"En eski", sort_rel:"İlgi düzeyi",
+    sort_new:"En yeni", sort_old:"En eski", sort_rel:"İlgi düzeyi", f_lang_all:"Tüm diller",
     res_results:"sonuç", res_searching:"Aranıyor…", empty:"Aramanızla eşleşen makale yok — daha az veya daha genel terim deneyin.",
     loading:"Yükleniyor…", err:"Bir sorun oluştu — lütfen tekrar deneyin.", read:"Oku",
     pg_prev:"← Önceki", pg_next:"Sonraki →", pg_page:"Sayfa", pg_of:"/", tot_total:"Toplam", stat_recent:"son 24 saatte eklendi",
@@ -268,7 +269,7 @@ var I18N = {
     hero_cta:"Solicitar acceso →",
     search_ph:"Busca por título, autores, revista — o en el contenido…", btn_search:"Buscar",
     f_author:"Autor", f_journal:"Revista", f_yf:"Año desde", f_yt:"Año hasta",
-    sort_new:"Más recientes", sort_old:"Más antiguos", sort_rel:"Relevancia",
+    sort_new:"Más recientes", sort_old:"Más antiguos", sort_rel:"Relevancia", f_lang_all:"Todos los idiomas",
     res_results:"resultados", res_searching:"Buscando…", empty:"Ningún artículo coincide — prueba términos más amplios.",
     loading:"Cargando…", err:"Algo salió mal — inténtalo de nuevo.", read:"Leer",
     pg_prev:"← Anterior", pg_next:"Siguiente →", pg_page:"Página", pg_of:"de", tot_total:"Total", stat_recent:"añadidos en las últimas 24 h",
@@ -288,7 +289,7 @@ var I18N = {
     hero_cta:"Zugang anfragen →",
     search_ph:"Titel, Autoren, Zeitschrift — oder im Volltext suchen…", btn_search:"Suchen",
     f_author:"Autor", f_journal:"Zeitschrift", f_yf:"Jahr von", f_yt:"Jahr bis",
-    sort_new:"Neueste", sort_old:"Älteste", sort_rel:"Relevanz",
+    sort_new:"Neueste", sort_old:"Älteste", sort_rel:"Relevanz", f_lang_all:"Alle Sprachen",
     res_results:"Ergebnisse", res_searching:"Suche läuft…", empty:"Keine Artikel gefunden — versuchen Sie breitere Begriffe.",
     loading:"Wird geladen…", err:"Etwas ist schiefgelaufen — bitte erneut versuchen.", read:"Lesen",
     pg_prev:"← Zurück", pg_next:"Weiter →", pg_page:"Seite", pg_of:"von", tot_total:"Gesamt", stat_recent:"in den letzten 24 Std. hinzugefügt",
@@ -308,7 +309,7 @@ var I18N = {
     hero_cta:"Demander l'accès →",
     search_ph:"Titre, auteurs, revue — ou dans le contenu…", btn_search:"Rechercher",
     f_author:"Auteur", f_journal:"Revue", f_yf:"Année de", f_yt:"Année à",
-    sort_new:"Plus récents", sort_old:"Plus anciens", sort_rel:"Pertinence",
+    sort_new:"Plus récents", sort_old:"Plus anciens", sort_rel:"Pertinence", f_lang_all:"Toutes les langues",
     res_results:"résultats", res_searching:"Recherche…", empty:"Aucun article ne correspond — essayez des termes plus larges.",
     loading:"Chargement…", err:"Une erreur est survenue — réessayez.", read:"Lire",
     pg_prev:"← Précédent", pg_next:"Suivant →", pg_page:"Page", pg_of:"sur", tot_total:"Total", stat_recent:"ajoutés ces dernières 24 h",
@@ -328,7 +329,7 @@ var I18N = {
     hero_cta:"Richiedi accesso →",
     search_ph:"Titolo, autori, rivista — o nel contenuto…", btn_search:"Cerca",
     f_author:"Autore", f_journal:"Rivista", f_yf:"Anno da", f_yt:"Anno a",
-    sort_new:"Più recenti", sort_old:"Più vecchi", sort_rel:"Pertinenza",
+    sort_new:"Più recenti", sort_old:"Più vecchi", sort_rel:"Pertinenza", f_lang_all:"Tutte le lingue",
     res_results:"risultati", res_searching:"Ricerca…", empty:"Nessun articolo corrisponde — prova termini più ampi.",
     loading:"Caricamento…", err:"Qualcosa è andato storto — riprova.", read:"Leggi",
     pg_prev:"← Precedente", pg_next:"Successivo →", pg_page:"Pagina", pg_of:"di", tot_total:"Totale", stat_recent:"aggiunti nelle ultime 24 h",
@@ -348,7 +349,7 @@ var I18N = {
     hero_cta:"Запросить доступ →",
     search_ph:"Поиск по названию, авторам, журналу — или по тексту…", btn_search:"Поиск",
     f_author:"Автор", f_journal:"Журнал", f_yf:"Год с", f_yt:"Год по",
-    sort_new:"Новые", sort_old:"Старые", sort_rel:"Релевантность",
+    sort_new:"Новые", sort_old:"Старые", sort_rel:"Релевантность", f_lang_all:"Все языки",
     res_results:"результатов", res_searching:"Поиск…", empty:"Ничего не найдено — попробуйте более общие запросы.",
     loading:"Загрузка…", err:"Что-то пошло не так — попробуйте снова.", read:"Читать",
     pg_prev:"← Назад", pg_next:"Вперёд →", pg_page:"Страница", pg_of:"из", tot_total:"Всего", stat_recent:"добавлено за последние 24 ч",
@@ -368,7 +369,7 @@ var I18N = {
     hero_cta:"Toegang aanvragen →",
     search_ph:"Zoek op titel, auteurs, tijdschrift — of in de inhoud…", btn_search:"Zoeken",
     f_author:"Auteur", f_journal:"Tijdschrift", f_yf:"Jaar vanaf", f_yt:"Jaar tot",
-    sort_new:"Nieuwste", sort_old:"Oudste", sort_rel:"Relevantie",
+    sort_new:"Nieuwste", sort_old:"Oudste", sort_rel:"Relevantie", f_lang_all:"Alle talen",
     res_results:"resultaten", res_searching:"Zoeken…", empty:"Geen artikelen gevonden — probeer bredere termen.",
     loading:"Laden…", err:"Er ging iets mis — probeer het opnieuw.", read:"Lezen",
     pg_prev:"← Vorige", pg_next:"Volgende →", pg_page:"Pagina", pg_of:"van", tot_total:"Totaal", stat_recent:"toegevoegd in de laatste 24 uur",
@@ -429,12 +430,25 @@ function renderKinds(){
   t.querySelectorAll(".tile").forEach(function(el){ el.onclick=function(){ setKind(el.dataset.kind); }; });
 }
 function setKind(k){ state.kind = (state.kind===k ? "" : k); state.page=1; renderKinds(); load(); window.scrollTo(0,0); }
+var LNAMES={en:"English",tr:"Türkçe",es:"Español",de:"Deutsch",fr:"Français",it:"Italiano",ru:"Русский",nl:"Nederlands",pt:"Português",zh:"中文",ar:"العربية",fa:"فارسی"};
+function populateLangFilter(langs){
+  var sel=document.getElementById("f_lang"); if(!sel||!langs) return;
+  var cur=sel.value, keep=sel.querySelector('option[value=""]');
+  sel.innerHTML=""; sel.appendChild(keep);
+  Object.keys(langs).sort(function(a,b){return langs[b]-langs[a];}).forEach(function(code){
+    if(!code||code==="?") return;
+    var o=document.createElement("option"); o.value=code;
+    o.textContent=(LNAMES[code]||code.toUpperCase())+" ("+Number(langs[code]).toLocaleString()+")";
+    sel.appendChild(o);
+  });
+  sel.value=cur;
+}
 function loadKinds(){
-  fetch("/api/public/library/kinds").then(function(r){return r.json();}).then(function(d){ window._kinds=d; renderKinds(); }).catch(function(){});
+  fetch("/api/public/library/kinds").then(function(r){return r.json();}).then(function(d){ window._kinds=d; renderKinds(); populateLangFilter(d.languages); }).catch(function(){});
 }
 
 /* ── search + results ── */
-var state={ q:"", author:"", journal:"", sort:"new", page:1, pages:1, kind:"" };
+var state={ q:"", author:"", journal:"", sort:"new", page:1, pages:1, kind:"", alang:"" };
 function renderResMeta(total){
   window._lastTotal=total;
   document.getElementById("resmeta").textContent = (total||0).toLocaleString()+" "+T("res_results");
@@ -466,6 +480,7 @@ function load(){
   if(state.yf) u.set("year_from",state.yf);
   if(state.yt) u.set("year_to",state.yt);
   if(state.kind) u.set("kind",state.kind);
+  if(state.alang) u.set("alang",state.alang);
   u.set("sort",state.sort); u.set("page",state.page); u.set("limit","24");
   fetch("/api/public/library?"+u.toString()).then(function(r){return r.json();}).then(function(d){
     state.pages=d.pages||1; renderResMeta(d.total||0);
@@ -493,6 +508,7 @@ function runSearch(){
   state.yf=document.getElementById("f_yf").value.trim();
   state.yt=document.getElementById("f_yt").value.trim();
   state.sort=document.getElementById("f_sort").value;
+  state.alang=document.getElementById("f_lang").value;
   state.page=1; load();
 }
 
@@ -547,6 +563,7 @@ function closeArticle(){ document.getElementById("modal").classList.remove("open
     document.getElementById(id).addEventListener("keydown",function(e){ if(e.key==="Enter") runSearch(); });
   });
   document.getElementById("f_sort").addEventListener("change",runSearch);
+  document.getElementById("f_lang").addEventListener("change",runSearch);
   document.getElementById("av_close").addEventListener("click",closeArticle);
   document.getElementById("modal").addEventListener("click",function(e){ if(e.target===this) closeArticle(); });
   document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeArticle(); });

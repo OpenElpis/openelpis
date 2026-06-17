@@ -112,7 +112,7 @@ def _stats(cur, ids, uid):
 def library(q: Optional[str] = None, author: Optional[str] = None, journal: Optional[str] = None,
             license: Optional[str] = None, source_type: Optional[str] = None,
             year_from: Optional[str] = None, year_to: Optional[str] = None, kind: Optional[str] = None,
-            favorites: int = 0, sort: str = "new", page: int = 1,
+            alang: Optional[str] = None, favorites: int = 0, sort: str = "new", page: int = 1,
             limit: int = 24, lang: Optional[str] = None, user=Depends(current_user)):
     limit = max(1, min(limit, 100))
     page = max(1, page)
@@ -151,10 +151,12 @@ def library(q: Optional[str] = None, author: Optional[str] = None, journal: Opti
                      "AND f.user_id=%(uid)s)"); params["uid"] = user["id"]
     if kind in _KIND_KNOWN:
         _kind_filter(kind, where, params)
+    if alang:
+        where.append("m.language=%(alang)s"); params["alang"] = alang
     # When kind is the ONLY filter, the (un-indexed) count over the whole corpus is slow — reuse
     # the cached corpus counts instead. Any other filter narrows it enough to count directly.
     kind_only = (kind in _KIND_KNOWN and not (q or author or journal or license
-                 or source_type or year_from or year_to or only_favs))
+                 or source_type or year_from or year_to or only_favs or alang))
     cached_total = kind_counts()["counts"].get(kind, 0) if kind_only else None
 
     relevance = (sort == "relevance" and bool(q))
@@ -216,8 +218,12 @@ def kind_counts():
             cur.execute("SELECT count(*) AS n FROM materials "
                         "WHERE status='approved' AND created_at > now() - interval '24 hours'")
             recent = cur.fetchone()["n"]
+            cur.execute("SELECT coalesce(language,'?') AS lang, count(*) AS n FROM materials "
+                        "WHERE status='approved' GROUP BY 1 ORDER BY 2 DESC")
+            languages = {r["lang"]: r["n"] for r in cur.fetchall()}
         counts["pmc"] = total - sum(counts.values())
-        c["v"] = {"total": total, "counts": counts, "recent": recent, "recent_window": "24h"}
+        c["v"] = {"total": total, "counts": counts, "recent": recent, "recent_window": "24h",
+                  "languages": languages}
         c["t"] = now
         return c["v"]
     except Exception:

@@ -37,7 +37,8 @@ def public_kinds():
 def public_library(q: Optional[str] = None, author: Optional[str] = None,
                    journal: Optional[str] = None, license: Optional[str] = None,
                    source_type: Optional[str] = None, year_from: Optional[str] = None,
-                   year_to: Optional[str] = None, kind: Optional[str] = None, sort: str = "new",
+                   year_to: Optional[str] = None, kind: Optional[str] = None,
+                   alang: Optional[str] = None, sort: str = "new",
                    page: int = 1, limit: int = 24):
     limit = max(1, min(limit, 100))
     page = max(1, page)
@@ -72,8 +73,10 @@ def public_library(q: Optional[str] = None, author: Optional[str] = None,
         where.append("(m.metadata->>'pub_year') <= %(yt)s"); params["yt"] = str(year_to)
     if kind in _KIND_KNOWN:
         _kind_filter(kind, where, params)
+    if alang:
+        where.append("m.language=%(alang)s"); params["alang"] = alang
     kind_only = (kind in _KIND_KNOWN and not (q or author or journal or license
-                 or source_type or year_from or year_to))
+                 or source_type or year_from or year_to or alang))
     cached_total = kind_counts()["counts"].get(kind, 0) if kind_only else None
 
     relevance = (sort == "relevance" and bool(q))

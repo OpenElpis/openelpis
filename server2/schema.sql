@@ -108,6 +108,9 @@ CREATE INDEX IF NOT EXISTS materials_metadata_idx   ON materials USING gin (meta
 -- these with CREATE INDEX CONCURRENTLY (see seeding.md); IF NOT EXISTS here for fresh setup.
 CREATE INDEX IF NOT EXISTS materials_lib_browse ON materials (created_at DESC, id DESC) WHERE status='approved';
 CREATE INDEX IF NOT EXISTS materials_lib_year   ON materials ((metadata->>'pub_year')) WHERE status='approved';
+-- article language (en/tr/…) — powers the Library language filter + the per-language counts.
+-- Existing corpus is all 'en'; OpenAlex now stores each work's real language.
+CREATE INDEX IF NOT EXISTS materials_lib_language ON materials (language) WHERE status='approved';
 -- keyset sort by PUBLISHED date (newest/oldest), with a pub_year fallback (see library.py _PUBDATE)
 CREATE INDEX IF NOT EXISTS materials_lib_pubdate ON materials (
   (coalesce(metadata->>'first_pub_date', nullif(metadata->>'pub_year','')||'-01-01', '0001-01-01')), id

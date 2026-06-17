@@ -97,7 +97,7 @@ def _meta(cur, ids):
     if not ids:
         return {}
     cur.execute(
-        "SELECT id,title,description,metadata->>'author_string' AS authors,"
+        "SELECT id,title,description,language,metadata->>'author_string' AS authors,"
         "metadata->'journal'->>'title' AS journal,metadata->>'pub_year' AS year,"
         "metadata->>'doi' AS doi,metadata->>'url' AS url,"
         "coalesce(metadata->>'kind', case when metadata->>'source'='europepmc' then 'pmc' else 'article' end) AS kind "
@@ -163,6 +163,9 @@ def _sources_block(rows):
             psg = psg[:1100] + "…"
         meta = " ".join(x for x in [r["authors"], r["journal"], r["year"]] if x)
         tag = _KIND_TAG.get(r.get("kind"), "")
+        lg = r.get("language")
+        if lg and lg != "en":
+            tag += f" [in {LANG_NAMES.get(lg, lg)}]"      # tell the model this source isn't English
         out.append(f"[{i}]{tag} {r['title']}. {meta}\nExcerpt: {psg or '(no excerpt available)'}")
     return "\n\n".join(out)
 
@@ -244,7 +247,7 @@ def ask(body: AskIn, user=Depends(current_user)):
             tmap = {}
     sources = [{"n": i, "id": str(r["id"]), "title": tmap.get(str(r["id"])) or r["title"],
                 "authors": r["authors"], "journal": r["journal"], "year": r["year"],
-                "doi": r["doi"], "url": r["url"], "kind": r.get("kind")}
+                "doi": r["doi"], "url": r["url"], "kind": r.get("kind"), "language": r.get("language")}
                for i, r in enumerate(rows, 1)]
     # Persist to chat history (best-effort — a history hiccup must not lose the answer).
     cid = body.conversation_id

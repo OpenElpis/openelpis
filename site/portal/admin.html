@@ -45,6 +45,7 @@
   .sysbar span.warn{background:var(--amber)} .sysbar span.crit{background:var(--rose-dark)}
   .sysv{color:var(--muted);white-space:nowrap}
   .sysv b{color:var(--ink-soft);font-weight:700}.sysv .syst{opacity:.7}
+  .idxnote{margin-top:9px;font-size:12.5px;color:var(--muted);line-height:1.5}
   .filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
   input,select{border:1px solid var(--line);border-radius:9px;padding:8px 11px;font:inherit;font-size:13.5px;color:var(--ink);background:#fbfdfc}
   input:focus,select:focus{outline:none;border-color:var(--teal)}
@@ -125,7 +126,7 @@
     <button data-tab="audit" onclick="go('audit')">Audit</button>
   </div>
 
-  <section class="panel card" data-panel="overview"><h2>Overview</h2><div id="ov" class="stats"><div class="empty">Loading…</div></div><div id="sysinfo" class="sysinfo"></div></section>
+  <section class="panel card" data-panel="overview"><h2>Overview</h2><div id="ov" class="stats"><div class="empty">Loading…</div></div><div id="idxinfo" class="sysinfo"></div><div id="sysinfo" class="sysinfo"></div></section>
 
   <section class="panel card hide" data-panel="members">
     <h2>Members</h2>
@@ -260,7 +261,22 @@ async function loadOverview(){
     $('#ov').innerHTML=cards.map(c=>'<div class="stat"><div class="n">'+fmt(c[1])+'</div><div class="l">'+c[0]+'</div></div>').join('');
     setBadge('#b_req',s.requests_pending); setBadge('#b_mat',s.materials_pending);
   }catch(e){ if(e.message!=='auth'&&e.message!=='forbidden') $('#ov').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+  loadIndex();
   loadSystem();
+}
+async function loadIndex(){    // copilot retrieval-index coverage (chunked + embedded share of the corpus)
+  try{
+    const s=await get('/api/admin/index-status');
+    const fmt=n=>Number(n||0).toLocaleString('en');
+    const note = s.complete
+      ? '✅ Fully indexed — the copilot searches the entire approved corpus.'
+      : '⏳ '+fmt(s.pending)+' pending — new material; the indexer (runs every 15 min) is catching up.';
+    $('#idxinfo').innerHTML='<div class="sysh">Copilot search index</div>'+
+      '<div class="sysrow"><div class="sysl">Indexed</div>'+
+        '<div class="sysbar"><span style="width:'+s.pct+'%"></span></div>'+
+        '<div class="sysv"><b>'+fmt(s.indexed)+'</b> of '+fmt(s.total)+' articles <span class="syst">('+s.pct+'%)</span></div></div>'+
+      '<div class="idxnote">'+note+' &nbsp;·&nbsp; ~'+fmt(s.chunks)+' body chunks (full-text keyword + semantic vectors).</div>';
+  }catch(e){ /* non-fatal */ }
 }
 function fmtB(b){ if(b==null) return '—'; return b>=1e9 ? (b/1e9).toFixed(1)+' GB' : (b/1e6).toFixed(0)+' MB'; }
 async function loadSystem(){

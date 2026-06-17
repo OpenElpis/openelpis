@@ -29,6 +29,7 @@ server2/app/openelpis-tunnel.service
 
 # Internal strategy / outreach — keep private
 proposal/
+linkedin-banner.png
 
 # Personal founder & name-SEO pages — generated for the live site, not relevant to the
 # open-source repo (GitHub visitors don't need them).

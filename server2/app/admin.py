@@ -5,7 +5,7 @@ management, access-request review (approve -> issues an invite), invite
 management, materials (the trust gate, filterable by uploader), forum moderation,
 and the audit log.
 """
-import secrets, hashlib, shutil, datetime as dt
+import secrets, hashlib, shutil, time, datetime as dt
 from typing import Optional
 
 from fastapi import APIRouter, Request, HTTPException, Depends
@@ -39,6 +39,37 @@ def system(user=Depends(require_admin)):
         "mem":  {"total": mem.get("MemTotal"), "available": mem.get("MemAvailable")},
         "swap": {"total": mem.get("SwapTotal"), "free": mem.get("SwapFree")},
     }
+
+
+# ── copilot retrieval-index coverage ──────────────────────────────────────────────
+_IDX_CACHE = {"t": 0.0, "v": None}
+
+
+@router.get("/api/admin/index-status")
+def index_status(user=Depends(require_admin)):
+    """How much of the approved corpus is chunked + embedded into `material_chunks` — the
+    index the copilot actually searches (full-body keyword + front-of-article semantic vectors).
+    'indexed' = chunks_v=2 (chunked AND front-embedded); 'pending' = approved-but-not-yet, fast
+    via the `materials_chunks_pending` partial index. New imports push pending up until the
+    `openelpis-embed.timer` (every 15 min) catches up. Cached ~30s."""
+    now = time.time()
+    c = _IDX_CACHE
+    if c["v"] and now - c["t"] < 30:
+        return c["v"]
+    with db() as cur:
+        cur.execute("""SELECT
+          (SELECT count(*) FROM materials WHERE status='approved')                         AS total,
+          (SELECT count(*) FROM materials WHERE status='approved'
+             AND (metadata->>'chunks_v') IS DISTINCT FROM '2')                              AS pending,
+          (SELECT reltuples::bigint FROM pg_class WHERE relname='material_chunks')          AS chunks""")
+        r = cur.fetchone()
+    total, pending = r["total"], r["pending"]
+    indexed = max(0, total - pending)
+    pct = round(indexed / total * 100, 1) if total else 100.0
+    c["v"] = {"total": total, "indexed": indexed, "pending": pending, "pct": pct,
+              "chunks": max(0, r["chunks"] or 0), "complete": pending == 0}
+    c["t"] = now
+    return c["v"]
 
 
 @router.get("/api/admin/overview")
